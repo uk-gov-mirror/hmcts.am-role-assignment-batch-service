@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  am-role-assignment-batch-service:
+    build:
+      context: .
+    image: hmcts/am-role-assignment-batch-service
+    container_name: am-role-assignment-batch-service
+    ports:
+      - ${SERVER_PORT:-4098}:${SERVER_PORT:-4098}

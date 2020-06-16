@@ -1,0 +1,65 @@
+#!groovy
+properties(
+  [
+    [
+      $class       : 'GithubProjectProperty',
+      projectUrlStr: 'https://github.com/hmcts/am-role-assignment-batch-service'
+    ],
+    pipelineTriggers([[$class: 'GitHubPushTrigger']])
+  ]
+)
+
+@Library("Infrastructure")
+
+def type = "java"
+def product = "am"
+def component = "role-assignment-batch-service"
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [$class     : 'AzureKeyVaultSecret',
+   secretType : 'Secret',
+   name       : secretName,
+   version    : '',
+   envVariable: envVar
+  ]
+}
+
+def vaultOverrides = [
+    'preview' : 'aat',
+    'spreview': 'saat'
+]
+
+def secrets = [
+
+]
+
+withPipeline(type, product, component) {
+  onMaster {
+    enableSlackNotifications('#am-role-assignment-batch-service-builds')
+  }
+  onPR {
+    enableSlackNotifications('#am-role-assignment-batch-service-builds')
+  }
+
+  overrideVaultEnvironments(vaultOverrides)
+  //loadVaultSecrets(secrets)
+  enableAksStagingDeployment()
+  disableLegacyDeploymentOnAAT()
+  disableLegacyDeployment()
+
+  after('functionalTest:preview') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
+  }
+
+  after('functionalTest:aat') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
+  }
+
+  after('smoketest:preview') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/site/serenity/**'
+  }
+
+  after('smoketest:aat') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/site/serenity/**'
+  }
+}
