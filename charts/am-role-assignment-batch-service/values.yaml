@@ -3,3 +3,7 @@ java:
   ingressHost: am-role-assignment-batch-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   applicationPort: 4098
   aadIdentityName: am
+  kind: CronJob
+  schedule: "*/10 * * * *"
+  global:
+    jobKind: CronJob
