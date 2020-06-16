@@ -1,0 +1,287 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.2.9")
+    }
+}
+
+plugins {
+    id 'application'
+    id 'checkstyle'
+    id 'pmd'
+    id 'jacoco'
+    id 'org.springframework.boot' version '2.3.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id 'org.owasp.dependencycheck' version '5.3.2.1'
+    id 'com.github.ben-manes.versions' version '0.28.0'
+    id 'org.sonarqube' version '2.8'
+}
+
+apply plugin: 'java'
+apply plugin: 'net.serenity-bdd.aggregator'
+apply plugin: 'project-report'
+apply plugin: 'idea'
+apply plugin: 'io.spring.dependency-management'
+
+def versions = [
+        junit              : '5.5.0',
+        lombok             : '1.18.6',
+        reformHealthStarter: '0.0.5',
+        reformLogging      : '5.1.1',
+        reformS2sClient    : '3.0.0',
+        serenity           : '2.1.0',
+        springBoot         : '2.1.4.RELEASE',
+        springHystrix      : '2.1.1.RELEASE',
+        rest_assured       : '3.3.0',
+        feign_jackson      : '9.7.0'
+]
+
+mainClassName = 'uk.gov.hmcts.reform.roleassignmentbatch.RoleAssignmentBatchApplication'
+def jarName = 'am-role-assignment-batch-service.jar'
+
+pmd {
+    toolVersion = '6.21.0'
+    sourceSets = []
+}
+
+group = 'uk.gov.hmcts.reform.roleassignmentbatch'
+version = '0.0.1'
+
+allprojects {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.0
+            }
+        }
+    }
+}
+
+configurations {
+    functionalTestCompile.extendsFrom testCompile
+    functionalTestRuntime.extendsFrom testRuntime
+}
+
+sourceSets {
+    functionalTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/functionalTest/java')
+        }
+        resources.srcDir file('src/functionalTest/resources')
+    }
+
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integrationTest/java')
+        }
+        resources.srcDir file('src/integrationTest/resources')
+    }
+
+    smokeTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/smokeTest/java')
+        }
+        resources.srcDir file('src/smokeTest/resources')
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:unchecked" << "-Werror"
+}
+
+/*task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+    doFirst {
+        generateCucumberReports.enabled = true
+        javaexec {
+            main = "uk.gov.hmcts.reform.roleassignmentbatch.befta.fda"
+            classpath += configurations.cucumberRuntime + sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
+                    'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features/']
+        }
+    }
+}*/
+
+task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+    finalizedBy aggregate
+}
+
+task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    serenity.outputDirectory = file("${projectDir}/integrationTest/site/reports")
+    finalizedBy aggregate
+}
+
+task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
+    testClassesDirs = sourceSets.smokeTest.output.classesDirs
+    classpath = sourceSets.smokeTest.runtimeClasspath
+    finalizedBy aggregate
+}
+
+checkstyle {
+    maxWarnings = 0
+    toolVersion = '8.18'
+    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
+    configDir = new File(rootDir, 'config/checkstyle')
+
+    checkstyleMain.shouldRunAfter(compileJava)
+    test.shouldRunAfter(checkstyleTest)
+}
+
+jacocoTestReport {
+    executionData(test)
+    reports {
+        xml.enabled = true
+        csv.enabled = false
+        xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+    }
+}
+
+project.tasks['sonarqube'].dependsOn jacocoTestReport
+
+jacoco {
+    toolVersion = "0.8.2"
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectName", "tempered:am-role-assignment-batch-service"
+        property "sonar.projectKey", "tempered:am-role-assignment-batch-service"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.pitest.mode", "reuseReport"
+        property "sonar.pitest.reportsDirectory", "build/reports/pitest"
+        property "sonar.exclusions", "src/main/java/**"
+       }
+}
+
+/*project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+project.tasks['sonarqube'].group = "Verification"*/
+
+dependencyUpdates.resolutionStrategy {
+    componentSelection { rules ->
+        rules.all {
+            def isNonStable = { String version ->
+                ['alpha', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'ea'].any { qualifier ->
+                    version ==~ /(?i).*[.-]\$qualifier[.\\d-+]*/
+                }
+            }
+            if (isNonStable(candidate.version) && !isNonStable(currentVersion)) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
+}
+
+//https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
+dependencyCheck {
+    // Specifies if the build should be failed if a CVSS score above a specified level is identified.
+    // range of 0-10 fails the build, anything greater and it doesn't fail the build
+    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
+    suppressionFiles = ['config/owasp/suppressions.xml']
+}
+
+dependencyUpdates.resolutionStrategy = {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+    maven {
+        url "https://dl.bintray.com/hmcts/hmcts-maven"
+    }
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
+}
+
+
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.3.RELEASE'
+    compile('org.springframework.boot:spring-boot-starter-hateoas')
+
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.3.RELEASE'
+    compile(group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4') {
+        // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
+        exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
+
+    }
+    compile group: 'javax.inject', name: 'javax.inject', version: '1'
+
+    compile group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
+    compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
+
+    testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot) {
+        exclude group: 'junit', module: 'junit'
+    }
+
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: versions.rest_assured
+    testCompile group: 'io.github.openfeign', name: 'feign-jackson', version: versions.feign_jackson
+
+    smokeTestCompile group: 'io.rest-assured', name: 'rest-assured', version: versions.rest_assured
+
+    functionalTestCompile sourceSets.main.runtimeClasspath
+    functionalTestCompile sourceSets.test.runtimeClasspath
+
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    smokeTestCompile sourceSets.main.runtimeClasspath
+    smokeTestCompile sourceSets.test.runtimeClasspath
+    smokeTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    smokeTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+}
+
+
+test {
+    useJUnitPlatform()
+    failFast = true
+}
+
+
+bootJar {
+    archiveName = jarName
+
+    manifest {
+        attributes('Implementation-Version': project.version.toString())
+    }
+}
