@@ -64,8 +64,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public Job runRoutesJob() {
         return jobs.get(jobName)
                    .incrementer(new RunIdIncrementer())
-                   .start(stepLeafRoute())
-                   .next(stepOrchestration())
+                   .start(stepOrchestration())
+                   .next(stepLeafRoute())
                    .build();
     }
 }
