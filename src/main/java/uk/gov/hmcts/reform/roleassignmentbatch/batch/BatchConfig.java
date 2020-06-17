@@ -22,7 +22,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Override
     public void setDataSource(DataSource dataSource) {
-        // initialize a Map based JobRepository by default
+        // initialize a Map based Job Repository by default
     }
 
     @Autowired
@@ -64,8 +64,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public Job runRoutesJob() {
         return jobs.get(jobName)
                    .incrementer(new RunIdIncrementer())
-                   .start(stepLeafRoute())
-                   .next(stepOrchestration())
+                   .start(stepOrchestration())
+                   .next(stepLeafRoute())
                    .build();
     }
 }
