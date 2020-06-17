@@ -48,7 +48,7 @@ spring:
     properties:
       charSet: UTFh-8
   batch:
-    initialize-schema: always
+    initialize-schema: never
 
 leaf-route-task: leaftask
 parent-route-task: parenttask
