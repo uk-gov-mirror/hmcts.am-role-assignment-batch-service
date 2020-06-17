@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ParentRouteTask implements Tasklet {
+public class FetchExpiredRecords implements Tasklet {
 
 
     @Override
