@@ -50,6 +50,6 @@ spring:
   batch:
     initialize-schema: never
 
-leaf-route-task: leaftask
-parent-route-task: parenttask
+get-expired-records: getExpiredRecords
+delete-expired-records: deleteExpiredRecords
 batchjob-name: deleteExpiredRecords
