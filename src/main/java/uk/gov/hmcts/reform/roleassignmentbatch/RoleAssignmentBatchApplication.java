@@ -3,10 +3,9 @@ package uk.gov.hmcts.reform.roleassignmentbatch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication
 @Slf4j
 @SuppressWarnings("HideUtilityClassConstructor")
 public class RoleAssignmentBatchApplication {
