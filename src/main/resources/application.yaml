@@ -47,8 +47,8 @@ spring:
     password: ${ROLE_ASSIGNMENT_DB_PASSWORD:am}
     properties:
       charSet: UTFh-8
-#  batch:
-#    initialize-schema: always
+  batch:
+    initialize-schema: always
 
 leaf-route-task: leaftask
 parent-route-task: parenttask
