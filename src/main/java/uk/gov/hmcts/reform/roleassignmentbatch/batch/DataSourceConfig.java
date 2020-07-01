@@ -13,6 +13,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.jdbc.core.ResultSetExtractor;
+
+import java.util.List;
 
 @Configuration
 @EnableTransactionManagement
@@ -88,6 +91,7 @@ public class DataSourceConfig {
         jdbcTemplate.setDataSource(springJdbcDataSource());
         return jdbcTemplate;
     }
+
 
     @Bean(name = "springJdbcTransactionManager")
     public PlatformTransactionManager springJdbcTransactionManager() {
