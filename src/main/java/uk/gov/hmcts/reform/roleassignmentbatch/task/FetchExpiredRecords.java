@@ -16,6 +16,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 
 
 @Component
@@ -26,29 +31,49 @@ public class FetchExpiredRecords implements Tasklet {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+
+
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         log.info("::ParentRouteTask starts::");
         log.info("Select Records - START");
-        List<RoleAssignmentHistory> rah= this.getLiveRecords();
-        for(RoleAssignmentHistory ra: rah){
-            //Change the Required Variables
-            log.info(ra.toString());
-            ra.setStatus("DELETED");
-            int statusSequence= ra.getStatusSequence();
-            ra.setStatusSequence(statusSequence+1);
-            ra.setLog("Record Deleted");
-            ra.setCreated(new Timestamp(System.currentTimeMillis()));
+        TransactionDefinition txDef = new DefaultTransactionDefinition();
+        TransactionStatus txStatus = transactionManager.getTransaction(txDef);
+        try {
+            List<RoleAssignmentHistory> rah= this.getLiveRecords();
+            for(RoleAssignmentHistory ra: rah){
+                //Change the Required Variables
+                log.info(ra.toString());
+                ra.setStatus("DELETED");
+                int statusSequence= ra.getStatusSequence();
+                ra.setStatusSequence(statusSequence+1);
+                ra.setLog("Record Deleted");
+                ra.setCreated(new Timestamp(System.currentTimeMillis()));
+            }
+            int[] batchUpdateStatusArray= this.batchUpdateUsingJdbcTemplate(rah);
+            this.deleteUsingJdbcTemplate(rah);
+            transactionManager.commit(txStatus);
+        } catch (SQLException e) {
+            transactionManager.rollback(txStatus);
+            log.info("SQLException "+e.getMessage());
+        }catch (DataAccessException e) {
+            transactionManager.rollback(txStatus);
+            log.info("DataAccessException"+e.getMessage());
+        }catch (Exception e) {
+            transactionManager.rollback(txStatus);
+            log.info("Exception"+e.getMessage());
         }
-        int[] batchUpdateStatusArray= this.batchUpdateUsingJdbcTemplate(rah);
-        this.deleteUsingJdbcTemplate(rah);
+
         log.info("Select Records - END");
         log.info("::ParentRouteTask completes with {}::", "status");
         return RepeatStatus.FINISHED;
     }
 
 
-    public int[] deleteUsingJdbcTemplate(List<RoleAssignmentHistory> rah) {
+    public int[] deleteUsingJdbcTemplate(List<RoleAssignmentHistory> rah) throws SQLException, DataAccessException{
         String deleteSql = "DELETE FROM role_assignment WHERE id = ?";
         int[] rows= new int[rah.size()];
         for(RoleAssignmentHistory ra: rah){
@@ -60,7 +85,7 @@ public class FetchExpiredRecords implements Tasklet {
         return rows;
     }
 
-    public int[] batchUpdateUsingJdbcTemplate(List<RoleAssignmentHistory> rah) {
+    public int[] batchUpdateUsingJdbcTemplate(List<RoleAssignmentHistory> rah) throws SQLException,DataAccessException {
         return jdbcTemplate.batchUpdate("INSERT INTO role_assignment_history VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)",
                 new BatchPreparedStatementSetter() {
                     @Override
@@ -94,8 +119,8 @@ public class FetchExpiredRecords implements Tasklet {
     }
 
 
-    public List<RoleAssignmentHistory> getLiveRecords() {
-        String SQL = "select * from role_assignment_history rah  WHERE id in (SELECT id FROM role_assignment WHERE end_time >= now()) and status='LIVE'";
+    public List<RoleAssignmentHistory> getLiveRecords() throws SQLException,DataAccessException{
+        String SQL = "select * from role_assignment_history rah  WHERE id in (SELECT id FROM role_assignment WHERE end_time <= now()) and status='LIVE'";
         List <RoleAssignmentHistory> rah = jdbcTemplate.query(SQL, new ResultSetExtractor<List<RoleAssignmentHistory>>(){
 
                     public List<RoleAssignmentHistory> extractData(
