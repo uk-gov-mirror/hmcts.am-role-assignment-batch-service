@@ -53,8 +53,8 @@ public class FetchExpiredRecords implements Tasklet {
                 ra.setLog("Record Deleted");
                 ra.setCreated(new Timestamp(System.currentTimeMillis()));
             }
-            int[] batchUpdateStatusArray= this.batchUpdateUsingJdbcTemplate(rah);
-            this.deleteUsingJdbcTemplate(rah);
+            this.deleteRoleAssignmentRecords(rah);
+            int[] batchUpdateStatusArray= this.batchUpdateRoleAssignmentHistory(rah);
             transactionManager.commit(txStatus);
         } catch (SQLException e) {
             transactionManager.rollback(txStatus);
@@ -73,7 +73,7 @@ public class FetchExpiredRecords implements Tasklet {
     }
 
 
-    public int[] deleteUsingJdbcTemplate(List<RoleAssignmentHistory> rah) throws SQLException, DataAccessException{
+    public int[] deleteRoleAssignmentRecords(List<RoleAssignmentHistory> rah) throws SQLException, DataAccessException{
         String deleteSql = "DELETE FROM role_assignment WHERE id = ?";
         int[] rows= new int[rah.size()];
         for(RoleAssignmentHistory ra: rah){
@@ -85,8 +85,8 @@ public class FetchExpiredRecords implements Tasklet {
         return rows;
     }
 
-    public int[] batchUpdateUsingJdbcTemplate(List<RoleAssignmentHistory> rah) throws SQLException,DataAccessException {
-        return jdbcTemplate.batchUpdate("INSERT INTO role_assignment_history VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)",
+    public int[] batchUpdateRoleAssignmentHistory(List<RoleAssignmentHistory> rah) throws SQLException,DataAccessException {
+        return jdbcTemplate.batchUpdate("INSERT INTO role_assignment_histor VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)",
                 new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
