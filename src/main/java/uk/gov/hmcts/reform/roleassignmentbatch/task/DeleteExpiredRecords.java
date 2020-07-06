@@ -1,5 +1,13 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -16,10 +24,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class DeleteExpiredRecords implements Tasklet {
@@ -39,44 +43,45 @@ public class DeleteExpiredRecords implements Tasklet {
         TransactionDefinition txDef = new DefaultTransactionDefinition();
         TransactionStatus txStatus = transactionManager.getTransaction(txDef);
         try {
-            List<RoleAssignmentHistory> rah= this.getLiveRecords();
-            log.info("RETRIEVED LIVE RECORDS WHOSE END TIME > CURRENT TIME. NO OF RECORDS RETRIEVED :"+rah.size());
-            for(RoleAssignmentHistory ra: rah){
+            List<RoleAssignmentHistory> rah = this.getLiveRecords();
+            log.info("RETRIEVED LIVE RECORDS WHOSE END TIME > CURRENT TIME. NO OF RECORDS RETRIEVED :" + rah.size());
+            for (RoleAssignmentHistory ra : rah) {
                 //Change the Required Variables
                 log.info(ra.toString());
                 ra.setStatus("DELETED");
-                int statusSequence= ra.getStatusSequence();
-                ra.setStatusSequence(statusSequence+1);
+                int statusSequence = ra.getStatusSequence();
+                ra.setStatusSequence(statusSequence + 1);
                 ra.setLog("Record Deleted");
                 ra.setCreated(new Timestamp(System.currentTimeMillis()));
             }
             this.deleteRoleAssignmentRecords(rah);
             log.info("DELETED ROLE ASSIGNMENT RECORDS IN LIVE TABLE");
-            log.info("TRANSACTION IN PROGRESS. IS COMPLETED :"+txStatus.isCompleted());
-            int[] batchUpdateStatusArray= this.batchUpdateRoleAssignmentHistory(rah);
+            log.info("TRANSACTION IN PROGRESS. IS COMPLETED :" + txStatus.isCompleted());
+            int[] batchUpdateStatusArray = this.batchUpdateRoleAssignmentHistory(rah);
             log.info("UPDATED ROLE ASSIGNMENT HISTORY TABLE");
-            log.info("TRANSACTION IN PROGRESS. IS COMPLETED :"+txStatus.isCompleted());
+            log.info("TRANSACTION IN PROGRESS. IS COMPLETED :" + txStatus.isCompleted());
             transactionManager.commit(txStatus);
-            log.info("TRANSACTION COMMITTED IS COMPLETED "+txStatus.isCompleted());
+            log.info("TRANSACTION COMMITTED IS COMPLETED " + txStatus.isCompleted());
         } catch (SQLException e) {
             transactionManager.rollback(txStatus);
-            log.info(" TRANSACTION ROLLBACK . IS COMPLETED :"+txStatus.isCompleted()+"SQLException "+e.getMessage());
-        }catch (DataAccessException e) {
+            log.info(" TRANSACTION ROLLBACK . IS COMPLETED :" + txStatus.isCompleted() + "SQLException " + e.getMessage());
+        } catch (DataAccessException e) {
             transactionManager.rollback(txStatus);
-            log.info("TRANSACTION ROLLBACK IS COMPLETED :"+txStatus.isCompleted()+" DataAccessException "+e.getMessage());
-        }catch (Exception e) {
+            log.info("TRANSACTION ROLLBACK IS COMPLETED :" + txStatus.isCompleted() + " DataAccessException " + e.getMessage());
+        } catch (Exception e) {
             transactionManager.rollback(txStatus);
-            log.info("TRANSACTION ROLLBACK IS COMPLETED :"+txStatus.isCompleted()+" Exception "+e.getMessage());
+            log.info("TRANSACTION ROLLBACK IS COMPLETED :" + txStatus.isCompleted() + " Exception " + e.getMessage());
         }
 
         log.info("DELETE EXPIRED RECORDS", "success");
         return RepeatStatus.FINISHED;
     }
-    public int[] deleteRoleAssignmentRecords(List<RoleAssignmentHistory> rah) throws SQLException, DataAccessException{
+
+    public int[] deleteRoleAssignmentRecords(List<RoleAssignmentHistory> rah) throws SQLException, DataAccessException {
         String deleteSql = "DELETE FROM role_assignment WHERE id = ?";
-        int[] rows= new int[rah.size()];
-        for(RoleAssignmentHistory ra: rah){
-            Object[] params = { ra.getId() };
+        int[] rows = new int[rah.size()];
+        for (RoleAssignmentHistory ra : rah) {
+            Object[] params = {ra.getId()};
             // define SQL types of the arguments
             int[] types = {Types.VARCHAR};
             rows[0] = jdbcTemplate.update(deleteSql, params, types);
@@ -84,7 +89,7 @@ public class DeleteExpiredRecords implements Tasklet {
         return rows;
     }
 
-    public int[] batchUpdateRoleAssignmentHistory(List<RoleAssignmentHistory> rah) throws SQLException,DataAccessException {
+    public int[] batchUpdateRoleAssignmentHistory(List<RoleAssignmentHistory> rah) throws SQLException, DataAccessException {
         return jdbcTemplate.batchUpdate("INSERT INTO role_assignment_history VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)",
                                         new BatchPreparedStatementSetter() {
                                             @Override
@@ -110,6 +115,7 @@ public class DeleteExpiredRecords implements Tasklet {
                                                 ps.setInt(19, rah.get(i).getStatusSequence());
                                                 ps.setTimestamp(20, rah.get(i).getCreated());
                                             }
+
                                             @Override
                                             public int getBatchSize() {
                                                 return rah.size();
@@ -118,15 +124,15 @@ public class DeleteExpiredRecords implements Tasklet {
     }
 
 
-    public List<RoleAssignmentHistory> getLiveRecords() throws SQLException,DataAccessException{
+    public List<RoleAssignmentHistory> getLiveRecords() throws SQLException, DataAccessException {
         String SQL = "select * from role_assignment_history rah  WHERE id in (SELECT id FROM role_assignment WHERE end_time <= now()) and status='LIVE'";
-        List <RoleAssignmentHistory> rah = jdbcTemplate.query(SQL, new ResultSetExtractor<List<RoleAssignmentHistory>>(){
+        List<RoleAssignmentHistory> rah = jdbcTemplate.query(SQL, new ResultSetExtractor<List<RoleAssignmentHistory>>() {
 
             public List<RoleAssignmentHistory> extractData(
                 ResultSet rs) throws SQLException, DataAccessException {
 
                 List<RoleAssignmentHistory> list = new ArrayList<RoleAssignmentHistory>();
-                while(rs.next()){
+                while (rs.next()) {
                     RoleAssignmentHistory roleAssignmentHistory = new RoleAssignmentHistory();
                     roleAssignmentHistory.setId(rs.getObject("id", java.util.UUID.class));
                     roleAssignmentHistory.setRequestId(rs.getObject("request_id", java.util.UUID.class));
