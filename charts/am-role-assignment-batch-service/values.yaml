@@ -1,4 +1,4 @@
-java:
+job:
   image: 'hmctspublic.azurecr.io/am/role-assignment-batch-service:latest'
   ingressHost: am-role-assignment-batch-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   applicationPort: 4098
@@ -7,3 +7,5 @@ java:
   schedule: "*/10 * * * *"
   global:
     jobKind: CronJob
+postgres:
+  enabled: false
