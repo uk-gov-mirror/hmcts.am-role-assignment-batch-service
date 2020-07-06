@@ -86,35 +86,35 @@ public class DeleteExpiredRecords implements Tasklet {
 
     public int[] batchUpdateRoleAssignmentHistory(List<RoleAssignmentHistory> rah) throws SQLException,DataAccessException {
         return jdbcTemplate.batchUpdate("INSERT INTO role_assignment_history VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)",
-                new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        ps.setObject(1, rah.get(i).getId());
-                        ps.setObject(2, rah.get(i).getRequestId());
-                        ps.setString(3, rah.get(i).getActorIDType());
-                        ps.setObject(4, rah.get(i).getActorId());
-                        ps.setString(5, rah.get(i).getRoleType());
-                        ps.setString(6, rah.get(i).getRoleName());
-                        ps.setString(7, rah.get(i).getClassification());
-                        ps.setString(8, rah.get(i).getGrantType());
-                        ps.setString(9, rah.get(i).getRoleCategory());
-                        ps.setBoolean(10, rah.get(i).isReadOnly());
-                        ps.setTimestamp(11, rah.get(i).getBeginTime());
-                        ps.setTimestamp(12, rah.get(i).getEndTime());
-                        ps.setString(13, rah.get(i).getStatus());
-                        ps.setString(14, rah.get(i).getReference());
-                        ps.setString(15, rah.get(i).getProcess());
-                        ps.setString(16, rah.get(i).getAttributes());
-                        ps.setString(17, rah.get(i).getNotes());
-                        ps.setString(18, rah.get(i).getLog());
-                        ps.setInt(19, rah.get(i).getStatusSequence());
-                        ps.setTimestamp(20, rah.get(i).getCreated());
-                    }
-                    @Override
-                    public int getBatchSize() {
-                        return rah.size();
-                    }
-                });
+                                        new BatchPreparedStatementSetter() {
+                                            @Override
+                                            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                                                ps.setObject(1, rah.get(i).getId());
+                                                ps.setObject(2, rah.get(i).getRequestId());
+                                                ps.setString(3, rah.get(i).getActorIDType());
+                                                ps.setObject(4, rah.get(i).getActorId());
+                                                ps.setString(5, rah.get(i).getRoleType());
+                                                ps.setString(6, rah.get(i).getRoleName());
+                                                ps.setString(7, rah.get(i).getClassification());
+                                                ps.setString(8, rah.get(i).getGrantType());
+                                                ps.setString(9, rah.get(i).getRoleCategory());
+                                                ps.setBoolean(10, rah.get(i).isReadOnly());
+                                                ps.setTimestamp(11, rah.get(i).getBeginTime());
+                                                ps.setTimestamp(12, rah.get(i).getEndTime());
+                                                ps.setString(13, rah.get(i).getStatus());
+                                                ps.setString(14, rah.get(i).getReference());
+                                                ps.setString(15, rah.get(i).getProcess());
+                                                ps.setString(16, rah.get(i).getAttributes());
+                                                ps.setString(17, rah.get(i).getNotes());
+                                                ps.setString(18, rah.get(i).getLog());
+                                                ps.setInt(19, rah.get(i).getStatusSequence());
+                                                ps.setTimestamp(20, rah.get(i).getCreated());
+                                            }
+                                            @Override
+                                            public int getBatchSize() {
+                                                return rah.size();
+                                            }
+                                        });
     }
 
 
@@ -123,7 +123,7 @@ public class DeleteExpiredRecords implements Tasklet {
         List <RoleAssignmentHistory> rah = jdbcTemplate.query(SQL, new ResultSetExtractor<List<RoleAssignmentHistory>>(){
 
             public List<RoleAssignmentHistory> extractData(
-                    ResultSet rs) throws SQLException, DataAccessException {
+                ResultSet rs) throws SQLException, DataAccessException {
 
                 List<RoleAssignmentHistory> list = new ArrayList<RoleAssignmentHistory>();
                 while(rs.next()){
