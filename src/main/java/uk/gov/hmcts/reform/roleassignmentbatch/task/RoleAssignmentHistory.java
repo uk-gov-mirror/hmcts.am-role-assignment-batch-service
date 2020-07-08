@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 public class RoleAssignmentHistory {
+
     private UUID id;
     private UUID requestId;
     private String actorIDType;
@@ -27,28 +28,28 @@ public class RoleAssignmentHistory {
 
     @Override
     public String toString() {
-        return "RoleAssignmentHistory{" +
-                "id=" + id +
-                ", requestId=" + requestId +
-                ", actorIDType='" + actorIDType + '\'' +
-                ", actorId=" + actorId +
-                ", roleType='" + roleType + '\'' +
-                ", roleName='" + roleName + '\'' +
-                ", classification='" + classification + '\'' +
-                ", grantType='" + grantType + '\'' +
-                ", roleCategory='" + roleCategory + '\'' +
-                ", readOnly=" + readOnly +
-                ", beginTime=" + beginTime +
-                ", endTime=" + endTime +
-                ", status='" + status + '\'' +
-                ", reference='" + reference + '\'' +
-                ", process='" + process + '\'' +
-                ", attributes='" + attributes + '\'' +
-                ", notes='" + notes + '\'' +
-                ", log='" + log + '\'' +
-                ", statusSequence=" + statusSequence +
-                ", created=" + created +
-                '}';
+        return "RoleAssignmentHistory{"
+                + "id=" + id
+                + ", requestId=" + requestId
+                + ", actorIDType='" + actorIDType + '\''
+                + ", actorId=" + actorId
+                + ", roleType='" + roleType + '\''
+                + ", roleName='" + roleName + '\''
+                + ", classification='" + classification + '\''
+                + ", grantType='" + grantType + '\''
+                + ", roleCategory='" + roleCategory + '\''
+                + ", readOnly=" + readOnly
+                + ", beginTime=" + beginTime
+                + ", endTime=" + endTime
+                + ", status='" + status + '\''
+                + ", reference='" + reference + '\''
+                + ", process='" + process + '\''
+                + ", attributes='" + attributes + '\''
+                + ", notes='" + notes + '\''
+                + ", log='" + log + '\''
+                + ", statusSequence=" + statusSequence
+                + ", created=" + created
+                + '}';
     }
 
     public UUID getId() {

@@ -1,3 +1,4 @@
+
 package uk.gov.hmcts.reform.roleassignmentbatch.batch;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -8,14 +9,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.jdbc.core.ResultSetExtractor;
-
-import java.util.List;
 
 @Configuration
 @EnableTransactionManagement
@@ -42,20 +36,6 @@ public class DataSourceConfig {
     @Value("${spring.datasource.maximum-pool-size}")
     int maxPoolSize;
 
-    @Bean
-    public DataSource dataSource() {
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName("org.postgresql.Driver");
-        dataSourceBuilder.url(url);
-        dataSourceBuilder.username(userName);
-        dataSourceBuilder.password(password);
-        HikariDataSource dataSource = (HikariDataSource) dataSourceBuilder.build();
-        dataSource.setMinimumIdle(idleConnections);
-        dataSource.setIdleTimeout(idleTimeOut);
-        //dataSource.setMaxLifetime(maxLife);
-        dataSource.setMaximumPoolSize(maxPoolSize);
-        return dataSource;
-    }
 
     @Bean("springJdbcDataSource")
     public DataSource springJdbcDataSource() {
@@ -72,18 +52,6 @@ public class DataSourceConfig {
         return dataSourceBuilder.build();
     }
 
-    @Bean(name = "txManager")
-    public PlatformTransactionManager txManager() {
-        PlatformTransactionManager platformTransactionManager = new DataSourceTransactionManager(dataSource());
-        return platformTransactionManager;
-    }
-
-    @Bean
-    public DefaultTransactionDefinition defaultTransactionDefinition() {
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setPropagationBehavior(Propagation.REQUIRED.ordinal());
-        return def;
-    }
 
     @Bean("springJdbcTemplate")
     JdbcTemplate springJdbcTemplate() {
@@ -93,9 +61,4 @@ public class DataSourceConfig {
     }
 
 
-    @Bean(name = "springJdbcTransactionManager")
-    public PlatformTransactionManager springJdbcTransactionManager() {
-        DataSourceTransactionManager platformTransactionManager = new DataSourceTransactionManager(springJdbcDataSource());
-        return platformTransactionManager;
-    }
 }
