@@ -14,10 +14,13 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.*;
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Timestamp;
+import java.sql.Types;
 
 @Component
 public class DeleteExpiredRecords implements Tasklet {
@@ -51,8 +54,6 @@ public class DeleteExpiredRecords implements Tasklet {
             log.info("DELETED ROLE ASSIGNMENT RECORDS IN LIVE TABLE");
             int[] batchUpdateStatusArray = this.batchUpdateRoleAssignmentHistory(rah);
             log.info("UPDATED ROLE ASSIGNMENT HISTORY TABLE");
-        } catch (SQLException e) {
-            log.info("SQLException " + e.getMessage());
         } catch (DataAccessException e) {
             log.info(" DataAccessException " + e.getMessage());
         } catch (Exception e) {
@@ -63,7 +64,7 @@ public class DeleteExpiredRecords implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    public int[] deleteRoleAssignmentRecords(List<RoleAssignmentHistory> rah) throws SQLException, DataAccessException {
+    public int[] deleteRoleAssignmentRecords(List<RoleAssignmentHistory> rah) throws DataAccessException {
         String deleteSql = "DELETE FROM role_assignment WHERE id = ?";
         int[] rows = new int[rah.size()];
         for (RoleAssignmentHistory ra : rah) {
@@ -75,8 +76,8 @@ public class DeleteExpiredRecords implements Tasklet {
         return rows;
     }
 
-    public int[] batchUpdateRoleAssignmentHistory(List<RoleAssignmentHistory> rah) throws SQLException,DataAccessException {
-        return jdbcTemplate.batchUpdate("INSERT INTO role_assignment_history VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)",
+    public int[] batchUpdateRoleAssignmentHistory(List<RoleAssignmentHistory> rah) throws DataAccessException {
+        return jdbcTemplate.batchUpdate("INSERT INTO role_assignment_history VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -110,9 +111,9 @@ public class DeleteExpiredRecords implements Tasklet {
     }
 
 
-    public List<RoleAssignmentHistory> getLiveRecords() throws SQLException,DataAccessException {
-        String retrievSQL = "select * from role_assignment_history rah  WHERE id in (SELECT id FROM role_assignment WHERE end_time <= now()) and status='LIVE'";
-        List<RoleAssignmentHistory> rah = jdbcTemplate.query(retrievSQL, new ResultSetExtractor<List<RoleAssignmentHistory>>() {
+    public List<RoleAssignmentHistory> getLiveRecords() throws DataAccessException {
+        String getSQL = "select * from role_assignment_history rah  WHERE id in (SELECT id FROM role_assignment WHERE end_time <= now()) and status='LIVE'";
+        List<RoleAssignmentHistory> rah = jdbcTemplate.query(getSQL, new ResultSetExtractor<List<RoleAssignmentHistory>>() {
 
             public List<RoleAssignmentHistory> extractData(
                     ResultSet rs) throws SQLException, DataAccessException {
