@@ -9,8 +9,7 @@ import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @SuppressWarnings("HideUtilityClassConstructor")
-public class
-RoleAssignmentBatchApplication {
+public class RoleAssignmentBatchApplication {
 
     private static final Logger log = LoggerFactory.getLogger(RoleAssignmentBatchApplication.class);
 
