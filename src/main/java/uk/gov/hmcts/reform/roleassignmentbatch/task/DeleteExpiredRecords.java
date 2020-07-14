@@ -58,7 +58,7 @@ public class DeleteExpiredRecords implements Tasklet {
         } catch (DataAccessException e) {
             log.info(" DataAccessException " + e.getMessage());
         } catch (Exception e) {
-            log.info(" Exception " + e.getMessage());
+            log.info(" Exception :" + e.getMessage());
         }
 
         log.info("DELETE EXPIRED RECORDS", "success");
