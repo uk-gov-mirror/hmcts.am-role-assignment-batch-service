@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.FetchExpiredRecords;
 
 @Configuration
 @EnableBatchProcessing
@@ -31,8 +30,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Autowired
     private StepBuilderFactory steps;
 
-    @Autowired
-    FetchExpiredRecords fetchExpiredRecords;
 
     @Autowired
     DeleteExpiredRecords deleteExpiredRecords;
@@ -46,17 +43,11 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Value("${batchjob-name}")
     String jobName;
 
-    @Bean
-    public Step stepLeafRoute() {
-        return steps.get(taskLeaf)
-                    .tasklet(deleteExpiredRecords)
-                    .build();
-    }
 
     @Bean
     public Step stepOrchestration() {
         return steps.get(taskParent)
-                    .tasklet(fetchExpiredRecords)
+                    .tasklet(deleteExpiredRecords)
                     .build();
     }
 
@@ -65,7 +56,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return jobs.get(jobName)
                    .incrementer(new RunIdIncrementer())
                    .start(stepOrchestration())
-                   .next(stepLeafRoute())
                    .build();
     }
 }
