@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.batch;
 
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
@@ -19,30 +17,20 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 @EnableBatchProcessing
 public class BatchConfig extends DefaultBatchConfigurer {
 
-    @Override
-    public void setDataSource(DataSource dataSource) {
-        // initialize a Map based Job Repository by default
-    }
-
     @Autowired
     private JobBuilderFactory jobs;
 
     @Autowired
     private StepBuilderFactory steps;
 
-
     @Autowired
     DeleteExpiredRecords deleteExpiredRecords;
 
-    @Value("${get-expired-records}")
+    @Value("${delete-expired-records}")
     String taskParent;
 
-    @Value("${delete-expired-records}")
-
-    String taskLeaf;
     @Value("${batchjob-name}")
     String jobName;
-
 
     @Bean
     public Step stepOrchestration() {

@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -7,21 +14,12 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.SQLException;
-import java.sql.ResultSet;
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.List;
-import java.sql.Timestamp;
-import java.sql.Types;
 
 @Component
 public class DeleteExpiredRecords implements Tasklet {
@@ -31,53 +29,56 @@ public class DeleteExpiredRecords implements Tasklet {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private PlatformTransactionManager transactionManager;
+    @Value("${batch-size}")
+    int batchSize;
 
     @Override
     @Transactional
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
-        log.info("DELETE EXPIRED RECORDS starts::");
-        log.info("TRANSACTION CREATED");
+        log.info("Delete Expired records task starts::");
+        int currentRecordsInHistoryTable = getCountFromHistoryTable();
         try {
-            List<RoleAssignmentHistory> rah = this.getLiveRecords();
-            log.info("RETRIEVED LIVE RECORDS WHOSE END TIME > CURRENT TIME. NO OF RECORDS RETRIEVED :" + rah.size());
+            List<RoleAssignmentHistory> rah = this.getLiveRecordsFromHistoryTable();
+            log.info(String.format("Retrieve History records whose End Time is less than current time."
+                                   + " Number of records: %s", rah.size()));
             for (RoleAssignmentHistory ra : rah) {
-                //Change the Required Variables
-                log.info(ra.toString());
-                ra.setStatus("DELETED");
+                ra.setStatus("EXPIRED");
                 int statusSequence = ra.getStatusSequence();
                 ra.setStatusSequence(statusSequence + 1);
-                ra.setLog("Record Deleted");
+                ra.setLog("Record Expired");
                 ra.setCreated(new Timestamp(System.currentTimeMillis()));
             }
-            this.deleteRoleAssignmentRecords(rah);
-            log.info("DELETED ROLE ASSIGNMENT RECORDS IN LIVE TABLE");
-            int[] batchUpdateStatusArray = this.batchUpdateRoleAssignmentHistory(rah);
-            log.info("UPDATED ROLE ASSIGNMENT HISTORY TABLE");
+            log.info("Deleting Live records.");
+            int rowsDeleted = this.deleteRoleAssignmentRecords(rah);
+            log.info(String.format("Number of live records deleted : %s", rowsDeleted));
+
+            this.insertIntoRoleAssignmentHistoryTable(rah);
+
+            log.info(String.format("Updated number of records in History Table : %s",
+                                   getCountFromHistoryTable() - currentRecordsInHistoryTable));
         } catch (DataAccessException e) {
-            log.info(" DataAccessException " + e.getMessage());
+            log.info(String.format(" DataAccessException %s", e.getMessage()));
         } catch (Exception e) {
-            log.info(" Exception :" + e.getMessage());
+            log.info(e.getMessage());
         }
 
-        log.info("DELETE EXPIRED RECORDS", "success");
+        log.info("Delete expired records is successful");
         return RepeatStatus.FINISHED;
     }
 
-    public int[] deleteRoleAssignmentRecords(List<RoleAssignmentHistory> rah) throws DataAccessException {
+    public int deleteRoleAssignmentRecords(List<RoleAssignmentHistory> rah) throws DataAccessException {
         String deleteSql = "DELETE FROM role_assignment WHERE id = ?";
-        int[] rows = new int[rah.size()];
+        int rows = 0;
         for (RoleAssignmentHistory ra : rah) {
             Object[] params = {ra.getId()};
             // define SQL types of the arguments
             int[] types = {Types.VARCHAR};
-            rows[0] = jdbcTemplate.update(deleteSql, params, types);
+            rows += jdbcTemplate.update(deleteSql, params, types);
         }
         return rows;
     }
 
-    public int[] batchUpdateRoleAssignmentHistory(List<RoleAssignmentHistory> rah) throws DataAccessException {
+    public int[] insertIntoRoleAssignmentHistoryTable(List<RoleAssignmentHistory> rah) {
         return jdbcTemplate.batchUpdate("INSERT INTO role_assignment_history "
                         + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 new BatchPreparedStatementSetter() {
@@ -107,49 +108,49 @@ public class DeleteExpiredRecords implements Tasklet {
 
                     @Override
                     public int getBatchSize() {
-                        return rah.size();
+                        return rah.size() > batchSize ? batchSize : rah.size();
                     }
                 });
     }
 
 
-    public List<RoleAssignmentHistory> getLiveRecords() throws DataAccessException {
-        String getSQL = "select * from role_assignment_history rah  "
-                + "WHERE id in (SELECT id FROM role_assignment WHERE end_time <= now()) and status='LIVE'";
-        List<RoleAssignmentHistory> rah =
-                jdbcTemplate.query(getSQL, new ResultSetExtractor<List<RoleAssignmentHistory>>() {
+    public List<RoleAssignmentHistory> getLiveRecordsFromHistoryTable() {
+        String getSQL = "SELECT * from role_assignment_history rah  "
+                        + "WHERE id in (SELECT id FROM role_assignment WHERE end_time <= now()) and status='LIVE'";
+        return
+            jdbcTemplate.query(getSQL, rs -> {
 
-                    public List<RoleAssignmentHistory> extractData(
-                            ResultSet rs) throws SQLException, DataAccessException {
+                List<RoleAssignmentHistory> list = new ArrayList<>();
+                while (rs.next()) {
+                    RoleAssignmentHistory roleAssignmentHistory = new RoleAssignmentHistory();
+                    roleAssignmentHistory.setId(rs.getObject("id", java.util.UUID.class));
+                    roleAssignmentHistory.setRequestId(rs.getObject("request_id", java.util.UUID.class));
+                    roleAssignmentHistory.setActorIDType(rs.getString("actor_id_type"));
+                    roleAssignmentHistory.setActorId(rs.getObject("actor_id", java.util.UUID.class));
+                    roleAssignmentHistory.setRoleType(rs.getString("role_type"));
+                    roleAssignmentHistory.setRoleName(rs.getString("role_name"));
+                    roleAssignmentHistory.setClassification(rs.getString("classification"));
+                    roleAssignmentHistory.setGrantType(rs.getString("grant_type"));
+                    roleAssignmentHistory.setRoleCategory(rs.getString("role_category"));
+                    roleAssignmentHistory.setReadOnly(rs.getBoolean("read_only"));
+                    roleAssignmentHistory.setBeginTime(rs.getTimestamp("begin_time"));
+                    roleAssignmentHistory.setEndTime(rs.getTimestamp("end_time"));
+                    roleAssignmentHistory.setStatus(rs.getString("status"));
+                    roleAssignmentHistory.setReference(rs.getString("reference"));
+                    roleAssignmentHistory.setProcess(rs.getString("process"));
+                    roleAssignmentHistory.setAttributes(rs.getString("attributes"));
+                    roleAssignmentHistory.setNotes(rs.getString("notes"));
+                    roleAssignmentHistory.setLog(rs.getString("log"));
+                    roleAssignmentHistory.setStatusSequence(rs.getInt("status_sequence"));
+                    roleAssignmentHistory.setCreated(rs.getTimestamp("created"));
+                    list.add(roleAssignmentHistory);
+                }
+                return list;
+            });
+    }
 
-                        List<RoleAssignmentHistory> list = new ArrayList<RoleAssignmentHistory>();
-                        while (rs.next()) {
-                            RoleAssignmentHistory roleAssignmentHistory = new RoleAssignmentHistory();
-                            roleAssignmentHistory.setId(rs.getObject("id", java.util.UUID.class));
-                            roleAssignmentHistory.setRequestId(rs.getObject("request_id", java.util.UUID.class));
-                            roleAssignmentHistory.setActorIDType(rs.getString("actor_id_type"));
-                            roleAssignmentHistory.setActorId(rs.getObject("actor_id", java.util.UUID.class));
-                            roleAssignmentHistory.setRoleType(rs.getString("role_type"));
-                            roleAssignmentHistory.setRoleName(rs.getString("role_name"));
-                            roleAssignmentHistory.setClassification(rs.getString("classification"));
-                            roleAssignmentHistory.setGrantType(rs.getString("grant_type"));
-                            roleAssignmentHistory.setRoleCategory(rs.getString("role_category"));
-                            roleAssignmentHistory.setReadOnly(rs.getBoolean("read_only"));
-                            roleAssignmentHistory.setBeginTime(rs.getTimestamp("begin_time"));
-                            roleAssignmentHistory.setEndTime(rs.getTimestamp("end_time"));
-                            roleAssignmentHistory.setStatus(rs.getString("status"));
-                            roleAssignmentHistory.setReference(rs.getString("reference"));
-                            roleAssignmentHistory.setProcess(rs.getString("process"));
-                            roleAssignmentHistory.setAttributes(rs.getString("attributes"));
-                            roleAssignmentHistory.setNotes(rs.getString("notes"));
-                            roleAssignmentHistory.setLog(rs.getString("log"));
-                            roleAssignmentHistory.setStatusSequence(rs.getInt("status_sequence"));
-                            roleAssignmentHistory.setCreated(rs.getTimestamp("created"));
-                            list.add(roleAssignmentHistory);
-                        }
-                        return list;
-                    }
-                });
-        return rah;
+    public Integer getCountFromHistoryTable() {
+        String getSQL = "SELECT count(*) from role_assignment_history rah";
+        return jdbcTemplate.queryForObject(getSQL, Integer.class);
     }
 }
