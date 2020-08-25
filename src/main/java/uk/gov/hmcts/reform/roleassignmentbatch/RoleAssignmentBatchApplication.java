@@ -18,8 +18,7 @@ public class RoleAssignmentBatchApplication {
         //Sleep added to allow app-insights to flush the logs
         Thread.sleep(6000);
         int exitCode = SpringApplication.exit(context);
-        log.info("Check 1");
-        log.info("RoleAssignmentBatchApplication Application exiting with exit code " + exitCode);
+        log.info(String.format("RoleAssignmentBatchApplication Application exiting with exit code " + exitCode));
         System.exit(exitCode);
     }
 }
