@@ -111,7 +111,6 @@ public class DeleteExpiredRecords implements Tasklet {
                     ps.setInt(19, roleAssignmentHistory.getStatusSequence());
                     ps.setTimestamp(20, roleAssignmentHistory.getCreated());
                 }
-
             });
     }
 
@@ -121,7 +120,6 @@ public class DeleteExpiredRecords implements Tasklet {
                         + "WHERE id in (SELECT id FROM role_assignment WHERE end_time <= now()) and status='LIVE'";
         return
             getJdbcTemplate().query(getSQL, rs -> {
-
                 List<RoleAssignmentHistory> list = new ArrayList<>();
                 while (rs.next()) {
                     RoleAssignmentHistory roleAssignmentHistory = new RoleAssignmentHistory();

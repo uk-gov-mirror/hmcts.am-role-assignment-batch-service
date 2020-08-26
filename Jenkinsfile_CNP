@@ -48,19 +48,11 @@ withPipeline(type, product, component) {
   disableLegacyDeployment()
   nonServiceApp()
 
-  after('functionalTest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
-  }
-
-  after('functionalTest:aat') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
-  }
-
-  after('smoketest:preview') {
+  after('test:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/site/serenity/**'
   }
 
-  after('smoketest:aat') {
+  after('test:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/site/serenity/**'
   }
 }
