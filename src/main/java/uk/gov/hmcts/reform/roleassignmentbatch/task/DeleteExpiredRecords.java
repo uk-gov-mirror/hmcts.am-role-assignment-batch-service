@@ -27,6 +27,7 @@ public class DeleteExpiredRecords implements Tasklet {
     private static final Logger log = LoggerFactory.getLogger(DeleteExpiredRecords.class);
 
     @Autowired
+    private
     JdbcTemplate jdbcTemplate;
 
     @Value("${batch-size}")
@@ -73,15 +74,15 @@ public class DeleteExpiredRecords implements Tasklet {
             Object[] params = {ra.getId()};
             // define SQL types of the arguments
             int[] types = {Types.VARCHAR};
-            rows += jdbcTemplate.update(deleteSql, params, types);
+            rows += getJdbcTemplate().update(deleteSql, params, types);
         }
         return rows;
     }
 
     public int[] insertIntoRoleAssignmentHistoryTable(List<RoleAssignmentHistory> rah) {
-        return jdbcTemplate.batchUpdate("INSERT INTO role_assignment_history "
-                        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                new BatchPreparedStatementSetter() {
+        return getJdbcTemplate().batchUpdate("INSERT INTO role_assignment_history "
+                                             + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                                             new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
                         ps.setObject(1, rah.get(i).getId());
@@ -118,7 +119,7 @@ public class DeleteExpiredRecords implements Tasklet {
         String getSQL = "SELECT * from role_assignment_history rah  "
                         + "WHERE id in (SELECT id FROM role_assignment WHERE end_time <= now()) and status='LIVE'";
         return
-            jdbcTemplate.query(getSQL, rs -> {
+            getJdbcTemplate().query(getSQL, rs -> {
 
                 List<RoleAssignmentHistory> list = new ArrayList<>();
                 while (rs.next()) {
@@ -151,6 +152,14 @@ public class DeleteExpiredRecords implements Tasklet {
 
     public Integer getCountFromHistoryTable() {
         String getSQL = "SELECT count(*) from role_assignment_history rah";
-        return jdbcTemplate.queryForObject(getSQL, Integer.class);
+        return getJdbcTemplate().queryForObject(getSQL, Integer.class);
+    }
+
+    public JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 }
