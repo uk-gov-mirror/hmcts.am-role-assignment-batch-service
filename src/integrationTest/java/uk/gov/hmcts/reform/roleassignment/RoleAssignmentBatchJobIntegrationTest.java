@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.roleassignment;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import javax.sql.DataSource;
 
@@ -23,7 +24,7 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
 
     private static final Logger logger = LoggerFactory.getLogger(RoleAssignmentBatchJobIntegrationTest.class);
 
-    private static final String COUNT_RECORDS = "SELECT count(1) as n FROM role_assignment_request";
+    private static final String COUNT_RECORDS = "SELECT count(*) as n FROM role_assignment";
 
     @Autowired
     private DataSource ds;
@@ -41,11 +42,12 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
                     "classpath:sql/insert_role_assignment_request.sql",
                     "classpath:sql/insert_role_assignment_history.sql",
                     "classpath:sql/insert_role_assignment.sql"})
-    public void shouldGetRecordCountFromRequestTable() {
+    public void shouldGetRecordCountFromLiveTable() {
         final Integer count = template.queryForObject(COUNT_RECORDS, Integer.class);
-        logger.info(" Total number of records fetched from role assignment request table...{}", count);
+        logger.info(" Total number of records fetched from role assignment Live table...{}", count);
+        assertNotNull(count);
         assertEquals(
-            "role_assignment_request record count ", 5, count.intValue());
+            "role_assignment record count ", 5, count.intValue());
     }
 
 }
