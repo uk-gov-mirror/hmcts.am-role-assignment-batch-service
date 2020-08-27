@@ -89,4 +89,21 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
         Assert.assertEquals("The EXPIRED records were not inserted", Integer.valueOf(5), count);
     }
 
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+         scripts = {"classpath:sql/role_assignment_clean_up.sql",
+                    "classpath:sqlcomplexscenarios/insert_role_assignment_request.sql",
+                    "classpath:sqlcomplexscenarios/insert_role_assignment_history.sql",
+                    "classpath:sqlcomplexscenarios/insert_role_assignment.sql"})
+    public void shouldDeleteLiveRecordsComplexScenario() {
+        Integer count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
+        logger.info(" Total number of expired records fetched from History table...{}", count);
+        Assert.assertEquals("The live records were not deleted", Integer.valueOf(0), count);
+        logger.info(" Deleting the records from Live table. Insert the records in History table.");
+        sut.execute(null, null);
+        count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
+        logger.info(" Total number of Expired records fetched from History table...{}", count);
+        Assert.assertEquals("The EXPIRED records were not inserted", Integer.valueOf(3), count);
+    }
+
 }
