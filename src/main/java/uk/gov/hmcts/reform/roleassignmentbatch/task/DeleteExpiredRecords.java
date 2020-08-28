@@ -23,16 +23,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@AllArgsConstructor
 public class DeleteExpiredRecords implements Tasklet {
 
     private static final Logger log = LoggerFactory.getLogger(DeleteExpiredRecords.class);
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
+    private final int batchSize;
 
-    @Value("${batch-size}")
-    int batchSize;
+    public DeleteExpiredRecords(@Autowired JdbcTemplate jdbcTemplate, @Value("${batch-size}")int batchSize) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.batchSize = batchSize;
+    }
 
     @Override
     @Transactional
