@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class DeleteExpiredRecords implements Tasklet {
 
     private static final Logger log = LoggerFactory.getLogger(DeleteExpiredRecords.class);
-
     private final JdbcTemplate jdbcTemplate;
     private final int batchSize;
 
@@ -68,22 +67,22 @@ public class DeleteExpiredRecords implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    public int deleteRoleAssignmentRecords(List<RoleAssignmentHistory> rah) throws DataAccessException {
-        String deleteSql = "DELETE FROM role_assignment WHERE id = ?";
+    public int deleteRoleAssignmentRecords(List<RoleAssignmentHistory> rah) {
+        String deleteSql = "DELETE FROM role_assignment WHERE id::uuid=?::uuid";
         int rows = 0;
         for (RoleAssignmentHistory ra : rah) {
             Object[] params = {ra.getId()};
             // define SQL types of the arguments
             int[] types = {Types.VARCHAR};
-            rows += getJdbcTemplate().update(deleteSql, params, types);
+            rows += jdbcTemplate.update(deleteSql, params, types);
         }
         return rows;
     }
 
     public int[][] insertIntoRoleAssignmentHistoryTable(List<RoleAssignmentHistory> rah) {
-        return getJdbcTemplate().batchUpdate(
+        return jdbcTemplate.batchUpdate(
             "INSERT INTO role_assignment_history "
-            + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            + "VALUES(?::uuid,?::uuid,?,?::uuid,?,?,?,?,?,?,?,?,?,?,?,?::jsonb,?::jsonb,?,?,?)",
             rah,
             batchSize,
             new ParameterizedPreparedStatementSetter<RoleAssignmentHistory>() {
@@ -118,9 +117,9 @@ public class DeleteExpiredRecords implements Tasklet {
     public List<RoleAssignmentHistory> getLiveRecordsFromHistoryTable() {
         String getSQL = "SELECT * from role_assignment_history rah  "
                         + "WHERE id in (SELECT id FROM role_assignment WHERE end_time <= now()) and status='LIVE'";
+        List<RoleAssignmentHistory> list = new ArrayList<>();
         return
-            getJdbcTemplate().query(getSQL, rs -> {
-                List<RoleAssignmentHistory> list = new ArrayList<>();
+            jdbcTemplate.query(getSQL, rs -> {
                 while (rs.next()) {
                     RoleAssignmentHistory roleAssignmentHistory = new RoleAssignmentHistory();
                     roleAssignmentHistory.setId(rs.getObject("id", java.util.UUID.class));
@@ -151,10 +150,7 @@ public class DeleteExpiredRecords implements Tasklet {
 
     public Integer getCountFromHistoryTable() {
         String getSQL = "SELECT count(*) from role_assignment_history rah";
-        return getJdbcTemplate().queryForObject(getSQL, Integer.class);
+        return jdbcTemplate.queryForObject(getSQL, Integer.class);
     }
 
-    public JdbcTemplate getJdbcTemplate() {
-        return jdbcTemplate;
-    }
 }
