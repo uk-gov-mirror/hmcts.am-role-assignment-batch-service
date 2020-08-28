@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.roleassignment;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.Properties;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
@@ -18,14 +15,17 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import org.junit.BeforeClass;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class BaseTest {
 
     protected static final ObjectMapper mapper = new ObjectMapper();
+    public static final String POSTGRES = "postgres";
 
     @BeforeClass
     public static void init() {
@@ -34,24 +34,30 @@ public class BaseTest {
     }
 
     @Bean
+    @Primary
     public EmbeddedPostgres embeddedPostgres() throws IOException {
         return EmbeddedPostgres
             .builder()
+            .setConnectConfig("stringtype", "unspecified")
             .setPort(0)
             .start();
     }
 
     @Bean
-    public DataSource dataSource() throws Exception {
-        final EmbeddedPostgres pg = embeddedPostgres();
+    @Primary
+    public DataSource dataSource(@Qualifier("embeddedPostgres") final EmbeddedPostgres pg) throws Exception {
 
-        final Properties props = new Properties();
-        props.setProperty("stringtype", "unspecified");
-        final Connection connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
+        DataSource datasource = DataSourceBuilder
+            .create()
+            .username(POSTGRES)
+            .password(POSTGRES)
+            .url(pg.getJdbcUrl(POSTGRES, POSTGRES))
+            .driverClassName("org.postgresql.Driver")
+            .build();
 
-        DataSource datasource = new SingleConnectionDataSource(connection, true);
-        Database database =
-            DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+
+        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
+            new JdbcConnection(datasource.getConnection()));
         Liquibase liquibase =
             new Liquibase("db/changelog/db.changelog-main.xml", new ClassLoaderResourceAccessor(), database);
 

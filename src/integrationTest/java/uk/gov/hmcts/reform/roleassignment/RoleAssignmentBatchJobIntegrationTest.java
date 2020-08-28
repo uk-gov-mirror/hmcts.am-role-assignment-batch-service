@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import javax.sql.DataSource;
 
+import javax.inject.Inject;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,12 +26,12 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
 
     private static final Logger logger = LoggerFactory.getLogger(RoleAssignmentBatchJobIntegrationTest.class);
 
-    DeleteExpiredRecords sut;
+    private DeleteExpiredRecords sut;
     private static final String COUNT_RECORDS_FROM_LIVE_TABLE = "SELECT count(*) as n FROM role_assignment";
     private static final String COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE =
         "SELECT count(*) as n FROM role_assignment_history where STATUS='EXPIRED'";
 
-    @Autowired
+    @Inject
     private DataSource ds;
 
     private JdbcTemplate template;
