@@ -4,10 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication
+@EnableTransactionManagement(proxyTargetClass = true)
 @SuppressWarnings("HideUtilityClassConstructor")
 public class RoleAssignmentBatchApplication {
 
@@ -18,8 +19,7 @@ public class RoleAssignmentBatchApplication {
         //Sleep added to allow app-insights to flush the logs
         Thread.sleep(6000);
         int exitCode = SpringApplication.exit(context);
-        log.info("Check 1");
-        log.info("RoleAssignmentBatchApplication Application exiting with exit code " + exitCode);
+        log.info(String.format("RoleAssignmentBatchApplication Application exiting with exit code %s", exitCode));
         System.exit(exitCode);
     }
 }
