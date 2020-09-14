@@ -48,10 +48,6 @@ spring:
     url: jdbc:postgresql://${ROLE_ASSIGNMENT_DB_HOST:localhost}:${ROLE_ASSIGNMENT_DB_PORT:5451}/${ROLE_ASSIGNMENT_DB_NAME:role_assignment}${ROLE_ASSIGNMENT_DB_OPTIONS:?stringtype=unspecified}
     username: ${ROLE_ASSIGNMENT_DB_USERNAME:am}
     password: ${ROLE_ASSIGNMENT_DB_PASSWORD:am}
-    min-idle: 1
-    max-life: 600000
-    idle-timeout: 30000
-    maximum-pool-size: 5
     properties:
       charSet: UTFh-8
   batch:

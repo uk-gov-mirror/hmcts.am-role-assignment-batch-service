@@ -55,13 +55,12 @@ public class BaseTest {
             .driverClassName("org.postgresql.Driver")
             .build();
 
-
         Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
             new JdbcConnection(datasource.getConnection()));
-        Liquibase liquibase =
-            new Liquibase("db/changelog/db.changelog-main.xml", new ClassLoaderResourceAccessor(), database);
-
-        liquibase.update(new Contexts());
+        try (Liquibase liquibase = new Liquibase("db/changelog/db.changelog-main.xml",
+                                                 new ClassLoaderResourceAccessor(), database)) {
+            liquibase.update(new Contexts());
+        }
         return datasource;
     }
 
