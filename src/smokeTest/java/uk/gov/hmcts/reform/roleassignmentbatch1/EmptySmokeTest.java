@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.roleassignmentbatch;
+package uk.gov.hmcts.reform.roleassignmentbatch1;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
