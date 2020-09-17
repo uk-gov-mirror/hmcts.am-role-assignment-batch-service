@@ -24,14 +24,17 @@ public class BatchConfig extends DefaultBatchConfigurer {
     String jobName;
 
     @Bean
-    public Step stepOrchestration(@Autowired StepBuilderFactory steps, @Autowired DeleteExpiredRecords deleteExpiredRecords) {
+    public Step stepOrchestration(@Autowired StepBuilderFactory steps,
+                                  @Autowired DeleteExpiredRecords deleteExpiredRecords) {
         return steps.get(taskParent)
                     .tasklet(deleteExpiredRecords)
                     .build();
     }
 
     @Bean
-    public Job runRoutesJob(@Autowired JobBuilderFactory jobs, @Autowired StepBuilderFactory steps, @Autowired DeleteExpiredRecords deleteExpiredRecords) {
+    public Job runRoutesJob(@Autowired JobBuilderFactory jobs,
+                            @Autowired StepBuilderFactory steps,
+                            @Autowired DeleteExpiredRecords deleteExpiredRecords) {
         return jobs.get(jobName)
                    .incrementer(new RunIdIncrementer())
                    .start(stepOrchestration(steps, deleteExpiredRecords))
