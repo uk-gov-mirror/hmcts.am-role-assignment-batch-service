@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.roleassignmentbatch.task;
+package uk.gov.hmcts.reform.roleassignmentbatch1.task;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
