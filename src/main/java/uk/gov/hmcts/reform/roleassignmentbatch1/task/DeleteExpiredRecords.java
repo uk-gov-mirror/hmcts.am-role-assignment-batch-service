@@ -51,12 +51,14 @@ public class DeleteExpiredRecords implements Tasklet {
             }
             log.info("Deleting Live records.");
             int rowsDeleted = this.deleteRoleAssignmentRecords(rah);
-            log.info(String.format("Number of live records deleted : %s", rowsDeleted));
+            String rowsDeletedLog = String.format("Number of live records deleted : %s", rowsDeleted);
+            log.info(rowsDeletedLog);
 
             this.insertIntoRoleAssignmentHistoryTable(rah);
 
-            log.info(String.format("Updated number of records in History Table : %s",
-                                   getCountFromHistoryTable() - currentRecordsInHistoryTable));
+            String numRecordsUpdatedLog = String.format("Updated number of records in History Table : %s",
+                    getCountFromHistoryTable() - currentRecordsInHistoryTable);
+            log.info(numRecordsUpdatedLog);
         } catch (DataAccessException e) {
             log.info(String.format(" DataAccessException %s", e.getMessage()));
         } catch (Exception e) {
