@@ -40,8 +40,9 @@ public class DeleteExpiredRecords implements Tasklet {
         int currentRecordsInHistoryTable = getCountFromHistoryTable();
         try {
             List<RoleAssignmentHistory> rah = this.getLiveRecordsFromHistoryTable();
-            log.info(String.format("Retrieve History records whose End Time is less than current time."
-                                   + " Number of records: %s", rah.size()));
+            String historyLog = String.format("Retrieve History records whose End Time is less than current time."
+                    + " Number of records: %s", rah.size());
+            log.info(historyLog);
             for (RoleAssignmentHistory ra : rah) {
                 ra.setStatus("EXPIRED");
                 int statusSequence = ra.getStatusSequence();
