@@ -31,10 +31,10 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public Job runRoutesJob(@Autowired JobBuilderFactory jobs) {
+    public Job runRoutesJob(@Autowired JobBuilderFactory jobs, @Autowired StepBuilderFactory steps, @Autowired DeleteExpiredRecords deleteExpiredRecords) {
         return jobs.get(jobName)
                    .incrementer(new RunIdIncrementer())
-                   .start(stepOrchestration())
+                   .start(stepOrchestration(steps, deleteExpiredRecords))
                    .build();
     }
 }
