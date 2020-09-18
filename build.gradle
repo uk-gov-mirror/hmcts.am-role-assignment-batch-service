@@ -159,14 +159,14 @@ sonarqube {
         property "sonar.projectName", "am-role-assignment-batch-service"
         property "sonar.projectKey", "am-role-assignment-batch-service"
         property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/roleassignmentbatch/RoleAssignmentBatchApplication.java"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
-        property "sonar.exclusions", "src/main/java/**"
     }
 }
 
-/*project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
-project.tasks['sonarqube'].group = "Verification"*/
+project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+project.tasks['sonarqube'].group = "Verification"
 
 dependencyUpdates.resolutionStrategy {
     componentSelection { rules ->

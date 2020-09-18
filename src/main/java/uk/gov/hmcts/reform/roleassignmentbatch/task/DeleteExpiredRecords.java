@@ -40,8 +40,9 @@ public class DeleteExpiredRecords implements Tasklet {
         int currentRecordsInHistoryTable = getCountFromHistoryTable();
         try {
             List<RoleAssignmentHistory> rah = this.getLiveRecordsFromHistoryTable();
-            log.info(String.format("Retrieve History records whose End Time is less than current time."
-                                   + " Number of records: %s", rah.size()));
+            String historyLog = String.format("Retrieve History records whose End Time is less than current time."
+                    + " Number of records: %s", rah.size());
+            log.info(historyLog);
             for (RoleAssignmentHistory ra : rah) {
                 ra.setStatus("EXPIRED");
                 int statusSequence = ra.getStatusSequence();
@@ -51,12 +52,14 @@ public class DeleteExpiredRecords implements Tasklet {
             }
             log.info("Deleting Live records.");
             int rowsDeleted = this.deleteRoleAssignmentRecords(rah);
-            log.info(String.format("Number of live records deleted : %s", rowsDeleted));
+            String rowsDeletedLog = String.format("Number of live records deleted : %s", rowsDeleted);
+            log.info(rowsDeletedLog);
 
             this.insertIntoRoleAssignmentHistoryTable(rah);
 
-            log.info(String.format("Updated number of records in History Table : %s",
-                                   getCountFromHistoryTable() - currentRecordsInHistoryTable));
+            String numRecordsUpdatedLog = String.format("Updated number of records in History Table : %s",
+                    getCountFromHistoryTable() - currentRecordsInHistoryTable);
+            log.info(numRecordsUpdatedLog);
         } catch (DataAccessException e) {
             log.info(String.format(" DataAccessException %s", e.getMessage()));
         } catch (Exception e) {
