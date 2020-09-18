@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.roleassignmentbatch1.task;
+package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
 import java.sql.Timestamp;
 import java.util.UUID;
