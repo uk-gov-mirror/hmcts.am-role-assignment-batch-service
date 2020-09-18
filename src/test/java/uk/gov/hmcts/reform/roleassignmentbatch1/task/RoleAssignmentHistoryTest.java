@@ -30,7 +30,6 @@ class RoleAssignmentHistoryTest {
     @Test
     void testToString() {
         assertTrue(roleAssignmentHistory.toString().contains("id="));
-        assertNotNull(roleAssignmentHistoryNoArgs);
     }
 
     @Test
