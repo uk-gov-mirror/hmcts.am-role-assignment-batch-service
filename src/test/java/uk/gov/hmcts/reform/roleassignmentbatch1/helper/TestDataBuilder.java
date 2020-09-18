@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch1.task.RoleAssignmentHistory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;

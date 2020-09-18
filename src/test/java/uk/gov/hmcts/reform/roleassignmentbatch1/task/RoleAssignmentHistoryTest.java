@@ -10,13 +10,15 @@ import uk.gov.hmcts.reform.roleassignmentbatch1.domain.model.enums.RoleType;
 import uk.gov.hmcts.reform.roleassignmentbatch1.domain.model.enums.Status;
 import uk.gov.hmcts.reform.roleassignmentbatch1.helper.TestDataBuilder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import javax.management.relation.Role;
 
 class RoleAssignmentHistoryTest {
 
