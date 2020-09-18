@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch1.task;
 
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.roleassignmentbatch1.domain.model.enums.ActorIdType;
 import uk.gov.hmcts.reform.roleassignmentbatch1.domain.model.enums.Classification;
