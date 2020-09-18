@@ -1,8 +1,15 @@
 package uk.gov.hmcts.reform.roleassignmentbatch1.task;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import java.sql.Timestamp;
 import java.util.UUID;
 
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class RoleAssignmentHistory {
 
     private UUID id;
