@@ -17,15 +17,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 @EnableBatchProcessing
 public class BatchConfig extends DefaultBatchConfigurer {
 
-    @Autowired
-    private JobBuilderFactory jobs;
-
-    @Autowired
-    private StepBuilderFactory steps;
-
-    @Autowired
-    DeleteExpiredRecords deleteExpiredRecords;
-
     @Value("${delete-expired-records}")
     String taskParent;
 
@@ -33,17 +24,20 @@ public class BatchConfig extends DefaultBatchConfigurer {
     String jobName;
 
     @Bean
-    public Step stepOrchestration() {
+    public Step stepOrchestration(@Autowired StepBuilderFactory steps,
+                                  @Autowired DeleteExpiredRecords deleteExpiredRecords) {
         return steps.get(taskParent)
                     .tasklet(deleteExpiredRecords)
                     .build();
     }
 
     @Bean
-    public Job runRoutesJob() {
+    public Job runRoutesJob(@Autowired JobBuilderFactory jobs,
+                            @Autowired StepBuilderFactory steps,
+                            @Autowired DeleteExpiredRecords deleteExpiredRecords) {
         return jobs.get(jobName)
                    .incrementer(new RunIdIncrementer())
-                   .start(stepOrchestration())
+                   .start(stepOrchestration(steps, deleteExpiredRecords))
                    .build();
     }
 }
