@@ -20,7 +20,7 @@ public class RoleAssignmentBatchApplication {
         Thread.sleep(6000);
         int exitCode = SpringApplication.exit(context);
         String exitCodeLog = String.format("RoleAssignmentBatchApplication Application exiting with exit code %s",
-                SpringApplication.exit(context));
+                                           exitCode);
         log.info(exitCodeLog);
         System.exit(exitCode);
     }
