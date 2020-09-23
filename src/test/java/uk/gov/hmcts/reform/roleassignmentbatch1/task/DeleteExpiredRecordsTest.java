@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.roleassignmentbatch1.task;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -68,7 +69,7 @@ public class DeleteExpiredRecordsTest {
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
         int[][] data = new int[1][1];
         data[0][0] = 1;
-        when(jdbcTemplate.batchUpdate(any(), any(), any(), any())).thenReturn(data);
+        when(jdbcTemplate.batchUpdate(anyString(), any(), anyInt(), any())).thenReturn(data);
 
         Assertions.assertEquals(data, sut.insertIntoRoleAssignmentHistoryTable(list));
     }
@@ -80,7 +81,6 @@ public class DeleteExpiredRecordsTest {
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
 
         when(jdbcTemplate.query(anyString(), any(ResultSetExtractor.class))).thenReturn(list);
-
         Assertions.assertEquals(list, sut.getLiveRecordsFromHistoryTable());
     }
 
