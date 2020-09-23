@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -25,7 +25,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import uk.gov.hmcts.reform.roleassignmentbatch1.helper.TestDataBuilder;
 
 
-public class DeleteExpiredRecordsTest {
+class DeleteExpiredRecordsTest {
 
     @Mock
     JdbcTemplate jdbcTemplate = mock(JdbcTemplate.class);
@@ -38,8 +38,8 @@ public class DeleteExpiredRecordsTest {
 
     DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
 
-    @Before
-    public void initialize() {
+    @BeforeEach
+    void initialize() {
         MockitoAnnotations.initMocks(this);
     }
 
