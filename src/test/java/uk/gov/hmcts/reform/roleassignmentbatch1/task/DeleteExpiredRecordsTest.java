@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.batch.core.StepContribution;
@@ -80,7 +81,7 @@ public class DeleteExpiredRecordsTest {
         List<RoleAssignmentHistory> list = new ArrayList<>();
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
 
-        when(jdbcTemplate.query(anyString(), any(ResultSetExtractor.class))).thenReturn(list);
+        when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any())).thenReturn(list);
         Assertions.assertEquals(list, sut.getLiveRecordsFromHistoryTable());
     }
 
