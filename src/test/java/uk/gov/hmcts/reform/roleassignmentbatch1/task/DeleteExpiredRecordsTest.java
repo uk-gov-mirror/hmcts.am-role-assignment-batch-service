@@ -13,14 +13,10 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -42,7 +38,7 @@ class DeleteExpiredRecordsTest {
     private DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
 
     @Before
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
