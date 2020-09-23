@@ -11,12 +11,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -24,11 +28,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import uk.gov.hmcts.reform.roleassignmentbatch1.helper.TestDataBuilder;
 
-
 class DeleteExpiredRecordsTest {
 
     @Mock
-    JdbcTemplate jdbcTemplate = mock(JdbcTemplate.class);
+    private JdbcTemplate jdbcTemplate = mock(JdbcTemplate.class);
 
     @Mock
     StepContribution stepContribution = mock(StepContribution.class);
@@ -36,10 +39,10 @@ class DeleteExpiredRecordsTest {
     @Mock
     ChunkContext chunkContext = mock(ChunkContext.class);
 
-    DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
+    private DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
 
-    @BeforeEach
-    void initialize() {
+    @Before
+    void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
