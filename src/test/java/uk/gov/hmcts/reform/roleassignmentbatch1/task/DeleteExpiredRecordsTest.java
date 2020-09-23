@@ -19,6 +19,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import uk.gov.hmcts.reform.roleassignmentbatch1.helper.TestDataBuilder;
 
 
@@ -72,15 +73,15 @@ public class DeleteExpiredRecordsTest {
         Assertions.assertEquals(data, sut.insertIntoRoleAssignmentHistoryTable(list));
     }
 
-    //@Test
+    @Test
     void getLiveRecordsFromHistoryTable() throws IOException {
 
         List<RoleAssignmentHistory> list = new ArrayList<>();
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
 
-        //when(jdbcTemplate.query(any(String.class),)).thenReturn(list);
+        when(jdbcTemplate.query(anyString(), any(ResultSetExtractor.class))).thenReturn(list);
 
-        Assertions.assertEquals(new int[1][0], sut.insertIntoRoleAssignmentHistoryTable(list));
+        Assertions.assertEquals(list, sut.getLiveRecordsFromHistoryTable());
     }
 
     @Test
