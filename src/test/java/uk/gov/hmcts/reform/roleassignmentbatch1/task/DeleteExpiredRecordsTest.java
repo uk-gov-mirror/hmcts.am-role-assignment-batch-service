@@ -49,12 +49,11 @@ public class DeleteExpiredRecordsTest {
             .thenReturn(400);
 
         List<RoleAssignmentHistory> list = new ArrayList<>();
-        list.add(TestDataBuilder.buildRoleAssignmentHistory().setStatus("EXPIRED").setLog("Record Expired"));
+        list.add(TestDataBuilder.buildRoleAssignmentHistory());
 
         when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any())).thenReturn(list);
 
         Assertions.assertEquals(RepeatStatus.FINISHED, sut.execute(stepContribution, chunkContext));
-        //need to do more here but is failing because execute calls getLiveRecordsFromHistoryTable()
     }
 
     @Test
