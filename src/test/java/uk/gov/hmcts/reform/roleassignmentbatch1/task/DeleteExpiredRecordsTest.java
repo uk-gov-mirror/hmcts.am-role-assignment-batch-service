@@ -1,5 +1,15 @@
 package uk.gov.hmcts.reform.roleassignmentbatch1.task;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -9,16 +19,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import uk.gov.hmcts.reform.roleassignmentbatch1.helper.TestDataBuilder;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class DeleteExpiredRecordsTest {
@@ -39,12 +40,10 @@ public class DeleteExpiredRecordsTest {
         MockitoAnnotations.initMocks(this);
     }
 
-
     @Test
     void execute() {
-        when(jdbcTemplate.queryForObject("SELECT count(*) from role_assignment_history rah", Integer.class))
-                .thenReturn(400);
-
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class)))
+            .thenReturn(400);
         Assertions.assertEquals(RepeatStatus.FINISHED, sut.execute(stepContribution, chunkContext));
         //need to do more here but is failing because execute calls getLiveRecordsFromHistoryTable()
     }
@@ -56,20 +55,21 @@ public class DeleteExpiredRecordsTest {
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
 
         when(jdbcTemplate.update(any(), any(), any()))
-                .thenReturn(1);
+            .thenReturn(1);
 
         Assertions.assertEquals(1, sut.deleteRoleAssignmentRecords(list));
     }
 
-    //@Test
+    @Test
     void insertIntoRoleAssignmentHistoryTable() throws IOException {
 
         List<RoleAssignmentHistory> list = new ArrayList<>();
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
+        int[][] data = new int[1][1];
+        data[0][0] = 1;
+        when(jdbcTemplate.batchUpdate(any(), any(), any(), any())).thenReturn(data);
 
-        //when(jdbcTemplate.batchUpdate(any(), any(), any(), any())).thenReturn(new int[1][0]);
-
-        Assertions.assertEquals(new int[1][0], sut.insertIntoRoleAssignmentHistoryTable(list));
+        Assertions.assertEquals(data, sut.insertIntoRoleAssignmentHistoryTable(list));
     }
 
     //@Test
@@ -86,7 +86,7 @@ public class DeleteExpiredRecordsTest {
     @Test
     void getCountFromHistoryTable() {
         when(jdbcTemplate.queryForObject("SELECT count(*) from role_assignment_history rah", Integer.class))
-                .thenReturn(400);
+            .thenReturn(400);
         Assertions.assertEquals(400, sut.getCountFromHistoryTable());
     }
 }
