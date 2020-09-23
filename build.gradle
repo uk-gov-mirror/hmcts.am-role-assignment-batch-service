@@ -164,7 +164,8 @@ pitest {
     pitestVersion = "1.5.2"
     testPlugin = "junit5"
     targetClasses = ['uk.gov.hmcts.reform.*']
-    excludedClasses = ['uk.gov.hmcts.reform.roleassignmentbatch.RoleAssignmentBatchApplication']
+    excludedClasses = ['uk.gov.hmcts.reform.roleassignmentbatch.RoleAssignmentBatchApplication',
+                       'uk.gov.hmcts.reform.roleassignmentbatch.batch.BatchConfig']
     threads = 15
     outputFormats = ['XML', 'HTML']
     timestampedReports = true
