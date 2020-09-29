@@ -8,6 +8,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +39,9 @@ class DeleteExpiredRecordsTest {
 
     @Mock
     ChunkContext chunkContext = mock(ChunkContext.class);
+
+    @Mock
+    ResultSet rs = mock(ResultSet.class);
 
     private DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
 
@@ -100,6 +105,19 @@ class DeleteExpiredRecordsTest {
     void getLiveRecordsFromHistoryTable() throws IOException {
         List<RoleAssignmentHistory> list = new ArrayList<>();
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
+        when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any())).thenReturn(list);
+        Assertions.assertEquals(list, sut.getLiveRecordsFromHistoryTable());
+    }
+
+    @Test
+    void getLiveRecordsFromHistoryTableWithValidValues() throws IOException, SQLException {
+        List<RoleAssignmentHistory> list = new ArrayList<>();
+        list.add(TestDataBuilder.buildRoleAssignmentHistory());
+        when(rs.next()).thenReturn(true).thenReturn(false);
+        when(rs.getObject("id")).thenReturn(java.util.UUID.class);
+        when(rs.getObject("request_id")).thenReturn(java.util.UUID.class);
+        when(rs.getString("actor_id_type")).thenReturn("string");
+        when(rs.getObject("actor_id")).thenReturn(java.util.UUID.class);
         when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any())).thenReturn(list);
         Assertions.assertEquals(list, sut.getLiveRecordsFromHistoryTable());
     }
