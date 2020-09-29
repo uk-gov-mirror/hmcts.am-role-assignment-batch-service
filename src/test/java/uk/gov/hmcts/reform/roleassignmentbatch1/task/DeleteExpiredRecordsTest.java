@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -118,6 +119,9 @@ class DeleteExpiredRecordsTest {
         when(rs.getObject("request_id")).thenReturn(java.util.UUID.class);
         when(rs.getString("actor_id_type")).thenReturn("string");
         when(rs.getObject("actor_id")).thenReturn(java.util.UUID.class);
+
+        ArgumentCaptor<ResultSetExtractor> extractorCaptor = ArgumentCaptor.forClass(ResultSetExtractor.class);
+
         when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any())).thenReturn(list);
         Assertions.assertEquals(list, sut.getLiveRecordsFromHistoryTable());
     }
