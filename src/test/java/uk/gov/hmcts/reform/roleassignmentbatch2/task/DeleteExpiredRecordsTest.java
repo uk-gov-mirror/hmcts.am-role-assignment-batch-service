@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.roleassignmentbatch1.task;
+package uk.gov.hmcts.reform.roleassignmentbatch2.task;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -27,7 +27,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import uk.gov.hmcts.reform.roleassignmentbatch1.helper.TestDataBuilder;
+import uk.gov.hmcts.reform.roleassignmentbatch2.helper.TestDataBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
 class DeleteExpiredRecordsTest {

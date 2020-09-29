@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.roleassignmentbatch1.task;
+package uk.gov.hmcts.reform.roleassignmentbatch2.task;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

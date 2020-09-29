@@ -17,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import uk.gov.hmcts.reform.roleassignmentbatch1.task.DeleteExpiredRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch2.task.DeleteExpiredRecords;
 
 @SpringBootTest
 @RunWith(SpringIntegrationSerenityRunner.class)
