@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +16,6 @@ import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -110,20 +108,34 @@ class DeleteExpiredRecordsTest {
         Assertions.assertEquals(list, sut.getLiveRecordsFromHistoryTable());
     }
 
+
     @Test
-    void getLiveRecordsFromHistoryTableWithValidValues() throws IOException, SQLException {
-        List<RoleAssignmentHistory> list = new ArrayList<>();
-        list.add(TestDataBuilder.buildRoleAssignmentHistory());
-        when(rs.next()).thenReturn(true).thenReturn(false);
-        when(rs.getObject("id")).thenReturn(java.util.UUID.class);
-        when(rs.getObject("request_id")).thenReturn(java.util.UUID.class);
-        when(rs.getString("actor_id_type")).thenReturn("string");
-        when(rs.getObject("actor_id")).thenReturn(java.util.UUID.class);
+    public void getLiveRecordsFromHistoryTableWithValidValues() {
+        when(jdbcTemplate.query(
+                ArgumentMatchers.anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any()))
+                .thenAnswer((invocation) -> {
 
-        ArgumentCaptor<ResultSetExtractor> extractorCaptor = ArgumentCaptor.forClass(ResultSetExtractor.class);
+                    final ResultSetExtractor<List<RoleAssignmentHistory>> resultSetExtractor =
+                            invocation.getArgument(1);
+                    when(rs.next()).thenReturn(true, false);
+                    when(rs.getObject(ArgumentMatchers.eq("id"))).thenReturn(java.util.UUID.class);
+                    when(rs.getObject(ArgumentMatchers.eq("request_id"))).thenReturn(java.util.UUID.class);
+                    when(rs.getString(ArgumentMatchers.eq("actor_id_type"))).thenReturn("string");
+                    when(rs.getObject(ArgumentMatchers.eq("actor_id")))
+                            .thenReturn("3168da13-00b3-41e3-81fa-cbc71ac28a0f");
+                    when(rs.getString(ArgumentMatchers.eq("role_type"))).thenReturn("string");
+                    when(rs.getString(ArgumentMatchers.eq("role_name"))).thenReturn("Judge");
+                    when(rs.getString(ArgumentMatchers.eq("classification"))).thenReturn("PUBLIC");
+                    when(rs.getString(ArgumentMatchers.eq("grant_type"))).thenReturn("string");
+                    when(rs.getString(ArgumentMatchers.eq("role_category"))).thenReturn("string");
+                    when(rs.getBoolean(ArgumentMatchers.eq("read_only"))).thenReturn(true);
+                    return resultSetExtractor.extractData(rs);
+                });
 
-        when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any())).thenReturn(list);
-        Assertions.assertEquals(list, sut.getLiveRecordsFromHistoryTable());
+        List<RoleAssignmentHistory> result = sut.getLiveRecordsFromHistoryTable();
+
+        Assertions.assertEquals("PUBLIC", result.get(0).getClassification());
+        Assertions.assertEquals("Judge", result.get(0).getRoleName());
     }
 
     @Test
