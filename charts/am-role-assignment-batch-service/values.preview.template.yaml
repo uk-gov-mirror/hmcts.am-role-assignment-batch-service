@@ -1,8 +1,6 @@
 job:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-postgresql:
-  enabled: true
   environment:
     ROLE_ASSIGNMENT_DB_HOST: "{{ .Release.Name }}-postgresql"
     ROLE_ASSIGNMENT_DB_NAME: role_assignment
@@ -10,3 +8,5 @@ postgresql:
     ENABLE_DB_MIGRATE: true
 global:
     jobKind: CronJob
+postgresql:
+  enabled: true
