@@ -10,3 +10,10 @@ global:
     jobKind: CronJob
 postgresql:
   enabled: true
+  image:
+    tag: '11.3.0'
+  postgresqlUsername: am
+  postgresqlPassword: am
+  postgresqlDatabase: role_assignment
+  persistence:
+    enabled: false
