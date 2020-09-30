@@ -66,21 +66,7 @@ jacocoTestCoverageVerification {
     }
 }
 
-configurations {
-    functionalTestCompile.extendsFrom testCompile
-    functionalTestRuntime.extendsFrom testRuntime
-}
-
 sourceSets {
-    functionalTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file('src/functionalTest/java')
-        }
-        resources.srcDir file('src/functionalTest/resources')
-    }
-
     integrationTest {
         java {
             compileClasspath += main.output + test.output
@@ -89,39 +75,10 @@ sourceSets {
         }
         resources.srcDir file('src/integrationTest/resources')
     }
-
-    smokeTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file('src/smokeTest/java')
-        }
-        resources.srcDir file('src/smokeTest/resources')
-    }
 }
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:unchecked" << "-Werror"
-}
-
-/*task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
-    testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
-    doFirst {
-        generateCucumberReports.enabled = true
-        javaexec {
-            main = "uk.gov.hmcts.reform.roleassignmentbatch.befta.fda"
-            classpath += configurations.cucumberRuntime + sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
-                    'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features/']
-        }
-    }
-}*/
-
-task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
-    testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
-    finalizedBy aggregate
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
@@ -131,13 +88,6 @@ task integration(type: Test, description: 'Runs the integration tests.', group: 
     finalizedBy aggregate
 }
 check.dependsOn integration
-
-
-task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
-    testClassesDirs = sourceSets.smokeTest.output.classesDirs
-    classpath = sourceSets.smokeTest.runtimeClasspath
-    finalizedBy aggregate
-}
 
 jacocoTestReport {
     executionData(test)
@@ -258,18 +208,8 @@ dependencies {
     testCompile group: 'io.github.openfeign', name: 'feign-jackson', version: versions.feign_jackson
     testCompile('com.opentable.components:otj-pg-embedded:0.13.3')
 
-    smokeTestCompile group: 'io.rest-assured', name: 'rest-assured', version: versions.rest_assured
-
-    functionalTestCompile sourceSets.main.runtimeClasspath
-    functionalTestCompile sourceSets.test.runtimeClasspath
-
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    smokeTestCompile sourceSets.main.runtimeClasspath
-    smokeTestCompile sourceSets.test.runtimeClasspath
-    smokeTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    smokeTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-
     integrationTestCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
     integrationTestCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
     integrationTestCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
