@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.LiquibaseMigration;
 
 @Configuration
 @EnableBatchProcessing
@@ -25,8 +26,10 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
-                                  @Autowired DeleteExpiredRecords deleteExpiredRecords) {
+                                  @Autowired DeleteExpiredRecords deleteExpiredRecords,
+                                  @Autowired LiquibaseMigration liquibaseMigration) {
         return steps.get(taskParent)
+                    .tasklet(liquibaseMigration)
                     .tasklet(deleteExpiredRecords)
                     .build();
     }
@@ -34,10 +37,11 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Job runRoutesJob(@Autowired JobBuilderFactory jobs,
                             @Autowired StepBuilderFactory steps,
-                            @Autowired DeleteExpiredRecords deleteExpiredRecords) {
+                            @Autowired DeleteExpiredRecords deleteExpiredRecords,
+                            @Autowired LiquibaseMigration liquibaseMigration) {
         return jobs.get(jobName)
                    .incrementer(new RunIdIncrementer())
-                   .start(stepOrchestration(steps, deleteExpiredRecords))
+                   .start(stepOrchestration(steps, deleteExpiredRecords, liquibaseMigration))
                    .build();
     }
 }
