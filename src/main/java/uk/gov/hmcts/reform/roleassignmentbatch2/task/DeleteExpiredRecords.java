@@ -84,8 +84,7 @@ public class DeleteExpiredRecords implements Tasklet {
         return jdbcTemplate.batchUpdate(
             "INSERT INTO role_assignment_history "
             + "VALUES(?::uuid,?::uuid,?,?::uuid,?,?,?,?,?,?,?,?,?,?,?,?::jsonb,?::jsonb,?,?,?)",
-            rah,
-            batchSize, BatchUtil.prepareSetterForRoleAssignmentHistory());
+            rah, batchSize, BatchUtil.prepareSetterForRoleAssignmentHistory());
     }
 
     public List<RoleAssignmentHistory> getLiveRecordsFromHistoryTable() {
