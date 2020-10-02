@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -40,7 +40,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch2.helper.TestDataBuilder;
 class DeleteExpiredRecordsTest {
 
     @Mock
-    private JdbcTemplate jdbcTemplate = Mockito.mock(JdbcTemplate.class);
+    private final JdbcTemplate jdbcTemplate = Mockito.mock(JdbcTemplate.class);
 
     @Mock
     StepContribution stepContribution = Mockito.mock(StepContribution.class);
@@ -51,7 +51,7 @@ class DeleteExpiredRecordsTest {
     @Mock
     ResultSet rs = Mockito.mock(ResultSet.class);
 
-    private DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
+    private final DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
 
     @Before
     public void setUp() {
@@ -111,7 +111,7 @@ class DeleteExpiredRecordsTest {
     }
 
     @Test
-    public void testBatchUpdateWithCollectionOfObjects() throws Exception {
+    void testBatchUpdateWithCollectionOfObjects() throws Exception {
         String sql = "INSERT INTO role_assignment_history "
                      + "VALUES(?::uuid,?::uuid,?,?::uuid,?,?,?,?,?,?,?,?,?,?,?,?::jsonb,?::jsonb,?,?,?)";
         List<RoleAssignmentHistory> list = new ArrayList<>();
