@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -108,46 +107,6 @@ class DeleteExpiredRecordsTest {
 
         Assertions.assertEquals(data, sut.insertIntoRoleAssignmentHistoryTable(list));
     }
-
-    @Test
-    void testBatchUpdateWithCollectionOfObjects() throws Exception {
-        String sql = "INSERT INTO role_assignment_history "
-                     + "VALUES(?::uuid,?::uuid,?,?::uuid,?,?,?,?,?,?,?,?,?,?,?,?::jsonb,?::jsonb,?,?,?)";
-        List<RoleAssignmentHistory> list = new ArrayList<>();
-        list.add(TestDataBuilder.buildRoleAssignmentHistory());
-        int[][] data = new int[1][1];
-
-        Mockito.doAnswer(invocationOnMock -> {
-
-            PreparedStatement ps = Mockito.mock(PreparedStatement.class);
-            List<RoleAssignmentHistory> history = invocationOnMock.getArgument(1);
-            //psr.get(0).setValues(null, 1);
-            return data;
-        }).when(jdbcTemplate).batchUpdate(anyString(), any(), anyInt(), any());
-        Assertions.assertEquals(data, sut.insertIntoRoleAssignmentHistoryTable(list));
-    }
-
-    /* @Test
-    public void testBatchUpdateWithCollectionOfObjects1() throws Exception {
-        List<RoleAssignmentHistory> list = new ArrayList<>();
-        list.add(TestDataBuilder.buildRoleAssignmentHistory());
-        int[][] data = new int[1][1];
-        PreparedStatement ps = mock(PreparedStatement.class);
-        Mockito.when(jdbcTemplate.batchUpdate(anyString(), any(), anyInt(), any())).thenAnswer(new Answer() {
-
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-
-                Object obj[] = invocation.getArguments();
-                //((ParameterizedPreparedStatementSetter) obj[0])
-                .setValues(ps, ((ArrayList<RoleAssignmentHistory>) obj[1]).get(0) );
-                obj[0]).setValues(ps, TestDataBuilder.buildRoleAssignmentHistory());
-                return data;
-            }
-        });
-
-        Assertions.assertEquals(data, sut.insertIntoRoleAssignmentHistoryTable(list));
-    }*/
 
     @Test
     void getLiveRecordsFromHistoryTable() throws IOException {
