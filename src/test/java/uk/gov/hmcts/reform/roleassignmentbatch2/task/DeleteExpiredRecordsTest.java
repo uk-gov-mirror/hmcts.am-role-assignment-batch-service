@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -21,39 +20,36 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.Status;
 import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.ActorIdType;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.RoleType;
 import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.Classification;
 import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.GrantType;
 import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.RoleCategory;
+import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.RoleType;
+import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.Status;
 import uk.gov.hmcts.reform.roleassignmentbatch2.helper.TestDataBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
 class DeleteExpiredRecordsTest {
 
     @Mock
-    private JdbcTemplate jdbcTemplate = mock(JdbcTemplate.class);
+    private JdbcTemplate jdbcTemplate = Mockito.mock(JdbcTemplate.class);
 
     @Mock
-    StepContribution stepContribution = mock(StepContribution.class);
+    StepContribution stepContribution = Mockito.mock(StepContribution.class);
 
     @Mock
-    ChunkContext chunkContext = mock(ChunkContext.class);
+    ChunkContext chunkContext = Mockito.mock(ChunkContext.class);
 
     @Mock
-    ResultSet rs = mock(ResultSet.class);
+    ResultSet rs = Mockito.mock(ResultSet.class);
 
     private DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
 
@@ -64,30 +60,31 @@ class DeleteExpiredRecordsTest {
 
     @Test
     void execute() throws IOException {
-        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class)))
-            .thenReturn(400);
+        Mockito.when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class)))
+               .thenReturn(400);
 
         List<RoleAssignmentHistory> list = new ArrayList<>();
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
 
-        when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any())).thenReturn(list);
+        Mockito.when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any()))
+               .thenReturn(list);
 
         Assertions.assertEquals(RepeatStatus.FINISHED, sut.execute(stepContribution, chunkContext));
     }
 
     @Test
     void executeThrowsException() throws IOException {
-        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class)))
-                .thenThrow(NullPointerException.class);
+        Mockito.when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class)))
+               .thenThrow(NullPointerException.class);
 
         List<RoleAssignmentHistory> list = new ArrayList<>();
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
 
-        when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any())).thenReturn(list);
+        Mockito.when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any()))
+               .thenReturn(list);
 
         Assertions.assertThrows(NullPointerException.class, () ->
-                sut.execute(stepContribution, chunkContext)
-        );
+            sut.execute(stepContribution, chunkContext));
     }
 
     @Test
@@ -96,7 +93,7 @@ class DeleteExpiredRecordsTest {
         List<RoleAssignmentHistory> list = new ArrayList<>();
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
 
-        when(jdbcTemplate.update(any(), any(), any())).thenReturn(1);
+        Mockito.when(jdbcTemplate.update(any(), any(), any())).thenReturn(1);
 
         Assertions.assertEquals(1, sut.deleteRoleAssignmentRecords(list));
     }
@@ -108,7 +105,7 @@ class DeleteExpiredRecordsTest {
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
         int[][] data = new int[1][1];
         data[0][0] = 1;
-        when(jdbcTemplate.batchUpdate(anyString(), any(), anyInt(), any())).thenReturn(data);
+        Mockito.when(jdbcTemplate.batchUpdate(anyString(), any(), anyInt(), any())).thenReturn(data);
 
         Assertions.assertEquals(data, sut.insertIntoRoleAssignmentHistoryTable(list));
     }
@@ -116,14 +113,14 @@ class DeleteExpiredRecordsTest {
     @Test
     public void testBatchUpdateWithCollectionOfObjects() throws Exception {
         String sql = "INSERT INTO role_assignment_history "
-                + "VALUES(?::uuid,?::uuid,?,?::uuid,?,?,?,?,?,?,?,?,?,?,?,?::jsonb,?::jsonb,?,?,?)";
+                     + "VALUES(?::uuid,?::uuid,?,?::uuid,?,?,?,?,?,?,?,?,?,?,?,?::jsonb,?::jsonb,?,?,?)";
         List<RoleAssignmentHistory> list = new ArrayList<>();
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
         int[][] data = new int[1][1];
 
-        doAnswer(invocationOnMock -> {
+        Mockito.doAnswer(invocationOnMock -> {
 
-            PreparedStatement ps = mock(PreparedStatement.class);
+            PreparedStatement ps = Mockito.mock(PreparedStatement.class);
             List<RoleAssignmentHistory> history = invocationOnMock.getArgument(1);
             //psr.get(0).setValues(null, 1);
             return data;
@@ -131,19 +128,20 @@ class DeleteExpiredRecordsTest {
         Assertions.assertEquals(data, sut.insertIntoRoleAssignmentHistoryTable(list));
     }
 
-   /* @Test
+    /* @Test
     public void testBatchUpdateWithCollectionOfObjects1() throws Exception {
         List<RoleAssignmentHistory> list = new ArrayList<>();
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
         int[][] data = new int[1][1];
         PreparedStatement ps = mock(PreparedStatement.class);
-        when(jdbcTemplate.batchUpdate(anyString(), any(), anyInt(), any())).thenAnswer(new Answer() {
+        Mockito.when(jdbcTemplate.batchUpdate(anyString(), any(), anyInt(), any())).thenAnswer(new Answer() {
 
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
 
                 Object obj[] = invocation.getArguments();
-                //((ParameterizedPreparedStatementSetter) obj[0]).setValues(ps, ((ArrayList<RoleAssignmentHistory>) obj[1]).get(0) );
+                //((ParameterizedPreparedStatementSetter) obj[0])
+                .setValues(ps, ((ArrayList<RoleAssignmentHistory>) obj[1]).get(0) );
                 obj[0]).setValues(ps, TestDataBuilder.buildRoleAssignmentHistory());
                 return data;
             }
@@ -156,7 +154,8 @@ class DeleteExpiredRecordsTest {
     void getLiveRecordsFromHistoryTable() throws IOException {
         List<RoleAssignmentHistory> list = new ArrayList<>();
         list.add(TestDataBuilder.buildRoleAssignmentHistory());
-        when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any())).thenReturn(list);
+        Mockito.when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any()))
+               .thenReturn(list);
         Assertions.assertEquals(list, sut.getLiveRecordsFromHistoryTable());
     }
 
@@ -166,39 +165,42 @@ class DeleteExpiredRecordsTest {
         Timestamp beginDate = Timestamp.valueOf(timeStamp.plusDays(1));
         Timestamp endDate = Timestamp.valueOf(timeStamp.plusMonths(1));
         Timestamp created = Timestamp.valueOf(timeStamp);
-        when(jdbcTemplate.query(
-                ArgumentMatchers.anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any()))
-                .thenAnswer((invocation) -> {
+        Mockito.when(jdbcTemplate.query(
+            ArgumentMatchers.anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any()))
+               .thenAnswer((invocation) -> {
 
-                    final ResultSetExtractor<List<RoleAssignmentHistory>> resultSetExtractor =
-                            invocation.getArgument(1);
-                    when(rs.next()).thenReturn(true, false);
+                   final ResultSetExtractor<List<RoleAssignmentHistory>> resultSetExtractor =
+                       invocation.getArgument(1);
+                   Mockito.when(rs.next()).thenReturn(true, false);
 
-                    when(rs.getObject(ArgumentMatchers.eq("id")))
-                            .thenReturn(UUID.fromString("9785c98c-78f2-418b-ab74-a892c3ccca9f"));
-                    when(rs.getString(ArgumentMatchers.eq("request_id")))
-                            .thenReturn("123e4567-e89b-42d3-a456-556642445678");
-                    when(rs.getString(ArgumentMatchers.eq("actor_id_type"))).thenReturn(ActorIdType.IDAM.name());
-                    when(rs.getObject(ArgumentMatchers.eq("actor_id")))
-                            .thenReturn("3168da13-00b3-41e3-81fa-cbc71ac28a0f");
-                    when(rs.getString(ArgumentMatchers.eq("role_type"))).thenReturn(RoleType.CASE.name());
-                    when(rs.getString(ArgumentMatchers.eq("role_name"))).thenReturn("Judge");
-                    when(rs.getString(ArgumentMatchers.eq("classification"))).thenReturn(Classification.PUBLIC.name());
-                    when(rs.getString(ArgumentMatchers.eq("grant_type"))).thenReturn(GrantType.STANDARD.name());
-                    when(rs.getString(ArgumentMatchers.eq("role_category"))).thenReturn(RoleCategory.JUDICIAL.name());
-                    when(rs.getBoolean(ArgumentMatchers.eq("read_only"))).thenReturn(true);
-                    when(rs.getTimestamp(ArgumentMatchers.eq("begin_time"))).thenReturn(beginDate);
-                    when(rs.getTimestamp(ArgumentMatchers.eq("end_time"))).thenReturn(endDate);
-                    when(rs.getString(ArgumentMatchers.eq("status"))).thenReturn(Status.LIVE.toString());
-                    when(rs.getString(ArgumentMatchers.eq("reference"))).thenReturn("reference");
-                    when(rs.getString(ArgumentMatchers.eq("process"))).thenReturn("process");
-                    when(rs.getString(ArgumentMatchers.eq("attributes"))).thenReturn("attributes");
-                    when(rs.getString(ArgumentMatchers.eq("notes"))).thenReturn("notes");
-                    when(rs.getString(ArgumentMatchers.eq("log"))).thenReturn("logs");
-                    when(rs.getInt(ArgumentMatchers.eq("status_sequence"))).thenReturn(1);
-                    when(rs.getTimestamp(ArgumentMatchers.eq("created"))).thenReturn(created);
-                    return resultSetExtractor.extractData(rs);
-                });
+                   Mockito.when(rs.getObject(ArgumentMatchers.eq("id")))
+                          .thenReturn(UUID.fromString("9785c98c-78f2-418b-ab74-a892c3ccca9f"));
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("request_id")))
+                          .thenReturn("123e4567-e89b-42d3-a456-556642445678");
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("actor_id_type"))).thenReturn(ActorIdType.IDAM.name());
+                   Mockito.when(rs.getObject(ArgumentMatchers.eq("actor_id")))
+                          .thenReturn("3168da13-00b3-41e3-81fa-cbc71ac28a0f");
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("role_type")))
+                          .thenReturn(RoleType.CASE.name());
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("role_name"))).thenReturn("Judge");
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("classification")))
+                          .thenReturn(Classification.PUBLIC.name());
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("grant_type"))).thenReturn(GrantType.STANDARD.name());
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("role_category")))
+                          .thenReturn(RoleCategory.JUDICIAL.name());
+                   Mockito.when(rs.getBoolean(ArgumentMatchers.eq("read_only"))).thenReturn(true);
+                   Mockito.when(rs.getTimestamp(ArgumentMatchers.eq("begin_time"))).thenReturn(beginDate);
+                   Mockito.when(rs.getTimestamp(ArgumentMatchers.eq("end_time"))).thenReturn(endDate);
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("status"))).thenReturn(Status.LIVE.toString());
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("reference"))).thenReturn("reference");
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("process"))).thenReturn("process");
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("attributes"))).thenReturn("attributes");
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("notes"))).thenReturn("notes");
+                   Mockito.when(rs.getString(ArgumentMatchers.eq("log"))).thenReturn("logs");
+                   Mockito.when(rs.getInt(ArgumentMatchers.eq("status_sequence"))).thenReturn(1);
+                   Mockito.when(rs.getTimestamp(ArgumentMatchers.eq("created"))).thenReturn(created);
+                   return resultSetExtractor.extractData(rs);
+               });
 
         List<RoleAssignmentHistory> result = sut.getLiveRecordsFromHistoryTable();
         Assertions.assertEquals("IDAM", result.get(0).getActorIDType());
@@ -222,8 +224,8 @@ class DeleteExpiredRecordsTest {
 
     @Test
     void getCountFromHistoryTable() {
-        when(jdbcTemplate.queryForObject("SELECT count(*) from role_assignment_history rah", Integer.class))
-            .thenReturn(400);
+        Mockito.when(jdbcTemplate.queryForObject("SELECT count(*) from role_assignment_history rah", Integer.class))
+               .thenReturn(400);
         Assertions.assertEquals(400, sut.getCountFromHistoryTable());
     }
 }
