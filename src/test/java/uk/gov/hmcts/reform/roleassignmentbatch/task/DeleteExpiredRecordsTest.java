@@ -14,14 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.BeforeClass;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -40,7 +39,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.helper.TestDataBuilder;
 class DeleteExpiredRecordsTest {
 
     @Mock
-    private final JdbcTemplate jdbcTemplate = Mockito.mock(JdbcTemplate.class);
+    private JdbcTemplate jdbcTemplate = Mockito.mock(JdbcTemplate.class);
 
     @Mock
     StepContribution stepContribution = Mockito.mock(StepContribution.class);
@@ -51,11 +50,11 @@ class DeleteExpiredRecordsTest {
     @Mock
     ResultSet rs = Mockito.mock(ResultSet.class);
 
-    private final DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
+    private DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    @BeforeClass
+    public static void setUp() {
+        //MockitoAnnotations.initMocks(this);
     }
 
     @Test
