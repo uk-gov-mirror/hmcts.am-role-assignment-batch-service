@@ -1,10 +1,10 @@
-package uk.gov.hmcts.reform.roleassignmentbatch2.util;
+package uk.gov.hmcts.reform.roleassignmentbatch.util;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
-import uk.gov.hmcts.reform.roleassignmentbatch2.task.RoleAssignmentHistory;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.RoleAssignmentHistory;
 
 public class BatchUtil {
     private BatchUtil() {
