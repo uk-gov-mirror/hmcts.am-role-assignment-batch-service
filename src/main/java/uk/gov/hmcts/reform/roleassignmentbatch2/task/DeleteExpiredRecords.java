@@ -85,10 +85,8 @@ public class DeleteExpiredRecords implements Tasklet {
             "INSERT INTO role_assignment_history "
             + "VALUES(?::uuid,?::uuid,?,?::uuid,?,?,?,?,?,?,?,?,?,?,?,?::jsonb,?::jsonb,?,?,?)",
             rah,
-            batchSize,
-                BatchUtil.prepareSetterForRoleAssignmentHistory());
+            batchSize, BatchUtil.prepareSetterForRoleAssignmentHistory());
     }
-
 
     public List<RoleAssignmentHistory> getLiveRecordsFromHistoryTable() {
         String getSQL = "SELECT * from role_assignment_history rah  "
