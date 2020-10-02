@@ -1,5 +1,15 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ActorIdType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Classification;
@@ -8,16 +18,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Status;
 import uk.gov.hmcts.reform.roleassignmentbatch.helper.TestDataBuilder;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 class RoleAssignmentHistoryTest {
 
