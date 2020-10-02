@@ -1,13 +1,13 @@
-package uk.gov.hmcts.reform.roleassignmentbatch2.task;
+package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.ActorIdType;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.Classification;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.GrantType;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.RoleCategory;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.RoleType;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.Status;
-import uk.gov.hmcts.reform.roleassignmentbatch2.helper.TestDataBuilder;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ActorIdType;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Classification;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.GrantType;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Status;
+import uk.gov.hmcts.reform.roleassignmentbatch.helper.TestDataBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;

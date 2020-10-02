@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.roleassignmentbatch2;
+package uk.gov.hmcts.reform.roleassignmentbatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

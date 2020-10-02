@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.roleassignmentbatch2.task;
+package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -17,7 +17,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.reform.roleassignmentbatch2.util.BatchUtil;
+import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 
 @Component
 public class DeleteExpiredRecords implements Tasklet {

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.roleassignmentbatch2.task;
+package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -28,13 +28,13 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.ActorIdType;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.Classification;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.GrantType;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.RoleCategory;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.RoleType;
-import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.Status;
-import uk.gov.hmcts.reform.roleassignmentbatch2.helper.TestDataBuilder;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ActorIdType;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Classification;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.GrantType;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Status;
+import uk.gov.hmcts.reform.roleassignmentbatch.helper.TestDataBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
 class DeleteExpiredRecordsTest {
