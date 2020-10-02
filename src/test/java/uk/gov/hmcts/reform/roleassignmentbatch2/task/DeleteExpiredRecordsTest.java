@@ -4,10 +4,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -22,11 +22,15 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.Status;
 import uk.gov.hmcts.reform.roleassignmentbatch2.domain.model.enums.ActorIdType;
@@ -108,6 +112,45 @@ class DeleteExpiredRecordsTest {
 
         Assertions.assertEquals(data, sut.insertIntoRoleAssignmentHistoryTable(list));
     }
+
+    @Test
+    public void testBatchUpdateWithCollectionOfObjects() throws Exception {
+        String sql = "INSERT INTO role_assignment_history "
+                + "VALUES(?::uuid,?::uuid,?,?::uuid,?,?,?,?,?,?,?,?,?,?,?,?::jsonb,?::jsonb,?,?,?)";
+        List<RoleAssignmentHistory> list = new ArrayList<>();
+        list.add(TestDataBuilder.buildRoleAssignmentHistory());
+        int[][] data = new int[1][1];
+
+        doAnswer(invocationOnMock -> {
+
+            PreparedStatement ps = mock(PreparedStatement.class);
+            List<RoleAssignmentHistory> history = invocationOnMock.getArgument(1);
+            //psr.get(0).setValues(null, 1);
+            return data;
+        }).when(jdbcTemplate).batchUpdate(anyString(), any(), anyInt(), any());
+        Assertions.assertEquals(data, sut.insertIntoRoleAssignmentHistoryTable(list));
+    }
+
+   /* @Test
+    public void testBatchUpdateWithCollectionOfObjects1() throws Exception {
+        List<RoleAssignmentHistory> list = new ArrayList<>();
+        list.add(TestDataBuilder.buildRoleAssignmentHistory());
+        int[][] data = new int[1][1];
+        PreparedStatement ps = mock(PreparedStatement.class);
+        when(jdbcTemplate.batchUpdate(anyString(), any(), anyInt(), any())).thenAnswer(new Answer() {
+
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+
+                Object obj[] = invocation.getArguments();
+                //((ParameterizedPreparedStatementSetter) obj[0]).setValues(ps, ((ArrayList<RoleAssignmentHistory>) obj[1]).get(0) );
+                obj[0]).setValues(ps, TestDataBuilder.buildRoleAssignmentHistory());
+                return data;
+            }
+        });
+
+        Assertions.assertEquals(data, sut.insertIntoRoleAssignmentHistoryTable(list));
+    }*/
 
     @Test
     void getLiveRecordsFromHistoryTable() throws IOException {
