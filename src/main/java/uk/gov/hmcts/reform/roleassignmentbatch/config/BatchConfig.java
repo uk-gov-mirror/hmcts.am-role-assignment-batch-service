@@ -25,10 +25,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
-                                  @Autowired DeleteExpiredRecords deleteExpiredRecords,
-                                  @Autowired LiquibaseMigration liquibaseMigration) {
+                                  @Autowired DeleteExpiredRecords deleteExpiredRecords) {
         return steps.get(taskParent)
-                    .tasklet(liquibaseMigration)
                     .tasklet(deleteExpiredRecords)
                     .build();
     }
@@ -36,11 +34,10 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Job runRoutesJob(@Autowired JobBuilderFactory jobs,
                             @Autowired StepBuilderFactory steps,
-                            @Autowired DeleteExpiredRecords deleteExpiredRecords,
-                            @Autowired LiquibaseMigration liquibaseMigration) {
+                            @Autowired DeleteExpiredRecords deleteExpiredRecords) {
         return jobs.get(jobName)
                    .incrementer(new RunIdIncrementer())
-                   .start(stepOrchestration(steps, deleteExpiredRecords, liquibaseMigration))
+                   .start(stepOrchestration(steps, deleteExpiredRecords))
                    .build();
     }
 }
