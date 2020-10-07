@@ -1,16 +1,7 @@
-/*
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
 import javax.sql.DataSource;
 
-import liquibase.Contexts;
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.lockservice.DatabaseChangeLogLock;
-import liquibase.resource.ClassLoaderResourceAccessor;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -30,7 +21,7 @@ public class LiquibaseMigration implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
+        /*Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
             new JdbcConnection(dataSource.getConnection()));
         Liquibase liquibase = null;
         try {
@@ -53,8 +44,7 @@ public class LiquibaseMigration implements Tasklet {
                 }
                 liquibase.close();
             }
-        }
+        }*/
         return RepeatStatus.FINISHED;
     }
 }
-*/
