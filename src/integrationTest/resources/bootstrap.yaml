@@ -1,0 +1,8 @@
+spring:
+  cloud:
+    propertiesvolume:
+      paths: /mnt/secrets/am
+      prefixed: false
+      aliases:
+        AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        role-assignment-service-POSTGRES-PASS: ROLE_ASSIGNMENT_DB_PASSWORD

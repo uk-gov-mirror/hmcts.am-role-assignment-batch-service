@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.roleassignmentbatch.batch;
+package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
