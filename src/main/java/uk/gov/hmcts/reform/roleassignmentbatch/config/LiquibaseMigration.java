@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
 import javax.sql.DataSource;
@@ -56,3 +57,4 @@ public class LiquibaseMigration implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 }
+*/
