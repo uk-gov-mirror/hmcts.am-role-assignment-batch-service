@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.roleassignmentbatch.util;
+package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
 import javax.sql.DataSource;
 
