@@ -25,13 +25,14 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 def vaultOverrides = [
-    'preview' : 'aat',
-    'spreview': 'saat'
+  'preview' : 'aat',
+  'spreview': 'saat'
 ]
 
-def secrets = [
+def secrets = []
 
-]
+// Configure branches to sync with master branch
+def branchesToSync = ['demo', 'perftest']
 
 withPipeline(type, product, component) {
   onMaster {
@@ -48,41 +49,14 @@ withPipeline(type, product, component) {
   disableLegacyDeployment()
   nonServiceApp()
 
+  // Sync environment specific branches with master branch
+  syncBranchesWithMaster(branchesToSync)
+
   after('test:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/site/serenity/**'
   }
 
   after('test:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/site/serenity/**'
-  }
-
-  after('checkout') {
-    onMaster {
-      withCredentials([usernamePassword(credentialsId: 'jenkins-github-hmcts-api-token', usernameVariable: 'USERNAME', passwordVariable: 'BEARER_TOKEN')]) {
-        sh '''
-          set -e
-          git remote set-url origin $(git config remote.origin.url | sed "s/github.com/${BEARER_TOKEN}@github.com/g")
-        '''
-
-        try {
-          sh '''
-            git fetch origin demo:demo
-            git push --force origin HEAD:demo
-          '''
-        } catch (err) {
-          notifyBuildEvent channel: '#am-master-builds', color: 'warning', message: 'Failed to update demo branch'
-        }
-
-        try {
-          sh '''
-            git fetch origin perftest:perftest
-            git push --force origin HEAD:perftest
-          '''
-        } catch (err) {
-          notifyBuildEvent channel: '#am-master-builds', color: 'warning', message: 'Failed to update perftest branch'
-        }
-      }
-    }
-    sh """ git submodule update --init """
   }
 }
