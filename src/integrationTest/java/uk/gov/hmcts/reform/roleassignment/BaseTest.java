@@ -8,12 +8,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
-import liquibase.Contexts;
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
 import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -45,23 +39,15 @@ public class BaseTest {
 
     @Bean
     @Primary
-    public DataSource dataSource(@Qualifier("embeddedPostgres") final EmbeddedPostgres pg) throws Exception {
+    public DataSource dataSource(@Qualifier("embeddedPostgres") final EmbeddedPostgres pg) {
 
-        DataSource datasource = DataSourceBuilder
+        return DataSourceBuilder
             .create()
             .username(POSTGRES)
             .password(POSTGRES)
             .url(pg.getJdbcUrl(POSTGRES, POSTGRES))
             .driverClassName("org.postgresql.Driver")
             .build();
-
-        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
-            new JdbcConnection(datasource.getConnection()));
-        try (Liquibase liquibase = new Liquibase("db/changelog/db.changelog-main.xml",
-                                                 new ClassLoaderResourceAccessor(), database)) {
-            liquibase.update(new Contexts());
-        }
-        return datasource;
     }
 
     @PreDestroy
