@@ -15,7 +15,7 @@ public class RoleAssignmentHistory {
     private UUID id;
     private UUID requestId;
     private String actorIDType;
-    private UUID actorId;
+    private String actorId;
     private String roleType;
     private String roleName;
     private String classification;
@@ -83,11 +83,11 @@ public class RoleAssignmentHistory {
         this.actorIDType = actorIDType;
     }
 
-    public UUID getActorId() {
+    public String getActorId() {
         return actorId;
     }
 
-    public void setActorId(UUID actorId) {
+    public void setActorId(String actorId) {
         this.actorId = actorId;
     }
 
