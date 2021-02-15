@@ -1,6 +1,11 @@
 package uk.gov.hmcts.reform.roleassignment;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
@@ -9,17 +14,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import org.junit.BeforeClass;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.http.MediaType;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@Configuration
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BaseTest {
 
     protected static final ObjectMapper mapper = new ObjectMapper();
-    public static final String POSTGRES = "postgres";
 
     @BeforeClass
     public static void init() {
@@ -27,31 +35,42 @@ public class BaseTest {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
-    @Bean
-    @Primary
-    public EmbeddedPostgres embeddedPostgres() throws IOException {
-        return EmbeddedPostgres
-            .builder()
-            .setConnectConfig("stringtype", "unspecified")
-            .setPort(0)
-            .start();
-    }
+    protected static final MediaType JSON_CONTENT_TYPE = new MediaType(
+            MediaType.APPLICATION_JSON.getType(),
+            MediaType.APPLICATION_JSON.getSubtype(),
+            StandardCharsets.UTF_8
+    );
 
-    @Bean
-    @Primary
-    public DataSource dataSource(@Qualifier("embeddedPostgres") final EmbeddedPostgres pg) {
+    @TestConfiguration
+    static class Configuration {
+        Connection connection;
 
-        return DataSourceBuilder
-            .create()
-            .username(POSTGRES)
-            .password(POSTGRES)
-            .url(pg.getJdbcUrl(POSTGRES, POSTGRES))
-            .driverClassName("org.postgresql.Driver")
-            .build();
-    }
+        @Bean
+        public EmbeddedPostgres embeddedPostgres() throws IOException {
+            return EmbeddedPostgres
+                    .builder()
+                    .setPort(0)
+                    .start();
+        }
 
-    @PreDestroy
-    public void contextDestroyed() throws IOException {
-        embeddedPostgres().close();
+        @Bean
+        public DataSource dataSource(@Autowired EmbeddedPostgres pg) throws Exception {
+
+            final Properties props = new Properties();
+            // Instruct JDBC to accept JSON string for JSONB
+            props.setProperty("stringtype", "unspecified");
+            connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
+            DataSource datasource = new SingleConnectionDataSource(connection, true);
+            return datasource;
+        }
+
+
+
+        @PreDestroy
+        public void contextDestroyed() throws SQLException {
+            if (connection != null) {
+                connection.close();
+            }
+        }
     }
 }
