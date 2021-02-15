@@ -60,7 +60,7 @@ public class BaseTest {
             connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
             DataSource datasource = new SingleConnectionDataSource(connection, true);
             Flyway.configure().dataSource(datasource)
-                    .locations("/Users/736062/HMCTS-Projects/AM/am-role-assignment-batch-service/src/integrationTest/resources/db/migration/V1_1__init_tables.sql").load().migrate();
+                    .locations("db/migration/").load().migrate();
             return datasource;
 
 
