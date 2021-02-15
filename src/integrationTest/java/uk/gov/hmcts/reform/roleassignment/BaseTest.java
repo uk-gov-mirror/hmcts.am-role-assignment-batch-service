@@ -13,18 +13,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
+import org.flywaydb.core.Flyway;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.stereotype.Service;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Service
 public class BaseTest {
 
     protected static final ObjectMapper mapper = new ObjectMapper();
@@ -61,6 +59,8 @@ public class BaseTest {
             props.setProperty("stringtype", "unspecified");
             connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
             DataSource datasource = new SingleConnectionDataSource(connection, true);
+            Flyway.configure().dataSource(datasource).locations("/Users/462450/IdeaProjects/am-role-assignment-batch-service/src/integrationTest/resources/db.migrate/V1_1__init_tables.sql").load().migrate();
+
             return datasource;
         }
 
