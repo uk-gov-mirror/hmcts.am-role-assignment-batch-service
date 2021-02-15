@@ -98,7 +98,7 @@ public class DeleteExpiredRecords implements Tasklet {
                     roleAssignmentHistory.setId(rs.getObject("id", java.util.UUID.class));
                     roleAssignmentHistory.setRequestId(rs.getObject("request_id", java.util.UUID.class));
                     roleAssignmentHistory.setActorIDType(rs.getString("actor_id_type"));
-                    roleAssignmentHistory.setActorId(rs.getObject("actor_id", java.util.UUID.class));
+                    roleAssignmentHistory.setActorId(rs.getString("actor_id"));
                     roleAssignmentHistory.setRoleType(rs.getString("role_type"));
                     roleAssignmentHistory.setRoleName(rs.getString("role_name"));
                     roleAssignmentHistory.setClassification(rs.getString("classification"));

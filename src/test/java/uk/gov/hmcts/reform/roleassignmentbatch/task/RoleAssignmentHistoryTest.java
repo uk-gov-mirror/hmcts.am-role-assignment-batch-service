@@ -35,7 +35,7 @@ class RoleAssignmentHistoryTest {
 
     @Test
     void getters() {
-        assertEquals(UUID.fromString("21334a2b-79ce-44eb-9168-2d49a744be9c"), roleAssignmentHistory.getActorId());
+        assertEquals("21334a2b-79ce-44eb-9168-2d49a744be9c", roleAssignmentHistory.getActorId());
         assertEquals(ActorIdType.IDAM.name(), roleAssignmentHistory.getActorIDType());
         assertTrue(roleAssignmentHistory.getAttributes().contains("jurisdiction"));
         assertNotNull(roleAssignmentHistory.getBeginTime().toLocalDateTime());
@@ -60,7 +60,7 @@ class RoleAssignmentHistoryTest {
     void setters() {
         assertNotNull(roleAssignmentHistoryNoArgs);
 
-        roleAssignmentHistoryNoArgs.setActorId(UUID.fromString("21334a2b-79ce-44eb-9168-2d49a744be9b"));
+        roleAssignmentHistoryNoArgs.setActorId("21334a2b-79ce-44eb-9168-2d49a744be9b");
         assertEquals("21334a2b-79ce-44eb-9168-2d49a744be9b",
                 roleAssignmentHistoryNoArgs.getActorId().toString());
 

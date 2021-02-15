@@ -30,7 +30,7 @@ public class TestDataBuilder {
         return RoleAssignmentHistory
                 .builder()
                 .id(UUID.fromString("9785c98c-78f2-418b-ab74-a892c3ccca9f"))
-                .actorId(UUID.fromString("21334a2b-79ce-44eb-9168-2d49a744be9c"))
+                .actorId("21334a2b-79ce-44eb-9168-2d49a744be9c")
                 .actorIDType(ActorIdType.IDAM.name())
                 .attributes(buildAttributesFromFile().toString())
                 .created(Timestamp.valueOf(timeStamp))
