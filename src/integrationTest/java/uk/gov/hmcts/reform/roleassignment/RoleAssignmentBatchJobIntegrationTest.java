@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -31,7 +32,7 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     private static final String COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE =
         "SELECT count(*) as n FROM role_assignment_history where STATUS='EXPIRED'";
 
-    @Inject
+    @Autowired
     private DataSource ds;
 
     private JdbcTemplate template;
