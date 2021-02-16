@@ -18,12 +18,12 @@ import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.stereotype.Service;
 
-@Service
-public class BaseTest {
+@Configuration
+public abstract class BaseTest {
 
     protected static final ObjectMapper mapper = new ObjectMapper();
 
@@ -62,8 +62,6 @@ public class BaseTest {
             Flyway.configure().dataSource(datasource)
                     .locations("db/migration/").load().migrate();
             return datasource;
-
-
 
         }
 
