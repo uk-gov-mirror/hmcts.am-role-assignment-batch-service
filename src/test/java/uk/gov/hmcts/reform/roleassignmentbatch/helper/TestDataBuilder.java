@@ -1,5 +1,11 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.helper;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,12 +18,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Status;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RoleAssignmentHistory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 @Setter
 public class TestDataBuilder {
 
@@ -29,8 +29,8 @@ public class TestDataBuilder {
         LocalDateTime timeStamp = LocalDateTime.now();
         return RoleAssignmentHistory
                 .builder()
-                .id(UUID.fromString("9785c98c-78f2-418b-ab74-a892c3ccca9f"))
-                .actorId(UUID.fromString("21334a2b-79ce-44eb-9168-2d49a744be9c"))
+                .id(("9785c98c-78f2-418b-ab74-a892c3ccca9f"))
+                .actorId(("21334a2b-79ce-44eb-9168-2d49a744be9c"))
                 .actorIDType(ActorIdType.IDAM.name())
                 .attributes(buildAttributesFromFile().toString())
                 .created(Timestamp.valueOf(timeStamp))

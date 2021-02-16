@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 
 import javax.sql.DataSource;
 
-import javax.inject.Inject;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Assert;
 import org.junit.Before;
