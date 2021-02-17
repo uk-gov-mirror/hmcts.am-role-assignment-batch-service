@@ -6,11 +6,4 @@ home: https://github.com/hmcts/am-role-assignment-batch-service
 version: 0.0.12
 maintainers:
   - name: Access Management Team
-dependencies:
-  - name: job
-    version: ~0.6.0
-    repository: '@hmctspublic'
-  - name: postgresql
-    version: ~8.9.8
-    repository: https://charts.bitnami.com/bitnami
-    condition: postgresql.enabled
+
