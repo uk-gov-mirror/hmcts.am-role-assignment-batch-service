@@ -69,7 +69,7 @@ public class DeleteExpiredRecords implements Tasklet {
     }
 
     public int deleteRoleAssignmentRecords(List<RoleAssignmentHistory> rah) {
-        String deleteSql = "DELETE FROM role_assignment WHERE id::uuid=?::uuid";
+        String deleteSql = "DELETE FROM role_assignment WHERE id=?";
         int rows = 0;
         for (RoleAssignmentHistory ra : rah) {
             Object[] params = {ra.getId()};
@@ -83,7 +83,7 @@ public class DeleteExpiredRecords implements Tasklet {
     public int[][] insertIntoRoleAssignmentHistoryTable(List<RoleAssignmentHistory> rah) {
         return jdbcTemplate.batchUpdate(
             "INSERT INTO role_assignment_history "
-            + "VALUES(?::uuid,?::uuid,?,?::uuid,?,?,?,?,?,?,?,?,?,?,?,?::jsonb,?::jsonb,?,?,?)",
+            + "VALUES(?,?::uuid,?,?,?,?,?,?,?,?,?,?,?,?,?,?::jsonb,?::jsonb,?,?,?)",
             rah, batchSize, BatchUtil.prepareSetterForRoleAssignmentHistory());
     }
 
@@ -95,10 +95,10 @@ public class DeleteExpiredRecords implements Tasklet {
             jdbcTemplate.query(getSQL, rs -> {
                 while (rs.next()) {
                     RoleAssignmentHistory roleAssignmentHistory = new RoleAssignmentHistory();
-                    roleAssignmentHistory.setId(rs.getObject("id", java.util.UUID.class));
+                    roleAssignmentHistory.setId(rs.getString("id"));
                     roleAssignmentHistory.setRequestId(rs.getObject("request_id", java.util.UUID.class));
                     roleAssignmentHistory.setActorIDType(rs.getString("actor_id_type"));
-                    roleAssignmentHistory.setActorId(rs.getObject("actor_id", java.util.UUID.class));
+                    roleAssignmentHistory.setActorId(rs.getString("actor_id"));
                     roleAssignmentHistory.setRoleType(rs.getString("role_type"));
                     roleAssignmentHistory.setRoleName(rs.getString("role_name"));
                     roleAssignmentHistory.setClassification(rs.getString("classification"));
