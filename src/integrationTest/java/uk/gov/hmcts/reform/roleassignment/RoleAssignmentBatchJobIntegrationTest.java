@@ -103,8 +103,7 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
         sut.execute(null, null);
         count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
         logger.info(" Total number of Expired records fetched from History table...{}", count);
-        // Need to fix this
-        //Assert.assertEquals("The EXPIRED records were not inserted", Integer.valueOf(3), count);
+        Assert.assertEquals("The EXPIRED records were not inserted", Integer.valueOf(3), count);
     }
 
 }
