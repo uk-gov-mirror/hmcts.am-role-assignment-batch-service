@@ -35,7 +35,7 @@ class RoleAssignmentHistoryTest {
 
     @Test
     void getters() {
-        assertEquals(UUID.fromString("21334a2b-79ce-44eb-9168-2d49a744be9c"), roleAssignmentHistory.getActorId());
+        assertEquals(("21334a2b-79ce-44eb-9168-2d49a744be9c"), roleAssignmentHistory.getActorId());
         assertEquals(ActorIdType.IDAM.name(), roleAssignmentHistory.getActorIDType());
         assertTrue(roleAssignmentHistory.getAttributes().contains("jurisdiction"));
         assertNotNull(roleAssignmentHistory.getBeginTime().toLocalDateTime());
@@ -43,7 +43,7 @@ class RoleAssignmentHistoryTest {
         assertNotNull(roleAssignmentHistory.getCreated().toLocalDateTime());
         assertNotNull(roleAssignmentHistory.getEndTime().toLocalDateTime());
         assertEquals(GrantType.STANDARD.name(), roleAssignmentHistory.getGrantType());
-        assertEquals(UUID.fromString("9785c98c-78f2-418b-ab74-a892c3ccca9f"), roleAssignmentHistory.getId());
+        assertEquals(("9785c98c-78f2-418b-ab74-a892c3ccca9f"), roleAssignmentHistory.getId());
         assertEquals("log", roleAssignmentHistory.getLog());
         assertTrue(roleAssignmentHistory.getNotes().contains("comment"));
         assertEquals("process", roleAssignmentHistory.getProcess());
@@ -60,11 +60,11 @@ class RoleAssignmentHistoryTest {
     void setters() {
         assertNotNull(roleAssignmentHistoryNoArgs);
 
-        roleAssignmentHistoryNoArgs.setActorId(UUID.fromString("21334a2b-79ce-44eb-9168-2d49a744be9b"));
+        roleAssignmentHistoryNoArgs.setActorId(("21334a2b-79ce-44eb-9168-2d49a744be9b"));
         assertEquals("21334a2b-79ce-44eb-9168-2d49a744be9b",
                 roleAssignmentHistoryNoArgs.getActorId().toString());
 
-        roleAssignmentHistoryNoArgs.setId(UUID.fromString("21334a2b-79ce-44eb-9168-2d49a744be9b"));
+        roleAssignmentHistoryNoArgs.setId(("21334a2b-79ce-44eb-9168-2d49a744be9b"));
         assertEquals("21334a2b-79ce-44eb-9168-2d49a744be9b",
                 roleAssignmentHistoryNoArgs.getActorId().toString());
 
