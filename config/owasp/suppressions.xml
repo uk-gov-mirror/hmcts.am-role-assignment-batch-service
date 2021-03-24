@@ -5,11 +5,4 @@
    ]]></notes>
     <cve>CVE-2018-1258</cve>
   </suppress>
-  <suppress>
-    <notes><![CDATA[
-   file name: guava-28.0-jre.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
-    <cve>CVE-2020-8908</cve>
-  </suppress>
 </suppressions>
