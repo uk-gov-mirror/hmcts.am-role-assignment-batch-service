@@ -13,7 +13,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.0'
     id 'pmd'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.3.4.RELEASE'
+    id 'org.springframework.boot' version '2.3.11.RELEASE'
     id 'info.solidsoft.pitest' version '1.5.0'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
@@ -36,7 +36,7 @@ def versions = [
         reformLogging      : '5.1.1',
         reformS2sClient    : '3.0.0',
         serenity           : '2.1.0',
-        springBoot         : '2.3.4.RELEASE',
+        springBoot         : '2.3.11.RELEASE',
         sonarPitest        : '0.5',
         springHystrix      : '2.1.1.RELEASE',
         rest_assured       : '3.3.0',
@@ -195,7 +195,8 @@ dependencies {
     }
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.3.RELEASE'
 
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.3.RELEASE'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.8.RELEASE'
+    implementation 'commons-io:commons-io:2.8.0'
     compile(group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4') {
         // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
         exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
