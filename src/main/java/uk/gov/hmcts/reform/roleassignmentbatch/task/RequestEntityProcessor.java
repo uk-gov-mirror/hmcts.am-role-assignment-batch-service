@@ -24,7 +24,7 @@ public class RequestEntityProcessor implements ItemProcessor<CcdCaseUsers, Reque
     public RequestEntity process(CcdCaseUsers ccdCaseUsers) throws Exception {
         return RequestEntity.builder()
                             .id(UUID.randomUUID())
-                            .correlationId(null)
+                            .correlationId(UUID.randomUUID().toString())
                             .clientId("ccd_migration")
                             .authenticatedUserId("A fixed Authenticated User Id")
                             .assignerId(ccdCaseUsers.getUserId())
@@ -32,6 +32,7 @@ public class RequestEntityProcessor implements ItemProcessor<CcdCaseUsers, Reque
                             .status("APPROVED")
                             .process("CCD")
                             .replaceExisting(false)
+                            .roleAssignmentId(UUID.randomUUID())
                             .reference(ccdCaseUsers.getCaseDataId().concat(ccdCaseUsers.getUserId()))
                             .log(null)
                             .created(LocalDateTime.now())

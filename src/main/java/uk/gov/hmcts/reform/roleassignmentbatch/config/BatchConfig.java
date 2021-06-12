@@ -135,8 +135,22 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public JdbcBatchItemWriter<RequestEntity> writer(@Autowired final DataSource dataSource) {
         return new JdbcBatchItemWriterBuilder<RequestEntity>()
             .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-            .sql("INSERT INTO role_assignment_history (id, log) VALUES (:id, :log)")
+            .sql(
+                "INSERT INTO role_assignment_request (id, correlation_id,client_id,authenticated_user_id,assigner_id,request_type,status,process,reference," +
+                "replace_existing,role_assignment_id,log,created)" +
+                " VALUES (:id, :correlationId,:clientId,:authenticatedUserId,:assignerId,:requestType,:status,:process,:reference,:replaceExisting," +
+                ":roleAssignmentId,:log,:created)")
             .dataSource(dataSource)
+            .build();
+    }
+
+    @Bean
+    public Step step2(JdbcBatchItemWriter<HistoryEntity> writer) {
+        return steps.get("step2")
+            .<RequestEntity, HistoryEntity>chunk(10)
+            .reader(ccdCaseUsersReader())
+            .processor(requestEntityProcessor())
+            .writer(writer)
             .build();
     }
 

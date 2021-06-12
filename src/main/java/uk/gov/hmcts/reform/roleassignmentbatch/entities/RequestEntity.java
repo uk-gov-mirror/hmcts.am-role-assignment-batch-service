@@ -2,14 +2,10 @@ package uk.gov.hmcts.reform.roleassignmentbatch.entities;
 
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +18,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Builder(toBuilder = true)
 @Getter
 @Setter
-@Entity(name = "role_assignment_request")
+//@Entity(name = "role_assignment_request")
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestEntity {
@@ -32,7 +28,7 @@ public class RequestEntity {
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
 
-    @Column(name = "correlation_id", nullable = false)
+    //@Column(name = "correlation_id", nullable = false)
     private String correlationId;
 
     @Column(name = "client_id", nullable = false)
@@ -69,8 +65,8 @@ public class RequestEntity {
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
 
-    @OneToMany(
+/*    @OneToMany(
         fetch = FetchType.LAZY,
         mappedBy = "requestEntity")
-    private Set<HistoryEntity> historyEntities;
+    private Set<HistoryEntity> historyEntities;*/
 }
