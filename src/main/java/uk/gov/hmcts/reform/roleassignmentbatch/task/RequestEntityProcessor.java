@@ -23,7 +23,7 @@ public class RequestEntityProcessor implements ItemProcessor<CcdCaseUsers, Reque
     @Override
     public RequestEntity process(CcdCaseUsers ccdCaseUsers) throws Exception {
         return RequestEntity.builder()
-                            .id(UUID.randomUUID())
+                            //.id("adfadkufhadfhb".toString())
                             .correlationId(UUID.randomUUID().toString())
                             .clientId("ccd_migration")
                             .authenticatedUserId("A fixed Authenticated User Id")
