@@ -194,7 +194,7 @@ dependencies {
     
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.0.3'
-    implementation 'commons-io:commons-io:2.9.0'
+    implementation 'commons-io:commons-io:2.10.0'
 
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
