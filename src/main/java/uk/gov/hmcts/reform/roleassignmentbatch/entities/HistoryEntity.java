@@ -1,29 +1,34 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.entities;
 
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 import org.springframework.data.domain.Persistable;
-import org.springframework.http.RequestEntity;
+import uk.gov.hmcts.reform.roleassignmentbatch.config.JsonBConverter;
 
 @Builder(toBuilder = true)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@Entity(name = "role_assignment_history")
+@Entity(name = "role_assignment_history")
+@IdClass(RoleAssignmentIdentity.class)
 public class HistoryEntity implements Persistable<UUID> {
 
     @Id
@@ -61,9 +66,9 @@ public class HistoryEntity implements Persistable<UUID> {
     @Column(name = "grant_type", nullable = false)
     private String grantType;
 
-/*    @Column(name = "notes", nullable = true, columnDefinition = "jsonb")
+    @Column(name = "notes", nullable = true, columnDefinition = "jsonb")
     @Convert(converter = JsonBConverter.class)
-    private JsonNode notes;*/
+    private JsonNode notes;
 
     @Column(name = "role_category")
     private String roleCategory;
@@ -78,9 +83,9 @@ public class HistoryEntity implements Persistable<UUID> {
     @Column(name = "begin_time")
     private LocalDateTime beginTime;
 
-/*    @Column(name = "attributes", nullable = false, columnDefinition = "jsonb")
+    @Column(name = "attributes", nullable = false, columnDefinition = "jsonb")
     @Convert(converter = JsonBConverter.class)
-    private JsonNode attributes;*/
+    private JsonNode attributes;
 
     @Column(name = "end_time")
     private LocalDateTime endTime;
@@ -90,17 +95,18 @@ public class HistoryEntity implements Persistable<UUID> {
     @JoinColumn(name = "request_id")
     private RequestEntity requestEntity;
 
-/*    @Column(name = "authorisations")
-    @Type(type = "uk.gov.hmcts.reform.roleassignment.data.GenericArrayUserType")
-    private String[] authorisations;*/
+    @Column(name = "authorisations")
+    @Type(type = "uk.gov.hmcts.reform.roleassignmentbatch.config.GenericArrayUserType")
+    private String[] authorisations;
 
     //getter method to retrieve the parent id in the child entity
-   /* public UUID getRequestId() {
+    public UUID getRequestId() {
         return requestEntity.getId();
     }
-*/
+
     @Override
     public boolean isNew() {
         return true;
     }
 }
+

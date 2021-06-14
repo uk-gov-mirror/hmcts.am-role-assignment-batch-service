@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.reform.roleassignmentbatch.ActorCacheRepository;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 
 @Component
@@ -25,10 +28,13 @@ public class DeleteExpiredRecords implements Tasklet {
     private static final Logger log = LoggerFactory.getLogger(DeleteExpiredRecords.class);
     private final JdbcTemplate jdbcTemplate;
     private final int batchSize;
+    private final ActorCacheRepository repository;
 
-    public DeleteExpiredRecords(@Autowired JdbcTemplate jdbcTemplate, @Value("${batch-size}")int batchSize) {
+    public DeleteExpiredRecords(@Autowired JdbcTemplate jdbcTemplate, @Value("${batch-size}") int batchSize,
+                                @Autowired ActorCacheRepository repository) {
         this.jdbcTemplate = jdbcTemplate;
         this.batchSize = batchSize;
+        this.repository = repository;
     }
 
     @Override
@@ -63,7 +69,10 @@ public class DeleteExpiredRecords implements Tasklet {
         } catch (Exception e) {
             log.info(e.getMessage());
         }
-
+        //insertIntoActorCacheEntity();
+        repository.save(ActorCacheEntity.builder()
+                                                  .etag(2L)
+                                                  .actorIds(UUID.randomUUID().toString()).build());
         log.info("Delete expired records is successful");
         return RepeatStatus.FINISHED;
     }
@@ -124,6 +133,11 @@ public class DeleteExpiredRecords implements Tasklet {
     public Integer getCountFromHistoryTable() {
         String getSQL = "SELECT count(*) from role_assignment_history rah";
         return jdbcTemplate.queryForObject(getSQL, Integer.class);
+    }
+
+    public void insertIntoActorCacheEntity() {
+        String getSQL = "insert into actor_cache_control values('55555',1);";
+         jdbcTemplate.update(getSQL);
     }
 
 }

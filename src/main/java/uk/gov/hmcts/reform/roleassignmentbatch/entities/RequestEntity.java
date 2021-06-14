@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.entities;
 
-
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,23 +17,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.data.domain.Persistable;
 
 @Builder(toBuilder = true)
 @Getter
 @Setter
-
-@Entity
-@Table(name = "role_assignment_request")
+@Entity(name = "role_assignment_request")
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestEntity implements Persistable<String> {
+public class RequestEntity {
 
     @Id
-    @Column(name = "id", nullable = false)
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    private String id;
+    private UUID id;
 
     @Column(name = "correlation_id", nullable = false)
     private String correlationId;
@@ -71,18 +68,11 @@ public class RequestEntity implements Persistable<String> {
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
 
-    /**
-     * Returns if the {@code Persistable} is new or was persisted already.
-     *
-     * @return if {@literal true} the object is new.
-     */
-    @Override
-    public boolean isNew() {
-        return true;
-    }
-
-/*    @OneToMany(
+    @OneToMany(
         fetch = FetchType.LAZY,
         mappedBy = "requestEntity")
-    private Set<HistoryEntity> historyEntities;*/
+    private Set<HistoryEntity> historyEntities;
+
+
 }
+

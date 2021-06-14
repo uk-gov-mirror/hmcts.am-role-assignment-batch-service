@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUsers;
+import uk.gov.hmcts.reform.roleassignmentbatch.ActorCacheRepository;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
@@ -46,6 +47,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
     JobBuilderFactory jobs;
     @Autowired
     StepBuilderFactory steps;
+    @Autowired
+    ActorCacheRepository actorCacheRepository;
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
@@ -59,6 +62,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public Job runRoutesJob(@Autowired JobBuilderFactory jobs,
                             @Autowired StepBuilderFactory steps,
                             @Autowired DeleteExpiredRecords deleteExpiredRecords) {
+
         return jobs.get(jobName)
                    .incrementer(new RunIdIncrementer())
                    .start(stepOrchestration(steps, deleteExpiredRecords))

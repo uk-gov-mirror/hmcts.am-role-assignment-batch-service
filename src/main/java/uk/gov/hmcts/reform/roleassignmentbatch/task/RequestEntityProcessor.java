@@ -4,11 +4,17 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUsers;
+import uk.gov.hmcts.reform.roleassignmentbatch.ActorCacheRepository;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
+
 
 public class RequestEntityProcessor implements ItemProcessor<CcdCaseUsers, RequestEntity> {
 
+    @Autowired
+    ActorCacheRepository actorCacheRepository;
 
     /**
      * Process the provided item, returning a potentially modified or new item for continued
@@ -22,6 +28,9 @@ public class RequestEntityProcessor implements ItemProcessor<CcdCaseUsers, Reque
      */
     @Override
     public RequestEntity process(CcdCaseUsers ccdCaseUsers) throws Exception {
+        actorCacheRepository.save(ActorCacheEntity.builder()
+                                                  .etag(2L)
+                                                  .actorIds(UUID.randomUUID().toString()).build());
         return RequestEntity.builder()
                             //.id("adfadkufhadfhb".toString())
                             .correlationId(UUID.randomUUID().toString())
@@ -37,5 +46,6 @@ public class RequestEntityProcessor implements ItemProcessor<CcdCaseUsers, Reque
                             .log(null)
                             .created(LocalDateTime.now())
                             .build();
+
     }
 }

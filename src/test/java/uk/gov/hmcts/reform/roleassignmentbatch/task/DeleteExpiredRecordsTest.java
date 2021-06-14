@@ -49,7 +49,7 @@ class DeleteExpiredRecordsTest {
     @Mock
     ResultSet rs = Mockito.mock(ResultSet.class);
 
-    private DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
+    private DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5, repository);
 
     @BeforeAll
     public static void setUp() {

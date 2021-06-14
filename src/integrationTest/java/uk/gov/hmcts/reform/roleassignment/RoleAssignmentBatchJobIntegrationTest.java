@@ -39,7 +39,7 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     @Before
     public void setUp() {
         template = new JdbcTemplate(ds);
-        sut = new DeleteExpiredRecords(template, 2);
+        sut = new DeleteExpiredRecords(template, 2, repository);
     }
 
     @Test
