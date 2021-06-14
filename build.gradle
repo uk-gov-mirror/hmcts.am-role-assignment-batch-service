@@ -1,19 +1,20 @@
 buildscript {
     repositories {
-        jcenter()
+
     }
     dependencies {
-        classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.24")
-        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.6.0'
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.3.12")
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.5.0'
     }
 }
+
 
 plugins {
     id 'application'
     id 'uk.gov.hmcts.java' version '0.12.11'
     id 'pmd'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.4.2'
+    id 'org.springframework.boot' version '2.5.1'
     id 'info.solidsoft.pitest' version '1.6.0'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
@@ -36,7 +37,7 @@ def versions = [
         reformLogging      : '5.1.1',
         reformS2sClient    : '3.0.0',
         serenity           : '2.1.0',
-        springBoot         : '2.4.2',
+        springBoot         : '2.5.1',
         sonarPitest        : '0.5',
         springHystrix      : '2.1.1.RELEASE',
         rest_assured       : '3.3.0',
@@ -172,11 +173,9 @@ dependencyUpdates.resolutionStrategy = {
 repositories {
     mavenLocal()
     jcenter()
+    gradlePluginPortal()
     mavenCentral()
-    maven {
-        url "https://dl.bintray.com/hmcts/hmcts-maven"
-    }
-    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
+    maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 }
 
 
