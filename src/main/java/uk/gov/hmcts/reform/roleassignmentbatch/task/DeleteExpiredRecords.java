@@ -5,8 +5,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -20,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 
 @Component
+@Slf4j
 public class DeleteExpiredRecords implements Tasklet {
 
-    private static final Logger log = LoggerFactory.getLogger(DeleteExpiredRecords.class);
     private final JdbcTemplate jdbcTemplate;
     private final int batchSize;
 
@@ -65,6 +64,14 @@ public class DeleteExpiredRecords implements Tasklet {
         }
 
         log.info("Delete expired records is successful");
+        log.info("Sys outing the details");
+        log.info("userName: " + System.getenv("ROLE_ASSIGNMENT_DB_USERNAME"));
+        log.info("ROLE_ASSIGNMENT_DB_PASSWORD: " + System.getenv("ROLE_ASSIGNMENT_DB_PASSWORD"));
+        log.info("ROLE_ASSIGNMENT_DB_HOST: " + System.getenv("ROLE_ASSIGNMENT_DB_HOST"));
+        log.info("ROLE_ASSIGNMENT_DB_PORT: " + System.getenv("ROLE_ASSIGNMENT_DB_PORT"));
+        log.info("ROLE_ASSIGNMENT_DB_NAME: " + System.getenv("ROLE_ASSIGNMENT_DB_NAME"));
+        log.info("ROLE_ASSIGNMENT_DB_OPTIONS: " + System.getenv("ROLE_ASSIGNMENT_DB_OPTIONS"));
+        log.info("Sys outing the details : end");
         return RepeatStatus.FINISHED;
     }
 
