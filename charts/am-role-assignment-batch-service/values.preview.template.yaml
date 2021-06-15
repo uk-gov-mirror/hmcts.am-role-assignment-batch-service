@@ -7,6 +7,11 @@ job:
     ROLE_ASSIGNMENT_DB_PORT: 5432
     ROLE_ASSIGNMENT_DB_USERNAME: am
     ENABLE_DB_MIGRATE: true
+  keyVaults:
+    am:
+      secrets:
+        - role-assignment-service-POSTGRES-PASS
+        - AppInsightsInstrumentationKey
 global:
     jobKind: CronJob
 postgresql:
