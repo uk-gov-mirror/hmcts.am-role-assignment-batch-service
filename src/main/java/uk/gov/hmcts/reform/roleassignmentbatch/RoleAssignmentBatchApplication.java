@@ -15,7 +15,7 @@ public class RoleAssignmentBatchApplication {
     private static final Logger log = LoggerFactory.getLogger(RoleAssignmentBatchApplication.class);
 
     public static void main(String[] args) throws Exception {
-        ApplicationContext context = SpringApplication.run(RoleAssignmentBatchApplication.class, args);
+
         log.info("Sys outing the details");
         log.info("userName: " + System.getenv("ROLE_ASSIGNMENT_DB_USERNAME"));
         log.info("ROLE_ASSIGNMENT_DB_PASSWORD: " + System.getenv("ROLE_ASSIGNMENT_DB_PASSWORD"));
@@ -24,6 +24,7 @@ public class RoleAssignmentBatchApplication {
         log.info("ROLE_ASSIGNMENT_DB_NAME: " + System.getenv("ROLE_ASSIGNMENT_DB_NAME"));
         log.info("ROLE_ASSIGNMENT_DB_OPTIONS: " + System.getenv("ROLE_ASSIGNMENT_DB_OPTIONS"));
         log.info("Sys outing the details : end");
+        ApplicationContext context = SpringApplication.run(RoleAssignmentBatchApplication.class, args);
         //Sleep added to allow app-insights to flush the logs
         Thread.sleep(1000 * 6);
         int exitCode = SpringApplication.exit(context);
