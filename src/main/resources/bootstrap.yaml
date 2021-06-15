@@ -6,3 +6,4 @@ spring:
       aliases:
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         role-assignment-service-POSTGRES-PASS: ROLE_ASSIGNMENT_DB_PASSWORD
+        am-role-assignment-service-s2s-secret: AM_ROLE_ASSIGNMENT_SERVICE_SECRET

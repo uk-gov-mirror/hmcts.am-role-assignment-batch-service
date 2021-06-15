@@ -70,7 +70,7 @@ public class DeleteExpiredRecords implements Tasklet {
         log.info("ROLE_ASSIGNMENT_DB_HOST: " + System.getenv("ROLE_ASSIGNMENT_DB_HOST"));
         log.info("ROLE_ASSIGNMENT_DB_PORT: " + System.getenv("ROLE_ASSIGNMENT_DB_PORT"));
         log.info("ROLE_ASSIGNMENT_DB_NAME: " + System.getenv("ROLE_ASSIGNMENT_DB_NAME"));
-        log.info("ROLE_ASSIGNMENT_DB_OPTIONS: " + System.getenv("ROLE_ASSIGNMENT_DB_OPTIONS"));
+        log.info("AM_ROLE_ASSIGNMENT_SERVICE_SECRET: " + System.getenv("AM_ROLE_ASSIGNMENT_SERVICE_SECRET"));
         log.info("Sys outing the details : end");
         return RepeatStatus.FINISHED;
     }
