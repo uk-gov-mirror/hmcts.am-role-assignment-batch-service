@@ -77,9 +77,9 @@ public class RequestEntityWriter implements ItemWriter<RequestEntity> {
                                                                     .actorIds(UUID.randomUUID().toString())
                                                                     .etag(1)
                                                                     .build());
-        newtableRepository.save(Newtable.builder().id(UUID.randomUUID().toString()).build());
-        System.out.println("Newtable :" + newtableRepository.findAll());
-        persistenceService.saveNewTable(Newtable.builder().id(UUID.randomUUID().toString()).build());
+        newtableRepository.save(Newtable.builder().column2("myvalue").build());
+        System.out.println(newtableRepository.findAll());
+
        /* SessionFactory sessionFactory = new Configuration().buildSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -87,6 +87,9 @@ public class RequestEntityWriter implements ItemWriter<RequestEntity> {
         session.flush();;
         session.getTransaction().commit();
         session.close();*/
+
+        //jdbcTemplate.execute("insert into nitish_table(myid) values('3')");
+
 
 
     }
