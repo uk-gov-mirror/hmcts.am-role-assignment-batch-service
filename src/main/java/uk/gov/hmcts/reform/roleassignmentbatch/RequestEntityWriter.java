@@ -6,24 +6,31 @@ import java.util.UUID;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Service;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.Newtable;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
+import uk.gov.hmcts.reform.roleassignmentbatch.util.NewtableRepository;
 
-@Configuration
-@Service
+@Component
 public class RequestEntityWriter implements ItemWriter<RequestEntity> {
 
     @Autowired
     private final RequestRepository requestRepository;
 
-    @Autowired
+
     final ActorCacheRepository actorCacheRepository;
 
     @Autowired
     final PersistenceService persistenceService;
+
+
+    final NewtableRepository newtableRepository;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     private StepExecution stepExecution;
     private final String query = "INSERT INTO role_assignment_request (id, correlation_id,client_id,authenticated_user_id,assigner_id,request_type,status," +
@@ -35,10 +42,11 @@ public class RequestEntityWriter implements ItemWriter<RequestEntity> {
 
     @Autowired
     public RequestEntityWriter(RequestRepository requestRepository, ActorCacheRepository actorCacheRepository,
-                               PersistenceService persistenceService) {
+                               PersistenceService persistenceService, NewtableRepository newtableRepository) {
         this.requestRepository = requestRepository;
         this.actorCacheRepository = actorCacheRepository;
         this.persistenceService = persistenceService;
+        this.newtableRepository = newtableRepository;
     }
 
 
@@ -69,6 +77,17 @@ public class RequestEntityWriter implements ItemWriter<RequestEntity> {
                                                                     .actorIds(UUID.randomUUID().toString())
                                                                     .etag(1)
                                                                     .build());
+        newtableRepository.save(Newtable.builder().id(UUID.randomUUID().toString()).build());
+        System.out.println("Newtable :" + newtableRepository.findAll());
+        persistenceService.saveNewTable(Newtable.builder().id(UUID.randomUUID().toString()).build());
+       /* SessionFactory sessionFactory = new Configuration().buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.save(Newtable.builder().id(UUID.randomUUID().toString()).build());
+        session.flush();;
+        session.getTransaction().commit();
+        session.close();*/
+
 
     }
 
