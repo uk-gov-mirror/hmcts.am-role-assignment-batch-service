@@ -8,7 +8,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.Newtable;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
@@ -58,7 +57,6 @@ public class RequestEntityWriter implements ItemWriter<RequestEntity> {
      * @throws Exception if there are errors. The framework will catch the
      *                   exception and convert or rethrow it as appropriate.
      */
-    @Transactional
     public void write(List<? extends RequestEntity> items) throws Exception {
 
 
@@ -80,13 +78,6 @@ public class RequestEntityWriter implements ItemWriter<RequestEntity> {
         newtableRepository.save(Newtable.builder().column2("myvalue").build());
         System.out.println(newtableRepository.findAll());
 
-       /* SessionFactory sessionFactory = new Configuration().buildSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.save(Newtable.builder().id(UUID.randomUUID().toString()).build());
-        session.flush();;
-        session.getTransaction().commit();
-        session.close();*/
 
         //jdbcTemplate.execute("insert into nitish_table(myid) values('3')");
 

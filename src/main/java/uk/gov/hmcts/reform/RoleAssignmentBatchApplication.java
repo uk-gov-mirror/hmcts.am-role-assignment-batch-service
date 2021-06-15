@@ -6,10 +6,9 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-@EnableTransactionManagement(proxyTargetClass = true)
+//@EnableTransactionManagement(proxyTargetClass = true)
 @EnableBatchProcessing
 @SuppressWarnings("HideUtilityClassConstructor")
 public class RoleAssignmentBatchApplication {

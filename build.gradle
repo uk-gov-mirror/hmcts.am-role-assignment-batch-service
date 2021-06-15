@@ -181,12 +181,8 @@ repositories {
 
 dependencies {
     compile (group: 'org.springframework.boot', name: 'spring-boot-starter-batch', version: '2.5.0')
-
-    compile(group: 'org.springframework', name: 'spring-jdbc', version: '5.3.7')
-    compile(group: 'org.springframework', name: 'spring-beans', version: '5.3.7')
-    compile(group: 'org.springframework', name: 'spring-context', version: '5.3.7')
-    compile(group: 'org.springframework', name: 'spring-core', version: '5.3.7')
-    compile(group: 'org.springframework', name: 'spring-tx', version: '5.3.7')
+    compile(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot)
+    compile(group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot)
 
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.8.RELEASE'
@@ -205,6 +201,8 @@ dependencies {
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot)
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
+
+
     testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     testImplementation 'org.springframework.batch:spring-batch-test'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
