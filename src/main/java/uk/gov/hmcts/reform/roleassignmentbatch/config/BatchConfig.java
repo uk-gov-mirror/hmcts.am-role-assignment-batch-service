@@ -33,9 +33,11 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.Newtable;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.EntityWrapperProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.HistoryEntityProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.NewTableProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RequestEntityProcessor;
+import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
 @Configuration
 @EnableBatchProcessing
@@ -146,11 +148,16 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public RequestEntityProcessor requestEntityProcessor() {
         return new RequestEntityProcessor();
     }
+    @Bean
+    public EntityWrapperProcessor entityWrapperProcessor() {
+        return new EntityWrapperProcessor();
+    }
 
     @Bean
     public NewTableProcessor newTableProcessor() {
         return new NewTableProcessor();
     }
+
 
     @Bean
     public JdbcBatchItemWriter<RequestEntity> insertInRequestTable() {
@@ -186,12 +193,17 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }*/
 
     @Bean
+    EntityWrapperWriter entityWrapperWriter() {
+        return new EntityWrapperWriter();
+    }
+
+    @Bean
     public Step step1() {
         return steps.get("step1")
-                    .<CcdCaseUsers, RequestEntity>chunk(10)
+                    .<CcdCaseUsers, EntityWrapper>chunk(10)
                     .reader(ccdCaseUsersReader())
-                    .processor(requestEntityProcessor())
-                    .writer(insertInRequestTable())
+                    .processor(entityWrapperProcessor())
+                    .writer(entityWrapperWriter())
                     .build();
     }
 
