@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.PathResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
@@ -88,7 +88,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new FlatFileItemReaderBuilder<CcdCaseUsers>()
             .name("historyEntityReader")
             .linesToSkip(1)
-            .resource(new ClassPathResource("book2.csv"))
+            .resource(new PathResource("src/main/resources/book2.csv"))
             .delimited()
             .names("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category")
             .lineMapper(lineMapper())
@@ -159,8 +159,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public Step step1() {
-        return steps.get("step1")
+    public Step ccdToRasStep() {
+        return steps.get("ccdToRasStep")
                     .<CcdCaseUsers, EntityWrapper>chunk(1000)
                     .reader(ccdCaseUsersReader())
                     .processor(entityWrapperProcessor())
@@ -176,11 +176,11 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public Job importVoltageJob(@Autowired NotificationListener listener, Step step1) {
-        return jobs.get("importVoltageJob")
+    public Job ccdToRasBatchJob(@Autowired NotificationListener listener, Step ccdToRasStep) {
+        return jobs.get("ccdToRasBatchJob")
                    .incrementer(new RunIdIncrementer())
                    .listener(listener)
-                   .flow(step1)
+                   .flow(ccdToRasStep)
                    .end()
                    .build();
 
