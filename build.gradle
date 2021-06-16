@@ -202,6 +202,7 @@ dependencies {
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
 
+    implementation group: 'com.azure', name: 'azure-storage-blob', version: '12.12.0'
 
     testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     testImplementation 'org.springframework.batch:spring-batch-test'
