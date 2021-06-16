@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUsers;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
@@ -155,11 +157,18 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Step step1() {
         return steps.get("step1")
-                    .<CcdCaseUsers, EntityWrapper>chunk(10)
+                    .<CcdCaseUsers, EntityWrapper>chunk(1000)
                     .reader(ccdCaseUsersReader())
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
+                    .taskExecutor(taskExecutor())
+                    .throttleLimit(10)
                     .build();
+    }
+
+    @Bean
+    public TaskExecutor taskExecutor() {
+        return new SimpleAsyncTaskExecutor("spring_batch");
     }
 
     @Bean
