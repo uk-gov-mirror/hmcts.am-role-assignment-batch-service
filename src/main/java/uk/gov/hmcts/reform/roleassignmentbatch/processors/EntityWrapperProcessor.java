@@ -25,9 +25,10 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUsers, Entit
      */
     @Override
     public EntityWrapper process(CcdCaseUsers ccdCaseUsers) throws Exception {
-        Newtable newtable = Newtable.builder().myid(UUID.randomUUID().toString()).column2(UUID.randomUUID().toString()).build();
+        UUID requestUuid = UUID.randomUUID();
+        Newtable newtable = Newtable.builder().myid(requestUuid.toString()).column2(requestUuid.toString()).build();
         RequestEntity requestEntity = RequestEntity.builder()
-                                                   .id(UUID.randomUUID())
+                                                   .id(requestUuid)
                                                    .correlationId(UUID.randomUUID().toString())
                                                    .clientId("ccd_migration")
                                                    .authenticatedUserId("A fixed Authenticated User Id")
