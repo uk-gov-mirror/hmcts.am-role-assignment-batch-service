@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
 import java.util.UUID;
+import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -9,8 +10,9 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -28,9 +30,11 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUsers;
 import uk.gov.hmcts.reform.roleassignmentbatch.ActorCacheRepository;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.Newtable;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.HistoryEntityProcessor;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.NewTableProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RequestEntityProcessor;
 
 @Configuration
@@ -49,6 +53,16 @@ public class BatchConfig extends DefaultBatchConfigurer {
     StepBuilderFactory steps;
     @Autowired
     ActorCacheRepository actorCacheRepository;
+    @Autowired
+    DataSource dataSource;
+
+    public final String REQUEST_QUERY = "INSERT INTO role_assignment_request(id, correlation_id,client_id,authenticated_user_id,assigner_id,request_type," +
+                                        "status," +
+                                        "process,reference," +
+                                        "replace_existing,role_assignment_id,log,created)" +
+                                        " VALUES (:id, :correlationId,:clientId,:authenticatedUserId,:assignerId,:requestType,:status,:process,:reference," +
+                                        ":replaceExisting," +
+                                        ":roleAssignmentId,:log,:created)";
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
@@ -133,36 +147,52 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new RequestEntityProcessor();
     }
 
-/*
     @Bean
-    public Step step2(JdbcBatchItemWriter<HistoryEntity> writer) {
-        return steps.get("step2")
-            .<RequestEntity, HistoryEntity>chunk(10)
-            .reader(ccdCaseUsersReader())
-            .processor(requestEntityProcessor())
-            .writer(writer)
+    public NewTableProcessor newTableProcessor() {
+        return new NewTableProcessor();
+    }
+
+    @Bean
+    public JdbcBatchItemWriter<RequestEntity> insertInRequestTable() {
+        return new JdbcBatchItemWriterBuilder<RequestEntity>()
+            .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+            .sql(REQUEST_QUERY)
+            .dataSource(dataSource)
             .build();
     }
-*/
 
     @Bean
-    public ExecutionContextPromotionListener promotionListener() {
-        ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
-        listener.setKeys(new String[] {"someKey"});
-        return listener;
+    public JdbcBatchItemWriter<Newtable> insertInRequestTableNewTable() {
+        return
+            new JdbcBatchItemWriterBuilder<Newtable>()
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .sql("insert into nitish_table(myid,column2) values(:myid,:column2)")
+                .dataSource(dataSource)
+                .build();
     }
 
+   /* @Bean
+    @SuppressWarnings("rawtypes")
+    public CompositeItemWriter compositeItemWriter() {
+        List<ItemWriter> writers = new ArrayList<>(2);
+        writers.add(insertInRequestTableNewTable());
+        writers.add(insertInRequestTable());
 
+        CompositeItemWriter itemWriter = new CompositeItemWriter();
+
+        itemWriter.setDelegates(writers);
+
+        return itemWriter;
+    }*/
 
     @Bean
-    public Step step1(ItemWriter<RequestEntity> writer) {
+    public Step step1() {
         return steps.get("step1")
-            .<CcdCaseUsers, RequestEntity>chunk(10)
-            .reader(ccdCaseUsersReader())
-            .processor(requestEntityProcessor())
-            .writer(writer)
-            .listener(promotionListener())
-            .build();
+                    .<CcdCaseUsers, RequestEntity>chunk(10)
+                    .reader(ccdCaseUsersReader())
+                    .processor(requestEntityProcessor())
+                    .writer(insertInRequestTable())
+                    .build();
     }
 
     @Bean
@@ -173,6 +203,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                    .flow(step1)
                    .end()
                    .build();
+
     }
 
 }

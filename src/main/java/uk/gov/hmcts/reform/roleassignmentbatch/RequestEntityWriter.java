@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.roleassignmentbatch;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.Newtable;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.NewtableRepository;
 
@@ -48,14 +50,16 @@ public class RequestEntityWriter implements ItemWriter<RequestEntity> {
     }
 
 
-    /**
+    */
+/**
      * Process the supplied data element. Will not be called with any null items
      * in normal operation.
      *
      * @param items items to be written
      * @throws Exception if there are errors. The framework will catch the
      *                   exception and convert or rethrow it as appropriate.
-     */
+     *//*
+
     public void write(List<? extends RequestEntity> items) throws Exception {
 
 
@@ -74,12 +78,15 @@ public class RequestEntityWriter implements ItemWriter<RequestEntity> {
                                                                     .actorIds(UUID.randomUUID().toString())
                                                                     .etag(1)
                                                                     .build());
+        newtableRepository.save(Newtable.builder().column2("myvalue").build());
+        System.out.println(newtableRepository.findAll());
 
 
-        //jdbcTemplate.execute("insert into nitish_table(myid) values('3')");
+        jdbcTemplate.execute("insert into nitish_table(myid) values('4')");
 
 
 
     }
 
 }
+*/

@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.roleassignmentbatch.entities;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -25,9 +23,8 @@ import lombok.ToString;
 @ToString
 public class Newtable implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "myid")
-    private Long id;
+    private String myid;
 
     @Column(name = "column2")
     private String column2;
