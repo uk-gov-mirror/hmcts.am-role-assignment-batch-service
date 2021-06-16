@@ -10,4 +10,6 @@ import lombok.Setter;
 public class EntityWrapper {
     public Newtable newtable;
     public RequestEntity requestEntity;
+    public HistoryEntity roleAssignmentHistoryEntity;
+    public RoleAssignmentEntity roleAssignmentEntity;
 }

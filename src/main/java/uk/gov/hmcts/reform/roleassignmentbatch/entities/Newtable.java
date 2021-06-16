@@ -15,7 +15,7 @@ import lombok.ToString;
 
 @Entity
 @Builder
-@Table(name = "nitish_table" )
+@Table(name = "nitish_table")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

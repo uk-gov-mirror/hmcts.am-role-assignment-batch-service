@@ -54,13 +54,15 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Autowired
     DataSource dataSource;
 
-    public final String REQUEST_QUERY = "INSERT INTO role_assignment_request(id, correlation_id,client_id,authenticated_user_id,assigner_id,request_type," +
-                                        "status," +
-                                        "process,reference," +
-                                        "replace_existing,role_assignment_id,log,created)" +
-                                        " VALUES (:id, :correlationId,:clientId,:authenticatedUserId,:assignerId,:requestType,:status,:process,:reference," +
-                                        ":replaceExisting," +
-                                        ":roleAssignmentId,:log,:created)";
+    public final String REQUEST_QUERY = "INSERT INTO role_assignment_request(id, correlation_id,client_id,"
+            + "authenticated_user_id,assigner_id,request_type,"
+            + "status,"
+            + "process,reference,"
+            + "replace_existing,role_assignment_id,log,created)"
+            + " VALUES (:id, :correlationId,:clientId,:authenticatedUserId,:assignerId,"
+            + ":requestType,:status,:process,:reference,"
+            + ":replaceExisting,"
+            + ":roleAssignmentId,:log,:created)";
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
@@ -148,6 +150,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
                 .dataSource(dataSource)
                 .build();
     }
+
+    //TODO history and live table
 
     @Bean
     EntityWrapperWriter entityWrapperWriter() {
