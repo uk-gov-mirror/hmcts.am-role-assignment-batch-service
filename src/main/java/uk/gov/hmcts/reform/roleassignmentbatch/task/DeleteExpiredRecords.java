@@ -17,6 +17,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 
 @Component

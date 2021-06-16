@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.entities;
 
-
 import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.Embeddable;

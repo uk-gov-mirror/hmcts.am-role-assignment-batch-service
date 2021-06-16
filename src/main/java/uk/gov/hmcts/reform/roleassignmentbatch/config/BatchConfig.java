@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
-import java.util.UUID;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
@@ -28,11 +27,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUsers;
-import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.Newtable;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
+import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.EntityWrapperProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
 @Configuration
@@ -108,19 +107,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return defaultLineMapper;
     }
 
-    @Component
-    public class HistoryFieldSetMapper implements FieldSetMapper<HistoryEntity> {
-        @Override
-        public HistoryEntity mapFieldSet(FieldSet fieldSet) {
-            final HistoryEntity historyEntity = new HistoryEntity();
-            historyEntity.setId(UUID.fromString(fieldSet.readString("id")));
-            historyEntity.setLog(fieldSet.readString("classification"));
-            return historyEntity;
-        }
-    }
 
     @Component
-    public class CcdFieldSetMapper implements FieldSetMapper<CcdCaseUsers> {
+    public static class CcdFieldSetMapper implements FieldSetMapper<CcdCaseUsers> {
         @Override
         public CcdCaseUsers mapFieldSet(FieldSet fieldSet) {
             final CcdCaseUsers caseUsers = new CcdCaseUsers();
@@ -138,7 +127,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public EntityWrapperProcessor entityWrapperProcessor() {
         return new EntityWrapperProcessor();
     }
-
 
     @Bean
     public JdbcBatchItemWriter<RequestEntity> insertInRequestTable() {

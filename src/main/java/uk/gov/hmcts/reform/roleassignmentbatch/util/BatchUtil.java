@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.RoleAssignmentHistory;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 
 public class BatchUtil {
     private BatchUtil() {

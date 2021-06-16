@@ -1,11 +1,11 @@
-package uk.gov.hmcts.reform.roleassignmentbatch.task;
+package uk.gov.hmcts.reform.roleassignmentbatch.processors;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.batch.item.ItemProcessor;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUsers;
-import uk.gov.hmcts.reform.roleassignmentbatch.config.EntityWrapper;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.Newtable;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 

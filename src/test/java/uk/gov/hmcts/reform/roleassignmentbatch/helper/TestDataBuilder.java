@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.GrantType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Status;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.RoleAssignmentHistory;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 
 @Setter
 public class TestDataBuilder {
