@@ -28,15 +28,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUsers;
-import uk.gov.hmcts.reform.roleassignmentbatch.ActorCacheRepository;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.Newtable;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.EntityWrapperProcessor;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.HistoryEntityProcessor;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.NewTableProcessor;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.RequestEntityProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
 @Configuration
@@ -53,8 +49,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     JobBuilderFactory jobs;
     @Autowired
     StepBuilderFactory steps;
-    @Autowired
-    ActorCacheRepository actorCacheRepository;
+
     @Autowired
     DataSource dataSource;
 
@@ -140,22 +135,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public HistoryEntityProcessor historyEntityProcessor() {
-        return new HistoryEntityProcessor();
-    }
-
-    @Bean
-    public RequestEntityProcessor requestEntityProcessor() {
-        return new RequestEntityProcessor();
-    }
-    @Bean
     public EntityWrapperProcessor entityWrapperProcessor() {
         return new EntityWrapperProcessor();
-    }
-
-    @Bean
-    public NewTableProcessor newTableProcessor() {
-        return new NewTableProcessor();
     }
 
 
@@ -177,20 +158,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
                 .dataSource(dataSource)
                 .build();
     }
-
-   /* @Bean
-    @SuppressWarnings("rawtypes")
-    public CompositeItemWriter compositeItemWriter() {
-        List<ItemWriter> writers = new ArrayList<>(2);
-        writers.add(insertInRequestTableNewTable());
-        writers.add(insertInRequestTable());
-
-        CompositeItemWriter itemWriter = new CompositeItemWriter();
-
-        itemWriter.setDelegates(writers);
-
-        return itemWriter;
-    }*/
 
     @Bean
     EntityWrapperWriter entityWrapperWriter() {
