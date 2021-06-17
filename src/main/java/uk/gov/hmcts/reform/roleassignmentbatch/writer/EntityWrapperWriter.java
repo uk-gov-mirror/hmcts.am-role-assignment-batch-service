@@ -19,17 +19,17 @@ public class EntityWrapperWriter implements ItemWriter<EntityWrapper> {
     @Autowired
     private JdbcBatchItemWriter<RequestEntity> requestEntityWriter;
     @Autowired
-    private JdbcBatchItemWriter<RoleAssignmentEntity> roleAssignmentWriter;
-    @Autowired
     private JdbcBatchItemWriter<HistoryEntity> roleAssignmentHistoryWriter;
+//    @Autowired
+//    private JdbcBatchItemWriter<RoleAssignmentEntity> roleAssignmentWriter;
 
     @Override
     public void write(List<? extends EntityWrapper> items) throws Exception {
         for (EntityWrapper item: items) {
             newtableWriter.write(Collections.singletonList(item.getNewtable()));
             requestEntityWriter.write(Collections.singletonList(item.getRequestEntity()));
-            roleAssignmentWriter.write(Collections.singletonList(item.getRoleAssignmentEntity()));
             roleAssignmentHistoryWriter.write(Collections.singletonList(item.getRoleAssignmentHistoryEntity()));
+            //roleAssignmentWriter.write(Collections.singletonList(item.getRoleAssignmentEntity()));
         }
     }
 }

@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
-import org.springframework.data.domain.Persistable;
 import uk.gov.hmcts.reform.roleassignmentbatch.config.JsonBConverter;
 
 
@@ -17,7 +16,7 @@ import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Transient;
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -27,7 +26,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "role_assignment")
-public class RoleAssignmentEntity implements Persistable<UUID> {
+public class RoleAssignmentEntity implements Serializable {
 
     @Id
     private UUID id;
@@ -73,14 +72,5 @@ public class RoleAssignmentEntity implements Persistable<UUID> {
     @Column(name = "authorisations")
     @Type(type = "uk.gov.hmcts.reform.roleassignmentbatch.config.GenericArrayUserType")
     private String[] authorisations;
-
-    @Builder.Default
-    @Transient
-    private boolean isNewFlag = true;
-
-    @Override
-    public boolean isNew() {
-        return isNewFlag;
-    }
 
 }

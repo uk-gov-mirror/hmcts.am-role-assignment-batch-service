@@ -1,15 +1,11 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
@@ -18,8 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.springframework.data.domain.Persistable;
 import uk.gov.hmcts.reform.roleassignmentbatch.config.JsonBConverter;
 
 @Builder(toBuilder = true)
@@ -27,9 +21,9 @@ import uk.gov.hmcts.reform.roleassignmentbatch.config.JsonBConverter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "role_assignment_history")
-@IdClass(RoleAssignmentIdentity.class)
-public class HistoryEntity implements Persistable<UUID> {
+//@Entity(name = "role_assignment_history")
+//@IdClass(RoleAssignmentIdentity.class)
+public class HistoryEntity implements Serializable {
 
     @Id
     private UUID id;
@@ -66,9 +60,9 @@ public class HistoryEntity implements Persistable<UUID> {
     @Column(name = "grant_type", nullable = false)
     private String grantType;
 
-    @Column(name = "notes", nullable = true, columnDefinition = "jsonb")
-    @Convert(converter = JsonBConverter.class)
-    private JsonNode notes;
+//    @Column(name = "notes", nullable = true, columnDefinition = "jsonb")
+//    @Convert(converter = JsonBConverter.class)
+//    private JsonNode notes;
 
     @Column(name = "role_category")
     private String roleCategory;
@@ -91,22 +85,12 @@ public class HistoryEntity implements Persistable<UUID> {
     private LocalDateTime endTime;
 
     @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_id")
-    private RequestEntity requestEntity;
+    @Column(name = "request_id")
+    private UUID requestId;
 
-    @Column(name = "authorisations")
-    @Type(type = "uk.gov.hmcts.reform.roleassignmentbatch.config.GenericArrayUserType")
-    private String[] authorisations;
+//    @Column(name = "authorisations")
+//    @Type(type = "uk.gov.hmcts.reform.roleassignmentbatch.config.GenericArrayUserType")
+//    private String[] authorisations;
 
-    //getter method to retrieve the parent id in the child entity
-    public UUID getRequestId() {
-        return requestEntity.getId();
-    }
-
-    @Override
-    public boolean isNew() {
-        return true;
-    }
 }
 

@@ -158,32 +158,32 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return
                 new JdbcBatchItemWriterBuilder<HistoryEntity>()
                         .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                        .sql("insert into role_assignment_history(id, status, actor_id_type, process, reference, "
-                                + "role_type, log, role_name, status_sequence, classification, grant_type, "
-                                + "notes, role_category, read_only, created, begin_time, attributes, end_time, "
-                                + "authorisations) "
-                                + "values(:id :status :actor_id_type :process :reference :role_type :log :role_name "
-                                + ":status_sequence :classification :grant_type"
-                                + ":notes :role_category :read_only :created :begin_time :attributes :end_time "
-                                + ":authorisations)")
+                        .sql("insert into role_assignment_history(id, status, actor_id_type, "
+                                + "role_type, role_name, status_sequence, classification, grant_type, "
+                                + "read_only, created, "
+                                + "actor_id, attributes, request_id) "
+                                + "values(:id, :status, :actorIdType, :roleType, :roleName, "
+                                + ":sequence, :classification, :grantType,"
+                                + ":readOnly, :created, "
+                                + ":actorId, :attributes::jsonb, :requestId)")
                         .dataSource(dataSource)
                         .build();
     }
 
-    @Bean
-    public JdbcBatchItemWriter<RoleAssignmentEntity> insertIntoRoleAssignmentTable() {
-        return
-                new JdbcBatchItemWriterBuilder<RoleAssignmentEntity>()
-                        .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                        .sql("insert into role_assignment(id, actor_id_type, actor_id, role_type, role_name, "
-                                + "classification, grant_type, role_category, read_only, created, "
-                                + "begin_time, attributes, end_time, authorisations, attributes, authorisations) "
-                                + "values(:id :actor_id_type :actor_id :role_type :role_name "
-                                + ":classification :grant_type :role_category :read_only :created "
-                                + ":begin_time :attributes :end_time :authorisations :attributes :authorisations)")
-                        .dataSource(dataSource)
-                        .build();
-    }
+//    @Bean
+//    public JdbcBatchItemWriter<RoleAssignmentEntity> insertIntoRoleAssignmentTable() {
+//        return
+//                new JdbcBatchItemWriterBuilder<RoleAssignmentEntity>()
+//                        .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+//                        .sql("insert into role_assignment(id, actor_id_type, actor_id, role_type, role_name, "
+//                                     + "classification, grant_type, role_category, read_only, created, "
+//                                     + "begin_time, attributes, end_time, authorisations, attributes, authorisations) "
+//                                     + "values(:id, :actorIdType, :actorId, :roleType, :roleName, "
+//                                     + ":classification, :grantType, :roleCategory, :readOnly, :created, "
+//                                     + ":beginTime, :attributes, :endTime, :authorisations, :attributes, :authorisations)")
+//                        .dataSource(dataSource)
+//                        .build();
+//    }
 
     @Bean
     EntityWrapperWriter entityWrapperWriter() {
