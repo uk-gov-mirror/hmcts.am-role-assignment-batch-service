@@ -14,9 +14,9 @@ import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.GrantType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Status;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
-import uk.gov.hmcts.reform.roleassignmentbatch.entities.Newtable;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentEntity;
 
@@ -39,10 +39,6 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUsers, Entit
         UUID requestUuid = UUID.randomUUID();
         Map<String, JsonNode> attributes = new HashMap<>();
         attributes.put("caseId", convertValueJsonNode("1234567890123456"));
-        Newtable newtable = Newtable.builder()
-                .myid(requestUuid.toString())
-                .column2(requestUuid.toString())
-                .build();
         RequestEntity requestEntity = RequestEntity.builder()
                 .id(requestUuid)
                 .correlationId(UUID.randomUUID().toString())
@@ -90,8 +86,14 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUsers, Entit
                         .created(LocalDateTime.now())
                         .attributes(convertValueJsonNode(attributes).toString())
                         .build();
+        ActorCacheEntity actorCacheEntity =
+                ActorCacheEntity.builder()
+                        .actorIds(UUID.randomUUID().toString()) //using random as dummy data violates unique key rule
+                        .etag(1L)
+                        .roleAssignmentResponse(convertValueJsonNode("{roleAssignmentResponse:1234}").toString())
+                        .build();
         return EntityWrapper.builder()
-                .newtable(newtable)
+                .actorCacheEntity(actorCacheEntity)
                 .requestEntity(requestEntity)
                 .roleAssignmentHistoryEntity(roleAssignmentHistoryEntity)
                 .roleAssignmentEntity(roleAssignmentEntity)

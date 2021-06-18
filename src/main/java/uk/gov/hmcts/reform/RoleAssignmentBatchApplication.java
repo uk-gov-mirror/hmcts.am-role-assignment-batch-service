@@ -20,7 +20,9 @@ public class RoleAssignmentBatchApplication {
 
     public static void main(String[] args) throws Exception {
 
-        String connectStr = "";
+        String connectStr = "DefaultEndpointsProtocol=https;AccountName=amdatamigrationstorage;" +
+                "AccountKey=7fIBJSmZsC7GRg0/tmYO0XI6FKApKpGmgAYjy3MoHSj4/uodsqfMjhBeNxxI22grTmZGg1VmSNh8e1AJplkuPA==;" +
+                "EndpointSuffix=core.windows.net";
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder().connectionString(connectStr).buildClient();
 
         // Create the container and return a container client object

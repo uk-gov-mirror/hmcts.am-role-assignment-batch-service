@@ -29,9 +29,9 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUsers;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
-import uk.gov.hmcts.reform.roleassignmentbatch.entities.Newtable;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
@@ -144,11 +144,12 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public JdbcBatchItemWriter<Newtable> insertInRequestTableNewTable() {
+    public JdbcBatchItemWriter<ActorCacheEntity> insertIntoActorCacheTable() {
         return
-            new JdbcBatchItemWriterBuilder<Newtable>()
+            new JdbcBatchItemWriterBuilder<ActorCacheEntity>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("insert into nitish_table(myid,column2) values(:myid,:column2)")
+                .sql("insert into actor_cache_control(actor_id,etag,json_response) "
+                        + "values(:actorIds,:etag, :roleAssignmentResponse)")
                 .dataSource(dataSource)
                 .build();
     }

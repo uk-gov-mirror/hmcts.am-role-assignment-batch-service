@@ -8,8 +8,8 @@ import lombok.Setter;
 @Setter
 @Builder
 public class EntityWrapper {
-    public Newtable newtable;
     public RequestEntity requestEntity;
     public HistoryEntity roleAssignmentHistoryEntity;
     public RoleAssignmentEntity roleAssignmentEntity;
+    public ActorCacheEntity actorCacheEntity;
 }

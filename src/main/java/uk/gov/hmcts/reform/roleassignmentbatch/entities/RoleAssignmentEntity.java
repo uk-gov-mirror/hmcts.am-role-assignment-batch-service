@@ -1,14 +1,11 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.entities;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import uk.gov.hmcts.reform.roleassignmentbatch.config.JsonBConverter;
 
 
@@ -18,7 +15,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Builder(toBuilder = true)
