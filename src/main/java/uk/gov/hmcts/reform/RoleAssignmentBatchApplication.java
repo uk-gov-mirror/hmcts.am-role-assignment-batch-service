@@ -1,11 +1,5 @@
 package uk.gov.hmcts.reform;
 
-import java.io.File;
-
-import com.azure.storage.blob.BlobClient;
-import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.BlobServiceClient;
-import com.azure.storage.blob.BlobServiceClientBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.SpringApplication;
@@ -19,7 +13,7 @@ import org.springframework.context.ApplicationContext;
 public class RoleAssignmentBatchApplication {
 
     public static void main(String[] args) throws Exception {
-
+/*
         String connectStr = "";
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder().connectionString(connectStr).buildClient();
 
@@ -27,7 +21,7 @@ public class RoleAssignmentBatchApplication {
         // BlobContainerClient containerClient = blobServiceClient.createBlobContainer(containerName);
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient("amccdras");
         //amccdras
-     /*   for (BlobItem blobItem : containerClient.listBlobs()) {
+        for (BlobItem blobItem : containerClient.listBlobs()) {
             System.out.println("\t" + blobItem.getName());
         }
         String localPath = "";
@@ -46,14 +40,14 @@ public class RoleAssignmentBatchApplication {
         System.out.println("\nUploading to Blob storage as blob:\n\t" + blobClient.getBlobUrl());
 
 // Upload the blob
-        blobClient.uploadFromFile(localPath + fileName, true);*/
-        BlobClient blobClient = containerClient.getBlobClient("book2.csv");
+        blobClient.uploadFromFile(localPath + fileName, true);
+        blobClient = containerClient.getBlobClient("book2.csv");
         File downloadedFile = new File("src/main/resources/book2.csv");
 
         System.out.println("\nDownloading blob to\n\t " + downloadedFile.getAbsolutePath());
 
         blobClient.downloadToFile(downloadedFile.getAbsolutePath(), true);
-        System.out.println("Download Completed");
+        System.out.println("Download Completed");*/
         ApplicationContext context = SpringApplication.run(RoleAssignmentBatchApplication.class, args);
         //Sleep added to allow app-insights to flush the logs
         Thread.sleep(1000 * 8);

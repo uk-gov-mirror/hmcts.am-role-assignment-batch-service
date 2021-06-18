@@ -4,15 +4,14 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Id;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import uk.gov.hmcts.reform.roleassignmentbatch.config.JsonBConverter;
 
 @Builder(toBuilder = true)
 @Getter
@@ -76,7 +75,6 @@ public class HistoryEntity implements Serializable {
     private LocalDateTime beginTime;
 
     @Column(name = "attributes", nullable = false, columnDefinition = "jsonb")
-    @Convert(converter = JsonBConverter.class)
     private String attributes;
 
     @Column(name = "end_time")
