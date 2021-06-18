@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.roleassignmentbatch.entities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import lombok.AllArgsConstructor;
@@ -16,7 +15,6 @@ import org.hibernate.annotations.CreationTimestamp;
 @Builder(toBuilder = true)
 @Getter
 @Setter
-@Entity(name = "role_assignment_request")
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestEntity {

@@ -89,7 +89,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUsers, Entit
         ActorCacheEntity actorCacheEntity =
                 ActorCacheEntity.builder()
                         .actorIds(UUID.randomUUID().toString()) //using random as dummy data violates unique key rule
-                        .etag(1L)
+                        .etag(0L)
                         .roleAssignmentResponse(convertValueJsonNode("{roleAssignmentResponse:1234}").toString())
                         .build();
         return EntityWrapper.builder()

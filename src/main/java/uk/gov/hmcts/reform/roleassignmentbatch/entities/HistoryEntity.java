@@ -18,14 +18,15 @@ import org.hibernate.annotations.CreationTimestamp;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@Entity(name = "role_assignment_history")
-//@IdClass(RoleAssignmentIdentity.class)
 public class HistoryEntity implements Serializable {
 
     @Id
     private UUID id;
     @Id
     private String status;
+    @Id
+    @Column(name = "request_id")
+    private UUID requestId;
 
     @Column(name = "actor_id_type", nullable = false)
     private String actorIdType;
@@ -79,10 +80,6 @@ public class HistoryEntity implements Serializable {
 
     @Column(name = "end_time")
     private LocalDateTime endTime;
-
-    @Id
-    @Column(name = "request_id")
-    private UUID requestId;
 
 //    @Column(name = "authorisations")
 //    @Type(type = "uk.gov.hmcts.reform.roleassignmentbatch.config.GenericArrayUserType")
