@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform;
 
 import java.io.File;
-import java.io.FileWriter;
 
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
-import com.azure.storage.blob.models.BlobItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.SpringApplication;
@@ -22,16 +20,14 @@ public class RoleAssignmentBatchApplication {
 
     public static void main(String[] args) throws Exception {
 
-        String connectStr = "DefaultEndpointsProtocol=https;AccountName=amdatamigrationstorage;" +
-                "AccountKey=7fIBJSmZsC7GRg0/tmYO0XI6FKApKpGmgAYjy3MoHSj4/uodsqfMjhBeNxxI22grTmZGg1VmSNh8e1AJplkuPA==;" +
-                "EndpointSuffix=core.windows.net";
+        String connectStr = "";
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder().connectionString(connectStr).buildClient();
 
         // Create the container and return a container client object
         // BlobContainerClient containerClient = blobServiceClient.createBlobContainer(containerName);
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient("amccdras");
         //amccdras
-        for (BlobItem blobItem : containerClient.listBlobs()) {
+     /*   for (BlobItem blobItem : containerClient.listBlobs()) {
             System.out.println("\t" + blobItem.getName());
         }
         String localPath = "";
@@ -50,8 +46,8 @@ public class RoleAssignmentBatchApplication {
         System.out.println("\nUploading to Blob storage as blob:\n\t" + blobClient.getBlobUrl());
 
 // Upload the blob
-        blobClient.uploadFromFile(localPath + fileName, true);
-        blobClient = containerClient.getBlobClient("book2.csv");
+        blobClient.uploadFromFile(localPath + fileName, true);*/
+        BlobClient blobClient = containerClient.getBlobClient("book2.csv");
         File downloadedFile = new File("src/main/resources/book2.csv");
 
         System.out.println("\nDownloading blob to\n\t " + downloadedFile.getAbsolutePath());

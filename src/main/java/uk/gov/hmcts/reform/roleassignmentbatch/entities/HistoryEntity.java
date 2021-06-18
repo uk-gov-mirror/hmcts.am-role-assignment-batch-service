@@ -6,15 +6,11 @@ import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Id;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.annotations.CreationTimestamp;
 import uk.gov.hmcts.reform.roleassignmentbatch.config.JsonBConverter;
 
