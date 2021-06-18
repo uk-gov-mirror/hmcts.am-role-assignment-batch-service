@@ -8,11 +8,13 @@ import javax.persistence.Convert;
 import javax.persistence.Id;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.annotations.CreationTimestamp;
 import uk.gov.hmcts.reform.roleassignmentbatch.config.JsonBConverter;
 
@@ -79,7 +81,7 @@ public class HistoryEntity implements Serializable {
 
     @Column(name = "attributes", nullable = false, columnDefinition = "jsonb")
     @Convert(converter = JsonBConverter.class)
-    private JsonNode attributes;
+    private String attributes;
 
     @Column(name = "end_time")
     private LocalDateTime endTime;

@@ -170,20 +170,20 @@ public class BatchConfig extends DefaultBatchConfigurer {
                         .build();
     }
 
-//    @Bean
-//    public JdbcBatchItemWriter<RoleAssignmentEntity> insertIntoRoleAssignmentTable() {
-//        return
-//                new JdbcBatchItemWriterBuilder<RoleAssignmentEntity>()
-//                        .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-//                        .sql("insert into role_assignment(id, actor_id_type, actor_id, role_type, role_name, "
-//                                     + "classification, grant_type, role_category, read_only, created, "
-//                                     + "begin_time, attributes, end_time, authorisations, attributes, authorisations) "
-//                                     + "values(:id, :actorIdType, :actorId, :roleType, :roleName, "
-//                                     + ":classification, :grantType, :roleCategory, :readOnly, :created, "
-//                                     + ":beginTime, :attributes, :endTime, :authorisations, :attributes, :authorisations)")
-//                        .dataSource(dataSource)
-//                        .build();
-//    }
+    @Bean
+    public JdbcBatchItemWriter<RoleAssignmentEntity> insertIntoRoleAssignmentTable() {
+        return
+                new JdbcBatchItemWriterBuilder<RoleAssignmentEntity>()
+                        .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                        .sql("insert into role_assignment(id, actor_id_type, actor_id, role_type, role_name, "
+                                     + "classification, grant_type, role_category, read_only, created, "
+                                     + "attributes) "
+                                     + "values(:id, :actorIdType, :actorId, :roleType, :roleName, "
+                                     + ":classification, :grantType, :roleCategory, :readOnly, :created, "
+                                     + ":attributes::jsonb)")
+                        .dataSource(dataSource)
+                        .build();
+    }
 
     @Bean
     EntityWrapperWriter entityWrapperWriter() {

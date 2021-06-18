@@ -20,8 +20,8 @@ public class EntityWrapperWriter implements ItemWriter<EntityWrapper> {
     private JdbcBatchItemWriter<RequestEntity> requestEntityWriter;
     @Autowired
     private JdbcBatchItemWriter<HistoryEntity> roleAssignmentHistoryWriter;
-//    @Autowired
-//    private JdbcBatchItemWriter<RoleAssignmentEntity> roleAssignmentWriter;
+    @Autowired
+    private JdbcBatchItemWriter<RoleAssignmentEntity> roleAssignmentWriter;
 
     @Override
     public void write(List<? extends EntityWrapper> items) throws Exception {
@@ -29,7 +29,7 @@ public class EntityWrapperWriter implements ItemWriter<EntityWrapper> {
             newtableWriter.write(Collections.singletonList(item.getNewtable()));
             requestEntityWriter.write(Collections.singletonList(item.getRequestEntity()));
             roleAssignmentHistoryWriter.write(Collections.singletonList(item.getRoleAssignmentHistoryEntity()));
-            //roleAssignmentWriter.write(Collections.singletonList(item.getRoleAssignmentEntity()));
+            roleAssignmentWriter.write(Collections.singletonList(item.getRoleAssignmentEntity()));
         }
     }
 }
