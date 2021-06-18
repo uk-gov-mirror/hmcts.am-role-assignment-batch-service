@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.processors;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.JacksonUtils.convertValueJsonNode;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.batch.item.ItemProcessor;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUsers;
@@ -10,14 +17,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.Newtable;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
-import uk.gov.hmcts.reform.roleassignmentbatch.util.JacksonUtils;
-
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.JacksonUtils.convertValueJsonNode;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 
 public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUsers, EntityWrapper> {
@@ -72,7 +71,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUsers, Entit
                         .grantType(GrantType.STANDARD.name())
                         .readOnly(false)
                         .created(LocalDateTime.now())
-                        .attributes(convertValueJsonNode(attributes))
+                        .attributes(convertValueJsonNode(attributes).toString())
                         .build();
 //        RoleAssignmentEntity roleAssignmentEntity =
 //                RoleAssignmentEntity.builder()
