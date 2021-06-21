@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.CcdToRasSetupTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
@@ -192,6 +193,18 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    CcdToRasSetupTasklet ccdToRasSetupTasklet() {
+        return new CcdToRasSetupTasklet();
+    }
+
+    @Bean
+    public Step taskletStep() {
+        return steps.get("taskletStep")
+                .tasklet(ccdToRasSetupTasklet())
+                .build();
+    }
+
+    @Bean
     public Step ccdToRasStep() {
         return steps.get("ccdToRasStep")
                     .<CcdCaseUsers, EntityWrapper>chunk(1000)
@@ -213,8 +226,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return jobs.get("ccdToRasBatchJob")
                    .incrementer(new RunIdIncrementer())
                    .listener(listener)
-                   .flow(ccdToRasStep)
-                   .end()
+                   .start(taskletStep())
+                   .next(ccdToRasStep)
                    .build();
 
     }
