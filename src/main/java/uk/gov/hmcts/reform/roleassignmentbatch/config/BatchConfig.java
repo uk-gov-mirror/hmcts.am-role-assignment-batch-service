@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.CcdToRasSetupTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
 @Configuration
@@ -159,8 +160,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
             new JdbcBatchItemWriterBuilder<ActorCacheEntity>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
                 .sql("insert into actor_cache_control(actor_id,etag,json_response) "
-                        + "values(:actorIds,:etag, :roleAssignmentResponse)")
+                        + "values(:actorIds,:etag, :roleAssignmentResponse) on conflict(actor_id) do nothing;")
                 .dataSource(dataSource)
+                .assertUpdates(false)
                 .build();
     }
 
@@ -207,10 +209,22 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    ReplicateTablesTasklet replicateTablesTasklet() {
+        return new ReplicateTablesTasklet();
+    }
+
+    @Bean
     public Step taskletStep() {
         return steps.get("taskletStep")
                 .tasklet(ccdToRasSetupTasklet())
                 .build();
+    }
+
+    @Bean
+    public Step replicateTables() {
+        return steps.get("ReplicateTables")
+                    .tasklet(replicateTablesTasklet())
+                    .build();
     }
 
     @Bean
@@ -236,6 +250,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                    .incrementer(new RunIdIncrementer())
                    .listener(listener)
                    .start(taskletStep())
+                   .next(replicateTables())
                    .next(ccdToRasStep)
                    .build();
 

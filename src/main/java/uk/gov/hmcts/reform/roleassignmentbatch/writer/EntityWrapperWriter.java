@@ -25,7 +25,7 @@ public class EntityWrapperWriter implements ItemWriter<EntityWrapper> {
 
     @Override
     public void write(List<? extends EntityWrapper> items) throws Exception {
-        for (EntityWrapper item: items) {
+        for (EntityWrapper item : items) {
             requestEntityWriter.write(Collections.singletonList(item.getRequestEntity()));
             roleAssignmentHistoryWriter.write(Collections.singletonList(item.getRoleAssignmentHistoryEntity()));
             roleAssignmentWriter.write(Collections.singletonList(item.getRoleAssignmentEntity()));
