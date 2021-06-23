@@ -150,8 +150,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
             new JdbcBatchItemWriterBuilder<ActorCacheEntity>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
                 .sql("insert into actor_cache_control(actor_id,etag,json_response) "
-                        + "values(:actorIds,:etag, :roleAssignmentResponse)")
+                        + "values(:actorIds,:etag, :roleAssignmentResponse) on conflict(actor_id) do nothing;")
                 .dataSource(dataSource)
+                .assertUpdates(false)
                 .build();
     }
 
