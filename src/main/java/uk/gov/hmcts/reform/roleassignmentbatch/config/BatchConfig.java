@@ -45,9 +45,18 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Value("${delete-expired-records}")
     String taskParent;
-
     @Value("${batchjob-name}")
     String jobName;
+    @Value("${csv-file-name}")
+    String fileName;
+    @Value("${csv-file-path}")
+    String filePath;
+    @Value("${azure.container-name}")
+    String containerName;
+    @Value("${azure.account-name}")
+    String accountName;
+    @Value("${azure.account-key}")
+    String accountKey;
 
     @Autowired
     JobBuilderFactory jobs;
@@ -194,7 +203,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Bean
     CcdToRasSetupTasklet ccdToRasSetupTasklet() {
-        return new CcdToRasSetupTasklet();
+        return new CcdToRasSetupTasklet(fileName, filePath, containerName, accountName, accountKey);
     }
 
     @Bean
