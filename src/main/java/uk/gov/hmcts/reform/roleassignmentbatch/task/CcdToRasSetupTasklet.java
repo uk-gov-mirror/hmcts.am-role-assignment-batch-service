@@ -43,7 +43,7 @@ public class CcdToRasSetupTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
 
-        if(fileDoesNotExistUpToDate(downloadedFile, blobClient)) {
+        if (fileDoesNotExistUpToDate(downloadedFile, blobClient)) {
             try {
                 blobClient.downloadToFile(downloadedFile.getAbsolutePath(), true);
 
@@ -59,31 +59,23 @@ public class CcdToRasSetupTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    public boolean fileDoesNotExistUpToDate(File downloadedFile, BlobClient blobClient) {
-        boolean notUpToDate = false;
-        if (fileDoesNotExistLocal(downloadedFile) || blobAndLocalFileSizeAreDifferent(blobClient, downloadedFile)) {
-            notUpToDate = true;
-        }
-        return notUpToDate;
+    protected boolean fileDoesNotExistUpToDate(File downloadedFile, BlobClient blobClient) {
+        return (fileDoesNotExistLocal(downloadedFile) || blobAndLocalFileSizeAreDifferent(blobClient, downloadedFile));
     }
 
-    public boolean fileDoesNotExistLocal(File file) {
+    protected boolean fileDoesNotExistLocal(File file) {
         return !file.exists();
     }
 
-    public boolean blobAndLocalFileSizeAreDifferent(BlobClient blobClient, File downloadedFile) {
-        boolean fileSizeMismatch = true;
-        if (getBlobFileSize(blobClient) == getLocalFileSize(downloadedFile)) {
-            fileSizeMismatch = false;
-        }
-        return fileSizeMismatch;
+    protected boolean blobAndLocalFileSizeAreDifferent(BlobClient blobClient, File downloadedFile) {
+        return (getLocalFileSize(downloadedFile) != getBlobFileSize(blobClient));
     }
 
-    public long getBlobFileSize(BlobClient blobClient) {
+    protected long getBlobFileSize(BlobClient blobClient) {
         return blobClient.getProperties().getBlobSize();
     }
 
-    public long getLocalFileSize(File downloadedFile) {
+    protected long getLocalFileSize(File downloadedFile) {
         return downloadedFile.length();
     }
 
