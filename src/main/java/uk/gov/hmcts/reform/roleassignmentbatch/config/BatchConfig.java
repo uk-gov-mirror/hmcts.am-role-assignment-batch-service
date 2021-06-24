@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.CcdToRasSetupTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
@@ -67,7 +68,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Autowired
     DataSource dataSource;
 
-    public final String REQUEST_QUERY = "INSERT INTO role_assignment_request(id, correlation_id,client_id,"
+    public final String REQUEST_QUERY = "INSERT INTO replica_role_assignment_request(id, correlation_id,client_id,"
             + "authenticated_user_id,assigner_id,request_type,"
             + "status,"
             + "process,reference,"
@@ -159,7 +160,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return
             new JdbcBatchItemWriterBuilder<ActorCacheEntity>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("insert into actor_cache_control(actor_id,etag,json_response) "
+                .sql("insert into replica_actor_cache_control(actor_id,etag,json_response) "
                         + "values(:actorIds,:etag, :roleAssignmentResponse) on conflict(actor_id) do nothing;")
                 .dataSource(dataSource)
                 .assertUpdates(false)
@@ -171,7 +172,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return
                 new JdbcBatchItemWriterBuilder<HistoryEntity>()
                         .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                        .sql("insert into role_assignment_history(id, status, actor_id_type, "
+                        .sql("insert into replica_role_assignment_history(id, status, actor_id_type, "
                                 + "role_type, role_name, status_sequence, classification, grant_type, "
                                 + "read_only, created, "
                                 + "actor_id, attributes, request_id) "
@@ -188,7 +189,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return
                 new JdbcBatchItemWriterBuilder<RoleAssignmentEntity>()
                         .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                        .sql("insert into role_assignment(id, actor_id_type, actor_id, role_type, role_name, "
+                        .sql("insert into replica_role_assignment(id, actor_id_type, actor_id, role_type, role_name, "
                                      + "classification, grant_type, role_category, read_only, created, "
                                      + "attributes) "
                                      + "values(:id, :actorIdType, :actorId, :roleType, :roleName, "
@@ -214,8 +215,20 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public Step taskletStep() {
-        return steps.get("taskletStep")
+    RenameTablesPostMigration renameTablesPostMigration() {
+        return new RenameTablesPostMigration();
+    }
+
+    @Bean
+    public Step renameTablesPostMigrationStep() {
+        return steps.get("renameTablesPostMigrationStep")
+                    .tasklet(renameTablesPostMigration())
+                    .build();
+    }
+
+    @Bean
+    public Step ccdToRasSetupStep() {
+        return steps.get("ccdToRasSetupStep")
                 .tasklet(ccdToRasSetupTasklet())
                 .build();
     }
@@ -245,13 +258,14 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public Job ccdToRasBatchJob(@Autowired NotificationListener listener, Step ccdToRasStep) {
+    public Job ccdToRasBatchJob(@Autowired NotificationListener listener) {
         return jobs.get("ccdToRasBatchJob")
                    .incrementer(new RunIdIncrementer())
                    .listener(listener)
-                   .start(taskletStep())
+                   .start(ccdToRasSetupStep())
                    .next(replicateTables())
-                   .next(ccdToRasStep)
+                   .next(ccdToRasStep())
+                   .next(renameTablesPostMigrationStep())
                    .build();
 
     }

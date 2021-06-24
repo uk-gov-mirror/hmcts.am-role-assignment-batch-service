@@ -17,46 +17,57 @@ public class ReplicateTablesTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-        log.info("Dropping replicated Request Table");
-        jdbcTemplate.update("DROP TABLE IF EXISTS replica_role_assignment_request");
-        log.info("Drop Table: Successful");
-
-        log.info("Dropping replica_role_assignment_history");
-        jdbcTemplate.update("DROP TABLE IF EXISTS replica_role_assignment_history");
-        log.info("Drop Table replica_role_assignment_history: Successful");
+        log.info("Dropping replica_actor_cache");
+        jdbcTemplate.update("DROP TABLE IF EXISTS replica_actor_cache_control");
+        log.info("Drop Table replica_role_assignment: Successful");
 
         log.info("Dropping replica_role_assignment");
         jdbcTemplate.update("DROP TABLE IF EXISTS replica_role_assignment");
         log.info("Drop Table replica_role_assignment: Successful");
 
-        log.info("Dropping replica_actor_cache");
-        jdbcTemplate.update("DROP TABLE IF EXISTS replica_actor_cache_control");
-        log.info("Drop Table replica_role_assignment: Successful");
+        log.info("Dropping replica_role_assignment_history");
+        jdbcTemplate.update("DROP TABLE IF EXISTS replica_role_assignment_history");
+        log.info("Drop Table replica_role_assignment_history: Successful");
+
+        log.info("Dropping replicated Request Table");
+        jdbcTemplate.update("DROP TABLE IF EXISTS replica_role_assignment_request");
+        log.info("Drop Table: Successful");
 
         log.info("Starting table replication");
 
         log.info("Replicating Request Table");
         log.info("Replication Request Table Successful ? "
                  + (1 <= jdbcTemplate
-            .update("CREATE TABLE IF NOT EXISTS replica_role_assignment_request AS (SELECT * from role_assignment_request);")));
+            .update("CREATE TABLE replica_role_assignment_request (LIKE role_assignment_request INCLUDING ALL);")));
         log.info("Replicating Request Table: Successful");
 
         log.info("Replicating History Table");
         log.info("Replication History Table Successful ? "
                  + (1 <= jdbcTemplate
-            .update("CREATE TABLE IF NOT EXISTS replica_role_assignment_history AS (SELECT * from role_assignment_history);")));
+            .update("CREATE TABLE replica_role_assignment_history (LIKE role_assignment_history INCLUDING ALL);")));
         log.info("Replicating History Table: Successful");
 
         log.info("Replicating Live Table");
         log.info("Replication Live Table Successful ? "
-                 + (1 <= jdbcTemplate.update("CREATE TABLE IF NOT EXISTS replica_role_assignment AS (SELECT * from role_assignment);")));
+                 + (1 <= jdbcTemplate.update("CREATE TABLE replica_role_assignment (LIKE role_assignment INCLUDING ALL);")));
         log.info("Replicating Live Table: Successful");
 
         log.info("Replicating Actor Cache Table");
         log.info("Replication Actor Cache Table Successful ? "
-                 + (1 <= jdbcTemplate.update("CREATE TABLE IF NOT EXISTS replica_actor_cache_control AS (SELECT * from actor_cache_control);")));
+                 + (1 <= jdbcTemplate.update("CREATE TABLE replica_actor_cache_control (LIKE actor_cache_control INCLUDING ALL);")));
         log.info("Replicating Actor Cache Table: Successful");
 
-        return null;
+
+        jdbcTemplate.update("ALTER TABLE replica_role_assignment_history ADD CONSTRAINT fk_role_assignment_history_role_assignment_request" +
+                            " FOREIGN KEY (request_id) REFERENCES replica_role_assignment_request(id);");
+
+        /*log.info("Insert data from current tables to Replicas");
+        jdbcTemplate.update("INSERT into replica_actor_cache_control(SELECT * FROM actor_cache_control);");
+        jdbcTemplate.update("INSERT into replica_role_assignment(SELECT * FROM role_assignment);");
+        jdbcTemplate.update("INSERT into replica_role_assignment_history(SELECT * FROM role_assignment_history);");
+        jdbcTemplate.update("INSERT into replica_role_assignment_request(SELECT * FROM role_assignment_request);");
+        log.info("Data insertion from Current tables to replicas is complete");*/
+
+        return RepeatStatus.FINISHED;
     }
 }
