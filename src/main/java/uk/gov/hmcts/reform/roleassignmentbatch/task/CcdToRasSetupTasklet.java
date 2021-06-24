@@ -23,8 +23,8 @@ public class CcdToRasSetupTasklet implements Tasklet {
     BlobClient blobClient;
 
     @Autowired
-    public CcdToRasSetupTasklet (String fileName,
-                                 String filePath, String containerName, String accountName, String accountKey) {
+    public CcdToRasSetupTasklet(String fileName,
+                                String filePath, String containerName, String accountName, String accountKey) {
 
         downloadedFile = new File(filePath + fileName);
 
