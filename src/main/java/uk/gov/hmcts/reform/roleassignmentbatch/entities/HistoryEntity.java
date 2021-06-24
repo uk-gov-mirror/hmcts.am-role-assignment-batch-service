@@ -58,9 +58,8 @@ public class HistoryEntity implements Serializable {
     @Column(name = "grant_type", nullable = false)
     private String grantType;
 
-//    @Column(name = "notes", nullable = true, columnDefinition = "jsonb")
-//    @Convert(converter = JsonBConverter.class)
-//    private JsonNode notes;
+    @Column(name = "notes", nullable = true, columnDefinition = "jsonb")
+    private String notes;
 
     @Column(name = "role_category")
     private String roleCategory;
