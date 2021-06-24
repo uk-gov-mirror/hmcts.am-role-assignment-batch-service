@@ -18,13 +18,10 @@ public class RenameTablesPostMigration implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
         log.info("Dropping the existing temp tables.");
-        log.info("Dropping the existing temp tables");
         jdbcTemplate.update("DROP TABLE IF EXISTS temp_actor_cache_control CASCADE;");
         jdbcTemplate.update("DROP TABLE IF EXISTS temp_role_assignment CASCADE;");
         jdbcTemplate.update("DROP TABLE IF EXISTS temp_role_assignment_history CASCADE;");
         jdbcTemplate.update("DROP TABLE IF EXISTS temp_role_assignment_request CASCADE;");
-
-
 
         log.info("Drop temp table is Successful");
 
