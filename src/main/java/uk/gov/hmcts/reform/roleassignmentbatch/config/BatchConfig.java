@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.roleassignmentbatch.config;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -27,9 +28,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
@@ -40,9 +43,8 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
+import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
-
-import java.util.List;
 
 @Configuration
 @EnableBatchProcessing
@@ -62,6 +64,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
     String accountName;
     @Value("${azure.account-key}")
     String accountKey;
+
+    @Value("${caseuser-filepath}")
+    String ccdCaseUserFilePath;
 
     @Autowired
     JobBuilderFactory jobs;
@@ -105,7 +110,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new FlatFileItemReaderBuilder<CcdCaseUser>()
             .name("historyEntityReader")
             .linesToSkip(1)
-            .resource(new PathResource("src/main/resources/book2.csv"))
+            .resource(new PathResource(ccdCaseUserFilePath))
             .delimited()
             .names("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category")
             .lineMapper(lineMapper())
@@ -159,6 +164,20 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    public JdbcBatchItemWriter<AuditFaults> insertInAuditFaults() {
+        return new JdbcBatchItemWriterBuilder<AuditFaults>()
+            .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+            .sql(Constants.AUDIT_QUERY)
+            .dataSource(dataSource)
+            .build();
+    }
+
+    @Bean
+    SkipListener<CcdCaseUser, EntityWrapper> auditSkipListener() {
+        return new AuditSkipListener();
+    }
+
+    @Bean
     public JdbcBatchItemWriter<ActorCacheEntity> insertIntoActorCacheTable() {
         return
             new JdbcBatchItemWriterBuilder<ActorCacheEntity>()
@@ -169,6 +188,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
                 .assertUpdates(false)
                 .build();
     }
+
+
 
     @Bean
     public JdbcBatchItemWriter<HistoryEntity> insertIntoHistoryTable() {
@@ -259,6 +280,12 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public Step ccdToRasStep() {
         return steps.get("ccdToRasStep")
                     .<CcdCaseUser, EntityWrapper>chunk(1000)
+                    .faultTolerant()
+                    .retryLimit(3)
+                    .retry(DeadlockLoserDataAccessException.class)
+                    .skip(Exception.class).skip(Throwable.class)
+                    .skipLimit(1000)
+                    .listener(auditSkipListener())
                     .reader(ccdCaseUsersReader())
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())

@@ -9,13 +9,17 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import lombok.Setter;
+import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ActorIdType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Classification;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.GrantType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Status;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 
 @Setter
@@ -68,4 +72,52 @@ public class TestDataBuilder {
         });
     }
 
+    public static RequestEntity buildRequestEntity(UUID requestId, String userId, String caseData) {
+
+        return RequestEntity.builder()
+                            .id(requestId)
+                            .correlationId(UUID.randomUUID().toString())
+                            .clientId("ccd_migration")
+                            .authenticatedUserId("A fixed Authenticated User Id")
+                            .assignerId(userId)
+                            .requestType("CREATE")
+                            .status("APPROVED")
+                            .process("CCD")
+                            .replaceExisting(false)
+                            .roleAssignmentId(UUID.randomUUID())
+                            .reference(caseData.concat(userId))
+                            .log(null)
+                            .created(LocalDateTime.now())
+                            .build();
+    }
+
+    public static HistoryEntity buildHistoryEntity(UUID requestId, String userId, String caseData) {
+        UUID requestUuid = UUID.randomUUID();
+        return HistoryEntity.builder()
+                .id(requestUuid)
+                .requestEntity(RequestEntity.builder().id(requestId).build())
+                .actorId(userId)
+                .actorIdType("judge")
+                .roleType("judge")
+                .roleName("name")
+                .status("APPROVED")
+                .process("CCD")
+                .classification("org")
+                .grantType("admin")
+                .attributes(BooleanNode.getFalse())
+                .reference(caseData.concat(userId))
+                .log(null)
+                .created(LocalDateTime.now())
+                .build();
+    }
+
+    public static CcdCaseUser buildCcdCaseUsers() {
+        UUID requestUuid = UUID.randomUUID();
+        CcdCaseUser ccdCaseUser = new CcdCaseUser();
+        ccdCaseUser.setUserId(requestUuid.toString());
+        ccdCaseUser.setCaseRole("Role");
+        ccdCaseUser.setCaseType("type");
+        ccdCaseUser.setCaseDataId("DataId");
+        return ccdCaseUser;
+    }
 }
