@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CcdCaseUsers implements Serializable {
+public class CcdCaseUser implements Serializable {
     private String caseDataId;
     private String userId;
     private String caseRole;

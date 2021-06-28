@@ -28,7 +28,7 @@ import org.springframework.core.io.PathResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUsers;
+import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
@@ -39,7 +39,10 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.CcdToRasSetupTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
+
+import java.util.List;
 
 @Configuration
 @EnableBatchProcessing
@@ -98,23 +101,23 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public FlatFileItemReader<CcdCaseUsers> ccdCaseUsersReader() {
-        return new FlatFileItemReaderBuilder<CcdCaseUsers>()
+    public FlatFileItemReader<CcdCaseUser> ccdCaseUsersReader() {
+        return new FlatFileItemReaderBuilder<CcdCaseUser>()
             .name("historyEntityReader")
             .linesToSkip(1)
             .resource(new PathResource("src/main/resources/book2.csv"))
             .delimited()
             .names("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category")
             .lineMapper(lineMapper())
-            .fieldSetMapper(new BeanWrapperFieldSetMapper<CcdCaseUsers>() {{
-                setTargetType(CcdCaseUsers.class);
+            .fieldSetMapper(new BeanWrapperFieldSetMapper<CcdCaseUser>() {{
+                setTargetType(CcdCaseUser.class);
             }})
             .build();
     }
 
     @Bean
-    public LineMapper<CcdCaseUsers> lineMapper() {
-        final DefaultLineMapper<CcdCaseUsers> defaultLineMapper = new DefaultLineMapper<>();
+    public LineMapper<CcdCaseUser> lineMapper() {
+        final DefaultLineMapper<CcdCaseUser> defaultLineMapper = new DefaultLineMapper<>();
         final DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
@@ -127,10 +130,10 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
 
     @Component
-    public static class CcdFieldSetMapper implements FieldSetMapper<CcdCaseUsers> {
+    public static class CcdFieldSetMapper implements FieldSetMapper<CcdCaseUser> {
         @Override
-        public CcdCaseUsers mapFieldSet(FieldSet fieldSet) {
-            final CcdCaseUsers caseUsers = new CcdCaseUsers();
+        public CcdCaseUser mapFieldSet(FieldSet fieldSet) {
+            final CcdCaseUser caseUsers = new CcdCaseUser();
             caseUsers.setCaseDataId(fieldSet.readString("case_data_id"));
             caseUsers.setUserId(fieldSet.readString("user_id"));
             caseUsers.setCaseRole(fieldSet.readString("case_role"));
@@ -210,6 +213,11 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    ValidationTasklet validationTasklet() {
+        return new ValidationTasklet(fileName, filePath, ccdCaseUsersReader());
+    }
+
+    @Bean
     ReplicateTablesTasklet replicateTablesTasklet() {
         return new ReplicateTablesTasklet();
     }
@@ -234,6 +242,13 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    public Step validationStep(){
+        return steps.get("validationStep")
+                .tasklet(validationTasklet())
+                .build();
+    }
+
+    @Bean
     public Step replicateTables() {
         return steps.get("ReplicateTables")
                     .tasklet(replicateTablesTasklet())
@@ -243,7 +258,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Step ccdToRasStep() {
         return steps.get("ccdToRasStep")
-                    .<CcdCaseUsers, EntityWrapper>chunk(1000)
+                    .<CcdCaseUser, EntityWrapper>chunk(1000)
                     .reader(ccdCaseUsersReader())
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
@@ -263,6 +278,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                    .incrementer(new RunIdIncrementer())
                    .listener(listener)
                    .start(ccdToRasSetupStep())
+                   .next(validationStep())
                    .next(replicateTables())
                    .next(ccdToRasStep())
                    .next(renameTablesPostMigrationStep())

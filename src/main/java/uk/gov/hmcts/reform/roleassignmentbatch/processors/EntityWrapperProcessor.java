@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.batch.item.ItemProcessor;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUsers;
+import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.GrantType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentEntity;
 
 
-public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUsers, EntityWrapper> {
+public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, EntityWrapper> {
 
 
     /**
@@ -29,13 +29,13 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUsers, Entit
      * processing.  If the returned result is null, it is assumed that processing of the item
      * should not continue.
      *
-     * @param ccdCaseUsers to be processed
+     * @param ccdCaseUser to be processed
      * @return potentially modified or new item for continued processing, {@code null} if processing of the
      * provided item should not continue.
      * @throws Exception thrown if exception occurs during processing.
      */
     @Override
-    public EntityWrapper process(CcdCaseUsers ccdCaseUsers) throws Exception {
+    public EntityWrapper process(CcdCaseUser ccdCaseUser) throws Exception {
         UUID requestUuid = UUID.randomUUID();
         Map<String, JsonNode> attributes = new HashMap<>();
         attributes.put("caseId", convertValueJsonNode("1234567890123456"));
@@ -44,14 +44,14 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUsers, Entit
                 .correlationId(UUID.randomUUID().toString())
                 .clientId("ccd_migration")
                 .authenticatedUserId("A fixed Authenticated User Id")
-                .assignerId(ccdCaseUsers.getUserId())
+                .assignerId(ccdCaseUser.getUserId())
                 .requestType("CREATE")
                 .status("APPROVED")
                 .process("CCD")
                 .replaceExisting(false)
                 .roleAssignmentId(UUID.randomUUID())
-                .reference(ccdCaseUsers.getCaseDataId()
-                        .concat(ccdCaseUsers.getUserId()))
+                .reference(ccdCaseUser.getCaseDataId()
+                        .concat(ccdCaseUser.getUserId()))
                 .log(null)
                 .created(LocalDateTime.now())
                 .build();
@@ -60,7 +60,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUsers, Entit
                         .id(UUID.randomUUID())
                         .status(Status.APPROVED.name())
                         .requestId(requestUuid)
-                        .actorId(ccdCaseUsers.getUserId())
+                        .actorId(ccdCaseUser.getUserId())
                         .actorIdType("IDAM")
                         .roleType(RoleType.CASE.name())
                         .roleName("secret-agent-man")
@@ -76,7 +76,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUsers, Entit
                 RoleAssignmentEntity.builder()
                         .id(requestUuid)
                         .actorIdType("IDAM")
-                        .actorId(ccdCaseUsers.getUserId())
+                        .actorId(ccdCaseUser.getUserId())
                         .roleType(RoleType.CASE.name())
                         .roleName("secret-agent-man")
                         .classification("Classified")
