@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
+import java.util.Collections;
+import javax.annotation.PostConstruct;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -11,11 +14,8 @@ import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.AuditOperationType;
-import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
-
-import javax.annotation.PostConstruct;
-import java.util.Collections;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 
 public class AuditSkipListener implements SkipListener<CcdCaseUser, EntityWrapper> {
 
@@ -56,7 +56,7 @@ public class AuditSkipListener implements SkipListener<CcdCaseUser, EntityWrappe
         auditFaults.setFailedAt(AuditOperationType.WRITE.getLabel());
         auditFaults.setCcdUsers(getJson(item.getCcdCaseUser()));
         auditFaults.setRequest(getJson(item.getRequestEntity()));
-        auditFaults.setHistory(getJson(item.getHistoryEntity()));
+        auditFaults.setHistory(getJson(item.getRoleAssignmentHistoryEntity()));
         auditWriter.write(Collections.singletonList(auditFaults));
     }
 

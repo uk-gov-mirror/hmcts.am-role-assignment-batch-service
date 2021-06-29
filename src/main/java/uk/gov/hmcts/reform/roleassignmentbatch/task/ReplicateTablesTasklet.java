@@ -17,6 +17,10 @@ public class ReplicateTablesTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
+        log.info("Dropping audit_faults");
+        jdbcTemplate.update("DROP TABLE IF EXISTS audit_faults");
+        log.info("Drop Table audit_faults: Successful");
+
         log.info("Dropping replica_actor_cache");
         jdbcTemplate.update("DROP TABLE IF EXISTS replica_actor_cache_control");
         log.info("Drop Table replica_role_assignment: Successful");
@@ -32,6 +36,19 @@ public class ReplicateTablesTasklet implements Tasklet {
         log.info("Dropping replicated Request Table");
         jdbcTemplate.update("DROP TABLE IF EXISTS replica_role_assignment_request");
         log.info("Drop Table: Successful");
+
+        log.info("Creating audit_faults Table");
+        jdbcTemplate
+            .update("CREATE TABLE audit_faults (id int8 NOT NULL," +
+                    "failed_at varchar NULL," +
+                    "reason varchar NULL," +
+                    "ccd_users varchar NULL," +
+                    "request varchar NULL," +
+                    "history varchar NULL," +
+                    "live varchar NULL);");
+        jdbcTemplate.update("CREATE SEQUENCE IF NOT EXISTS AUDIT_ID_SEQ");
+        jdbcTemplate.update("ALTER TABLE audit_faults ALTER COLUMN id SET DEFAULT nextval('AUDIT_ID_SEQ');");
+        log.info("Creating audit_faults Table: Successful");
 
         log.info("Starting table replication");
 

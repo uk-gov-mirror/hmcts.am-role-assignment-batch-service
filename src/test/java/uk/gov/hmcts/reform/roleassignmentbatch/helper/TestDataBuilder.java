@@ -9,7 +9,6 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.BooleanNode;
 import lombok.Setter;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ActorIdType;
@@ -95,7 +94,6 @@ public class TestDataBuilder {
         UUID requestUuid = UUID.randomUUID();
         return HistoryEntity.builder()
                 .id(requestUuid)
-                .requestEntity(RequestEntity.builder().id(requestId).build())
                 .actorId(userId)
                 .actorIdType("judge")
                 .roleType("judge")
@@ -104,7 +102,7 @@ public class TestDataBuilder {
                 .process("CCD")
                 .classification("org")
                 .grantType("admin")
-                .attributes(BooleanNode.getFalse())
+                .attributes(null)
                 .reference(caseData.concat(userId))
                 .log(null)
                 .created(LocalDateTime.now())

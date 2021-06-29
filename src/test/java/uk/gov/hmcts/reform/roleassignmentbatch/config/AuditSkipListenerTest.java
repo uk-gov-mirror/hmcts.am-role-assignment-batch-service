@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +19,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.helper.TestDataBuilder;
 
-import java.util.UUID;
-
 @RunWith(MockitoJUnitRunner.class)
 public class AuditSkipListenerTest {
 
@@ -35,11 +35,11 @@ public class AuditSkipListenerTest {
 
     @Test
     public void verifyOnSkipInProcess() throws Exception {
-        CcdCaseUsers ccdCaseUsers = TestDataBuilder.buildCcdCaseUsers();
+        CcdCaseUser ccdCaseUser = TestDataBuilder.buildCcdCaseUsers();
         String msg = "Exception";
         Throwable t = new Throwable(msg);
 
-        auditSkipListener.onSkipInProcess(ccdCaseUsers, t);
+        auditSkipListener.onSkipInProcess(ccdCaseUser, t);
         Mockito.verify(auditWriter, Mockito.times(1)).write(Mockito.any());
     }
 
@@ -51,12 +51,13 @@ public class AuditSkipListenerTest {
     @Test
     public void verifyOnSkipInWrite() throws Exception {
         UUID requestUuid = UUID.randomUUID();
-        CcdCaseUsers ccdCaseUsers = TestDataBuilder.buildCcdCaseUsers();
-        HistoryEntity historyEntity = TestDataBuilder.buildHistoryEntity(requestUuid, ccdCaseUsers.getUserId(),
-                                                                         ccdCaseUsers.getCaseDataId());
-        RequestEntity requestEntity = TestDataBuilder.buildRequestEntity(requestUuid, ccdCaseUsers.getUserId(),
-                                                                         ccdCaseUsers.getCaseDataId());
-        EntityWrapper entityWrapper = EntityWrapper.builder().ccdCaseUsers(ccdCaseUsers).historyEntity(historyEntity)
+        CcdCaseUser ccdCaseUser = TestDataBuilder.buildCcdCaseUsers();
+        HistoryEntity historyEntity = TestDataBuilder.buildHistoryEntity(requestUuid, ccdCaseUser.getUserId(),
+                                                                         ccdCaseUser.getCaseDataId());
+        RequestEntity requestEntity = TestDataBuilder.buildRequestEntity(requestUuid, ccdCaseUser.getUserId(),
+                                                                         ccdCaseUser.getCaseDataId());
+        EntityWrapper entityWrapper = EntityWrapper.builder().ccdCaseUser(ccdCaseUser)
+                                                   .roleAssignmentHistoryEntity(historyEntity)
                                                    .requestEntity(requestEntity).build();
         String msg = "Exception";
         Throwable t = new Throwable(msg);
