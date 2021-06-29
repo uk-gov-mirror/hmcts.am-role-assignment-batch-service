@@ -53,25 +53,20 @@ public class ReplicateTablesTasklet implements Tasklet {
         log.info("Starting table replication");
 
         log.info("Replicating Request Table");
-        log.info("Replication Request Table Successful ? "
-                 + (1 <= jdbcTemplate
-            .update("CREATE TABLE replica_role_assignment_request (LIKE role_assignment_request INCLUDING ALL);")));
+        jdbcTemplate.update("CREATE TABLE replica_role_assignment_request (LIKE role_assignment_request INCLUDING ALL);");
         log.info("Replicating Request Table: Successful");
 
         log.info("Replicating History Table");
-        log.info("Replication History Table Successful ? "
-                 + (1 <= jdbcTemplate
-            .update("CREATE TABLE replica_role_assignment_history (LIKE role_assignment_history INCLUDING ALL);")));
+
+        jdbcTemplate.update("CREATE TABLE replica_role_assignment_history (LIKE role_assignment_history INCLUDING ALL);");
         log.info("Replicating History Table: Successful");
 
         log.info("Replicating Live Table");
-        log.info("Replication Live Table Successful ? "
-                 + (1 <= jdbcTemplate.update("CREATE TABLE replica_role_assignment (LIKE role_assignment INCLUDING ALL);")));
+        jdbcTemplate.update("CREATE TABLE replica_role_assignment (LIKE role_assignment INCLUDING ALL);");
         log.info("Replicating Live Table: Successful");
 
         log.info("Replicating Actor Cache Table");
-        log.info("Replication Actor Cache Table Successful ? "
-                 + (1 <= jdbcTemplate.update("CREATE TABLE replica_actor_cache_control (LIKE actor_cache_control INCLUDING ALL);")));
+        jdbcTemplate.update("CREATE TABLE replica_actor_cache_control (LIKE actor_cache_control INCLUDING ALL);");
         log.info("Replicating Actor Cache Table: Successful");
 
 
