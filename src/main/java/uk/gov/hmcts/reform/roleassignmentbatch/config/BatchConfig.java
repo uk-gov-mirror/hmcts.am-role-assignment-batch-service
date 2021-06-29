@@ -76,16 +76,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Autowired
     DataSource dataSource;
 
-    public final String REQUEST_QUERY = "INSERT INTO replica_role_assignment_request(id, correlation_id,client_id,"
-            + "authenticated_user_id,assigner_id,request_type,"
-            + "status,"
-            + "process,reference,"
-            + "replace_existing,role_assignment_id,log,created)"
-            + " VALUES (:id, :correlationId,:clientId,:authenticatedUserId,:assignerId,"
-            + ":requestType,:status,:process,:reference,"
-            + ":replaceExisting,"
-            + ":roleAssignmentId,:log,:created)";
-
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
                                   @Autowired DeleteExpiredRecords deleteExpiredRecords) {
@@ -158,7 +148,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public JdbcBatchItemWriter<RequestEntity> insertInRequestTable() {
         return new JdbcBatchItemWriterBuilder<RequestEntity>()
             .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-            .sql(REQUEST_QUERY)
+            .sql(Constants.REQUEST_QUERY)
             .dataSource(dataSource)
             .build();
     }
@@ -182,8 +172,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return
             new JdbcBatchItemWriterBuilder<ActorCacheEntity>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("insert into replica_actor_cache_control(actor_id,etag,json_response) "
-                        + "values(:actorIds,:etag, :roleAssignmentResponse) on conflict(actor_id) do nothing;")
+                .sql(Constants.ACTOR_CACHE_QUERY)
                 .dataSource(dataSource)
                 .assertUpdates(false)
                 .build();
@@ -196,14 +185,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return
                 new JdbcBatchItemWriterBuilder<HistoryEntity>()
                         .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                        .sql("insert into replica_role_assignment_history(id, status, actor_id_type, "
-                                + "role_type, role_name, status_sequence, classification, grant_type, "
-                                + "read_only, created, "
-                                + "actor_id, attributes, request_id) "
-                                + "values(:id, :status, :actorIdType, :roleType, :roleName, "
-                                + ":sequence, :classification, :grantType,"
-                                + ":readOnly, :created, "
-                                + ":actorId, :attributes::jsonb, :requestId)")
+                        .sql(Constants.HISTORY_QUERY)
                         .dataSource(dataSource)
                         .build();
     }
@@ -213,12 +195,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return
                 new JdbcBatchItemWriterBuilder<RoleAssignmentEntity>()
                         .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                        .sql("insert into replica_role_assignment(id, actor_id_type, actor_id, role_type, role_name, "
-                                     + "classification, grant_type, role_category, read_only, created, "
-                                     + "attributes) "
-                                     + "values(:id, :actorIdType, :actorId, :roleType, :roleName, "
-                                     + ":classification, :grantType, :roleCategory, :readOnly, :created, "
-                                     + ":attributes::jsonb)")
+                        .sql(Constants.ROLE_ASSIGNMENT_LIVE_TABLE)
                         .dataSource(dataSource)
                         .build();
     }
