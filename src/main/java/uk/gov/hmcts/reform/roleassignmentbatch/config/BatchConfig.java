@@ -305,7 +305,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                    .incrementer(new RunIdIncrementer())
                    .listener(listener)
                    .start(ccdToRasSetupStep())
-                   .next(validationStep())
+                   //.next(validationStep())
                    .next(replicateTables())
                    .next(ccdToRasStep())
                    .next(renameTablesPostMigrationStep())
