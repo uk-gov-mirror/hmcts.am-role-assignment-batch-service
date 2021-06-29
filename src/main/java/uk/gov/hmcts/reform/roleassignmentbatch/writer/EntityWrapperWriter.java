@@ -16,10 +16,13 @@ public class EntityWrapperWriter implements ItemWriter<EntityWrapper> {
 
     @Autowired
     private JdbcBatchItemWriter<RequestEntity> requestEntityWriter;
+
     @Autowired
     private JdbcBatchItemWriter<HistoryEntity> roleAssignmentHistoryWriter;
+
     @Autowired
     private JdbcBatchItemWriter<RoleAssignmentEntity> roleAssignmentWriter;
+
     @Autowired
     private JdbcBatchItemWriter<ActorCacheEntity> actorCacheWriter;
 
