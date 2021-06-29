@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
+import uk.gov.hmcts.reform.roleassignmentbatch.writer.CcdViewWriterTemp;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
 @Configuration
@@ -116,7 +117,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         final DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
-        lineTokenizer.setNames("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category");
+        lineTokenizer.setNames("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category", "begin_date");
         final CcdFieldSetMapper ccdFieldSetMapper = new CcdFieldSetMapper();
         defaultLineMapper.setLineTokenizer(lineTokenizer);
         defaultLineMapper.setFieldSetMapper(ccdFieldSetMapper);
@@ -135,6 +136,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
             caseUsers.setJurisdiction(fieldSet.readString("jurisdiction"));
             caseUsers.setCaseType(fieldSet.readString("case_type"));
             caseUsers.setRoleCategory(fieldSet.readString("role_category"));
+            caseUsers.setBeginDate(fieldSet.readString("begin_date"));
             return caseUsers;
         }
     }
@@ -142,6 +144,11 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public EntityWrapperProcessor entityWrapperProcessor() {
         return new EntityWrapperProcessor();
+    }
+
+    @Bean
+    public CcdViewWriterTemp ccdViewWriterTemp() {
+        return new CcdViewWriterTemp();
     }
 
     @Bean
@@ -188,6 +195,17 @@ public class BatchConfig extends DefaultBatchConfigurer {
                         .sql(Constants.HISTORY_QUERY)
                         .dataSource(dataSource)
                         .build();
+    }
+
+    @Bean
+    public JdbcBatchItemWriter<CcdCaseUser> insertIntoCcdView() {
+        return
+            new JdbcBatchItemWriterBuilder<CcdCaseUser>()
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .sql("insert into ccd_view(case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date) values " +
+                     "(:caseDataId,:userId,:caseRole,:jurisdiction,:caseType,:roleCategory,:beginDate)")
+                .dataSource(dataSource)
+                .build();
     }
 
     @Bean
@@ -272,6 +290,19 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    public Step injectDataIntoView() {
+        return steps.get("injectDataIntoView")
+                    .<CcdCaseUser, CcdCaseUser>chunk(1000)
+                    .reader(ccdCaseUsersReader())
+                    .writer(ccdViewWriterTemp())
+                    .taskExecutor(taskExecutor())
+                    .throttleLimit(10)
+                    .build();
+    }
+
+
+
+    @Bean
     public TaskExecutor taskExecutor() {
         return new SimpleAsyncTaskExecutor("spring_batch");
     }
@@ -284,6 +315,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                    .start(ccdToRasSetupStep())
                    //.next(validationStep())
                    .next(replicateTables())
+                   .next(injectDataIntoView())
                    .next(ccdToRasStep())
                    .next(renameTablesPostMigrationStep())
                    .build();
