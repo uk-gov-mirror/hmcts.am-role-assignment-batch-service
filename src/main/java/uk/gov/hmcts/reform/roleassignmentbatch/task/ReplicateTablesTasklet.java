@@ -17,6 +17,10 @@ public class ReplicateTablesTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
+        log.info("Dropping CCD_VIEW");
+        jdbcTemplate.update("DROP TABLE IF EXISTS CCD_VIEW");
+        log.info("Drop Table CCD_VIEW: Successful");
+
         log.info("Creating CCD_VIEW ");
         jdbcTemplate.execute("create table if not exists ccd_view(\n" +
                              "case_data_id varchar not null,\n" +
@@ -28,6 +32,7 @@ public class ReplicateTablesTasklet implements Tasklet {
                              "begin_date timestamp\n" +
                              ")");
         log.info("Creating CCD_VIEW : Complete ");
+
         log.info("Dropping audit_faults");
         jdbcTemplate.update("DROP TABLE IF EXISTS audit_faults");
         log.info("Drop Table audit_faults: Successful");

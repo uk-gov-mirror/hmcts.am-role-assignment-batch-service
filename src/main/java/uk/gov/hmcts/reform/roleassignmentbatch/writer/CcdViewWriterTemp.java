@@ -16,8 +16,10 @@ public class CcdViewWriterTemp implements ItemWriter<CcdCaseUser> {
     @Override
     public void write(List<? extends CcdCaseUser> items) throws Exception {
         for (CcdCaseUser user: items) {
-            ccdCaseUserJdbcBatchItemWriter.write(items);
+            user.setJurisdiction("The Database One");
+            user.setCaseRole("I am being read from the db");
         }
+        ccdCaseUserJdbcBatchItemWriter.write(items);
 
     }
 }

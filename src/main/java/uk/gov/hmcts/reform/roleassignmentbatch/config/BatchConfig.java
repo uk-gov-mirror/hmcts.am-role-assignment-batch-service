@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
@@ -12,7 +16,11 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.database.JdbcPagingItemReader;
+import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
+import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
+import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -29,6 +37,7 @@ import org.springframework.core.io.PathResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.DeadlockLoserDataAccessException;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
@@ -76,6 +85,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Autowired
     DataSource dataSource;
+
+    @Autowired
+    PagingQueryProvider queryProvider;
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
@@ -219,6 +231,54 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    public JdbcPagingItemReader<CcdCaseUser> databaseItemReader() {
+        Map<String, Object> parameterValues = new HashMap<>();
+        parameterValues.put("status", "NEW");
+
+        return new JdbcPagingItemReaderBuilder<CcdCaseUser>()
+            .name("ccdCaseUserReader")
+            .dataSource(dataSource)
+            .queryProvider(queryProvider)
+            //.parameterValues(parameterValues)
+            .rowMapper(new CcdViewRowMapper())
+            .pageSize(100)
+            .build();
+    }
+
+    @Bean
+    public SqlPagingQueryProviderFactoryBean queryProvider() {
+        SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
+
+        provider.setSelectClause("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date");
+        provider.setFromClause("from ccd_view");
+        //provider.setWhereClause("where status=:status");
+        provider.setSortKey("case_data_id");
+        provider.setDataSource(dataSource);
+
+        return provider;
+    }
+
+    public class CcdViewRowMapper implements RowMapper<CcdCaseUser> {
+
+        @Override
+        public CcdCaseUser mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+            CcdCaseUser ccdCaseUser = new CcdCaseUser();
+            ccdCaseUser.setCaseDataId(rs.getString("case_data_id"));
+            ccdCaseUser.setUserId(rs.getString("user_id"));
+            ccdCaseUser.setCaseRole(rs.getString("case_role"));
+            ccdCaseUser.setCaseType(rs.getString("case_type"));
+            ccdCaseUser.setBeginDate(rs.getString("begin_date"));
+            ccdCaseUser.setRoleCategory(rs.getString("role_category"));
+            ccdCaseUser.setJurisdiction(rs.getString("jurisdiction"));
+
+
+            return ccdCaseUser;
+
+        }
+    }
+
+    @Bean
     EntityWrapperWriter entityWrapperWriter() {
         return new EntityWrapperWriter();
     }
@@ -281,7 +341,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .skip(Exception.class).skip(Throwable.class)
                     .skipLimit(1000)
                     .listener(auditSkipListener())
-                    .reader(ccdCaseUsersReader())
+                    .reader(databaseItemReader())
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
                     .taskExecutor(taskExecutor())
@@ -312,9 +372,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return jobs.get("ccdToRasBatchJob")
                    .incrementer(new RunIdIncrementer())
                    .listener(listener)
-                   .start(ccdToRasSetupStep())
+                   //.start(ccdToRasSetupStep())
                    //.next(validationStep())
-                   .next(replicateTables())
+                   .start(replicateTables())
                    .next(injectDataIntoView())
                    .next(ccdToRasStep())
                    .next(renameTablesPostMigrationStep())
