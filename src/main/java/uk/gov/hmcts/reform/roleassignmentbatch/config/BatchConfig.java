@@ -244,7 +244,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
             //.parameterValues(parameterValues)
             .rowMapper(new CcdViewRowMapper())
             .saveState(false)
-            .pageSize(3)
+            .pageSize(1000)
             .build();
     }
 
