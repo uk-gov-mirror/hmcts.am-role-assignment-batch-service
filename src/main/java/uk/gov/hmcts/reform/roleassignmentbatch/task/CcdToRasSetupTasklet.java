@@ -1,17 +1,18 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import java.io.File;
+
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
 
 @Component
 public class CcdToRasSetupTasklet implements Tasklet {
@@ -25,13 +26,15 @@ public class CcdToRasSetupTasklet implements Tasklet {
     @Autowired
     public CcdToRasSetupTasklet(String fileName,
                                 String filePath, String containerName, String accountName, String accountKey) {
-
+        if (StringUtils.isEmpty(accountKey)) {
+            throw new RuntimeException("Please provide the Blob key in application.yaml");
+        }
         downloadedFile = new File(filePath + fileName);
 
         connectionString = "DefaultEndpointsProtocol=https;"
-                + "AccountName=" + accountName + ";"
-                + "AccountKey=" + accountKey + ";"
-                + "EndpointSuffix=core.windows.net";
+                           + "AccountName=" + accountName + ";"
+                           + "AccountKey=" + accountKey + ";"
+                           + "EndpointSuffix=core.windows.net";
 
         blobServiceClient = new BlobServiceClientBuilder().connectionString(connectionString).buildClient();
 
