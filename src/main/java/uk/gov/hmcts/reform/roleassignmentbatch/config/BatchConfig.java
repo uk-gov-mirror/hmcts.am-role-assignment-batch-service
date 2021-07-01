@@ -16,9 +16,11 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -241,7 +243,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .queryProvider(queryProvider)
             //.parameterValues(parameterValues)
             .rowMapper(new CcdViewRowMapper())
-            .pageSize(100)
+            .saveState(false)
+            .pageSize(3)
             .build();
     }
 
@@ -256,6 +259,19 @@ public class BatchConfig extends DefaultBatchConfigurer {
         provider.setDataSource(dataSource);
 
         return provider;
+    }
+
+    @Bean
+    public JdbcCursorItemReader<CcdCaseUser> jdbcCursorItemReader() {
+        return new JdbcCursorItemReaderBuilder<CcdCaseUser>()
+            .dataSource(this.dataSource)
+            .name("JdbcCursorItemReader")
+            .sql("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date from ccd_view order by case_data_id")
+            .rowMapper(new CcdViewRowMapper())
+            .saveState(false)
+            //.verifyCursorPosition(true)
+            .build();
+
     }
 
     public class CcdViewRowMapper implements RowMapper<CcdCaseUser> {
@@ -341,7 +357,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .skip(Exception.class).skip(Throwable.class)
                     .skipLimit(1000)
                     .listener(auditSkipListener())
-                    .reader(databaseItemReader())
+                    .reader(jdbcCursorItemReader())
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
                     .taskExecutor(taskExecutor())

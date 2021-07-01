@@ -38,7 +38,8 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
     public EntityWrapper process(CcdCaseUser ccdCaseUser) throws Exception {
         UUID requestUuid = UUID.randomUUID();
         Map<String, JsonNode> attributes = new HashMap<>();
-        attributes.put("caseId", convertValueJsonNode("1234567890123456"));
+        attributes.put("caseId", convertValueJsonNode(ccdCaseUser.getCaseDataId()));
+        attributes.put("caseTypeId", convertValueJsonNode(ccdCaseUser.getCaseType()));
         RequestEntity requestEntity = RequestEntity.builder()
                 .id(requestUuid)
                 .correlationId(UUID.randomUUID().toString())
@@ -65,7 +66,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
                         .roleType(RoleType.CASE.name())
                         .roleName(ccdCaseUser.getCaseRole())
                         .sequence(1)
-                        .classification("Classified")
+                        .classification("CLASSIFIED")
                         .grantType(GrantType.STANDARD.name())
                         .roleCategory(RoleCategory.JUDICIAL.name())
                         .readOnly(false)
@@ -78,8 +79,8 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
                         .actorIdType("IDAM")
                         .actorId(ccdCaseUser.getUserId())
                         .roleType(RoleType.CASE.name())
-                        .roleName("secret-agent-man")
-                        .classification("Classified")
+                        .roleName(ccdCaseUser.getCaseRole())
+                        .classification("CLASSIFIED")
                         .grantType(GrantType.STANDARD.name())
                         .roleCategory(RoleCategory.JUDICIAL.name())
                         .readOnly(false)
@@ -90,7 +91,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
                 ActorCacheEntity.builder()
                         .actorIds(UUID.randomUUID().toString()) //using random as dummy data violates unique key rule
                         .etag(0L)
-                        .roleAssignmentResponse(convertValueJsonNode("{roleAssignmentResponse:1234}").toString())
+                        .roleAssignmentResponse(convertValueJsonNode(attributes).toString())
                         .build();
         return EntityWrapper.builder()
                 .actorCacheEntity(actorCacheEntity)
