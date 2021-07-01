@@ -381,7 +381,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Bean
     public TaskExecutor taskExecutor() {
-        return new SimpleAsyncTaskExecutor("spring_batch");
+        return new SimpleAsyncTaskExecutor("ccd_migration");
     }
 
     @Bean
