@@ -252,10 +252,10 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public SqlPagingQueryProviderFactoryBean queryProvider() {
         SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
 
-        provider.setSelectClause("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date");
+        provider.setSelectClause("select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date");
         provider.setFromClause("from ccd_view");
         //provider.setWhereClause("where status=:status");
-        provider.setSortKey("case_data_id");
+        provider.setSortKey("id");
         provider.setDataSource(dataSource);
 
         return provider;
@@ -269,6 +269,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .sql("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date from ccd_view order by case_data_id")
             .rowMapper(new CcdViewRowMapper())
             .saveState(false)
+            .fetchSize(1000)
             //.verifyCursorPosition(true)
             .build();
 
@@ -357,7 +358,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .skip(Exception.class).skip(Throwable.class)
                     .skipLimit(1000)
                     .listener(auditSkipListener())
-                    .reader(jdbcCursorItemReader())
+                    .reader(databaseItemReader())
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
                     .taskExecutor(taskExecutor())
