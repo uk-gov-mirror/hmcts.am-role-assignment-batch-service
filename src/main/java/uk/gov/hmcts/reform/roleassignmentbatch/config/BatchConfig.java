@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
 
+import com.launchdarkly.sdk.server.LDClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
@@ -13,6 +15,10 @@ import org.springframework.batch.core.configuration.annotation.DefaultBatchConfi
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.FlowBuilder;
+import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
+import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
@@ -29,6 +35,7 @@ import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +47,7 @@ import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.ApplicationParams;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
@@ -56,6 +64,11 @@ import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.CcdViewWriterTemp;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
+
+@Slf4j
 @Configuration
 @EnableBatchProcessing
 public class BatchConfig extends DefaultBatchConfigurer {
@@ -75,9 +88,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Value("${azure.account-key}")
     String accountKey;
 
-    @Value("${caseuser-filepath}")
-    String ccdCaseUserFilePath;
-
     @Autowired
     JobBuilderFactory jobs;
     @Autowired
@@ -88,6 +98,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Autowired
     PagingQueryProvider queryProvider;
+
+    @Autowired
+    ApplicationParams applicationParams;
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
@@ -113,13 +126,14 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new FlatFileItemReaderBuilder<CcdCaseUser>()
             .name("historyEntityReader")
             .linesToSkip(1)
-            .resource(new PathResource(ccdCaseUserFilePath))
+            .saveState(false)
+            .resource(new PathResource(filePath + fileName))
             .delimited()
             .names("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category")
             .lineMapper(lineMapper())
             .fieldSetMapper(new BeanWrapperFieldSetMapper<CcdCaseUser>() {{
-                setTargetType(CcdCaseUser.class);
-            }})
+                    setTargetType(CcdCaseUser.class);
+                }})
             .build();
     }
 
@@ -129,7 +143,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
         final DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
-        lineTokenizer.setNames("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category", "begin_date");
+        lineTokenizer.setNames("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category",
+                "begin_date");
         final CcdFieldSetMapper ccdFieldSetMapper = new CcdFieldSetMapper();
         defaultLineMapper.setLineTokenizer(lineTokenizer);
         defaultLineMapper.setFieldSetMapper(ccdFieldSetMapper);
@@ -214,8 +229,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return
             new JdbcBatchItemWriterBuilder<CcdCaseUser>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("insert into ccd_view(case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date) values " +
-                     "(:caseDataId,:userId,:caseRole,:jurisdiction,:caseType,:roleCategory,:beginDate)")
+                .sql("insert into ccd_view(case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
+                        + "begin_date) values (:caseDataId,:userId,:caseRole,:jurisdiction,:caseType,:roleCategory,"
+                        + ":beginDate)")
                 .dataSource(dataSource)
                 .build();
     }
@@ -249,7 +265,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public SqlPagingQueryProviderFactoryBean queryProvider() {
         SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
 
-        provider.setSelectClause("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date");
+        provider.setSelectClause("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
+                + "begin_date");
         provider.setFromClause("from ccd_view");
         //provider.setWhereClause("where status=:status");
         provider.setSortKey("case_data_id");
@@ -318,7 +335,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public Step validationStep(){
+    public Step validationStep() {
         return steps.get("validationStep")
                 .tasklet(validationTasklet())
                 .build();
@@ -368,18 +385,64 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    public JobExecutionDecider checkLdStatus() {
+        return new JobRunnableDecider();
+    }
+
+    @Bean
+    public JobExecutionDecider checkCcdProcessStatus() {
+        return (job, step) -> new FlowExecutionStatus(applicationParams.getProcessCcdDataEnabled());
+    }
+
+    @Bean
+    public JobExecutionDecider checkRenamingTablesStatus() {
+        return (job, step) -> new FlowExecutionStatus(applicationParams.getRenamingPostMigrationTablesEnabled());
+    }
+
+    @Bean
+    public Step firstStep() {
+        return steps.get("LdValidation")
+                .tasklet((contribution,chunkContext) ->  RepeatStatus.FINISHED)
+                .build();
+    }
+
+    @Bean
+    public Flow processCcdDataToTempTablesFlow() {
+        return new FlowBuilder<Flow>("processCcdDataToTempTables")
+                .start(replicateTables())
+                .next(injectDataIntoView())
+                .next(ccdToRasStep())
+                .build();
+    }
+
+    /**
+     * Job will start and check for LD flag, In case LD flag is disabled it will end the JOB
+     * otherwise will check or CCD migration flag, In case flag is enabled will process the CCD data to temp tables
+     * otherwise will check migration rename to live tables, In case flag is enabled will rename the temp tables to
+     * live tables otherwise it will end the job.
+     * @param listener Pre/post operation handler
+     * @return job
+     */
+    @Bean
     public Job ccdToRasBatchJob(@Autowired NotificationListener listener) {
         return jobs.get("ccdToRasBatchJob")
-                   .incrementer(new RunIdIncrementer())
-                   .listener(listener)
-                   //.start(ccdToRasSetupStep())
-                   //.next(validationStep())
-                   .start(replicateTables())
-                   .next(injectDataIntoView())
-                   .next(ccdToRasStep())
-                   .next(renameTablesPostMigrationStep())
-                   .build();
+                .incrementer(new RunIdIncrementer())
+                .listener(listener)
+                .start(firstStep()) //Dummy step as Decider will work after Step
+                .next(checkLdStatus()).on(DISABLED).end(STOPPED)
+                .from(checkLdStatus()).on(ANY).to(checkCcdProcessStatus())
+                .from(checkCcdProcessStatus()).on(DISABLED).to(checkRenamingTablesStatus())
+                .from(checkCcdProcessStatus()).on(ANY).to(processCcdDataToTempTablesFlow())
+                                              .on(ANY).to(checkRenamingTablesStatus())
+                .from(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
+                .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
+                .end()
+                .build();
 
     }
 
+    @Bean
+    public LDClient ldClient(@Value("${launchdarkly.sdk.key}") String sdkKey) {
+        return new LDClient(sdkKey);
+    }
 }
