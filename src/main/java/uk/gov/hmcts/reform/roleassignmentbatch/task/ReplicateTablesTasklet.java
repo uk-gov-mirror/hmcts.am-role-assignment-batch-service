@@ -49,6 +49,8 @@ create view myview as (select
                              "ccd_role_name_data jsonb," +
                              "am_jurisdiction_data jsonb," +
                              "am_role_name_data jsonb," +
+                             "total_count_from_ccd int8," +
+                             "total_count_from_am int8," +
                              "status varchar," +
                              "notes varchar" +
                              ")");
