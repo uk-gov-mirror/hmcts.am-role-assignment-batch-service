@@ -29,17 +29,30 @@ create view myview as (select
         log.info("Drop Table CCD_VIEW: Successful");
 
         log.info("Creating CCD_VIEW ");
-        jdbcTemplate.execute("create table if not exists ccd_view(\n" +
+        jdbcTemplate.execute("create table if not exists ccd_view(" +
                              "id SERIAL PRIMARY KEY," +
-                             "case_data_id varchar not null,\n" +
-                             "user_id varchar not null,\n" +
-                             "case_role varchar not null,\n" +
-                             "jurisdiction varchar not null,\n" +
-                             "case_type varchar  not null ,\n" +
-                             "role_category varchar not null,\n" +
-                             "begin_date timestamp\n" +
+                             "case_data_id varchar not null," +
+                             "user_id varchar not null," +
+                             "case_role varchar not null," +
+                             "jurisdiction varchar not null," +
+                             "case_type varchar  not null ," +
+                             "role_category varchar not null," +
+                             "begin_date timestamp" +
                              ")");
         log.info("Creating CCD_VIEW : Complete ");
+
+        log.info("Creating reconciliation_data ");
+        jdbcTemplate.execute("create table if not exists reconciliation_data(" +
+                             "run_id SERIAL primary key," +
+                             "created_date timestamp not null DEFAULT (current_timestamp AT TIME ZONE 'UTC')," +
+                             "ccd_jurisdiction_data jsonb," +
+                             "ccd_role_name_data jsonb," +
+                             "am_jurisdiction_data jsonb," +
+                             "am_role_name_data jsonb," +
+                             "status varchar," +
+                             "notes varchar" +
+                             ")");
+        log.info("Creating reconciliation_data : Complete ");
 
         log.info("Dropping audit_faults");
         jdbcTemplate.update("DROP TABLE IF EXISTS audit_faults");
