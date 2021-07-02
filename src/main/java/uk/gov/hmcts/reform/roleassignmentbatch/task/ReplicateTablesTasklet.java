@@ -43,7 +43,7 @@ create view myview as (select
 
         log.info("Creating reconciliation_data ");
         jdbcTemplate.execute("create table if not exists reconciliation_data(" +
-                             "run_id SERIAL primary key," +
+                             "run_id int8 primary key," +
                              "created_date timestamp not null DEFAULT (current_timestamp AT TIME ZONE 'UTC')," +
                              "ccd_jurisdiction_data jsonb," +
                              "ccd_role_name_data jsonb," +
