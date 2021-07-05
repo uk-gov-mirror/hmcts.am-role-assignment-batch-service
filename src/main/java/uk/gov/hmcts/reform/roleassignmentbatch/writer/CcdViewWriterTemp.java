@@ -7,7 +7,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 
 public class CcdViewWriterTemp implements ItemWriter<CcdCaseUser> {
     @Autowired

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.domain.model;
+package uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums;
 
 import java.io.Serializable;
 

@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.batch.item.ItemProcessor;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.GrantType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;

@@ -48,7 +48,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.ApplicationParams;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;

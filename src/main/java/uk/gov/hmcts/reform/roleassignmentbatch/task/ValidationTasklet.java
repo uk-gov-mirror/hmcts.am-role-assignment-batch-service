@@ -9,7 +9,7 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 
 import java.io.File;
 

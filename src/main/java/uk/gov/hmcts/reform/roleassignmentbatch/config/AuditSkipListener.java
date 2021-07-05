@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.AuditOperationType;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;

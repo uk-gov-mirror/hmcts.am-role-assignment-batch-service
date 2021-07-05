@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform;
+package uk.gov.hmcts.reform.roleassignmentbatch;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
