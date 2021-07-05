@@ -57,6 +57,7 @@ public class AuditSkipListener implements SkipListener<CcdCaseUser, EntityWrappe
         auditFaults.setCcdUsers(getJson(item.getCcdCaseUser()));
         auditFaults.setRequest(getJson(item.getRequestEntity()));
         auditFaults.setHistory(getJson(item.getRoleAssignmentHistoryEntity()));
+        auditFaults.setLive(getJson(item.getRoleAssignmentEntity()));
         auditWriter.write(Collections.singletonList(auditFaults));
     }
 
