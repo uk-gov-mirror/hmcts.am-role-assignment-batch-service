@@ -22,9 +22,11 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -257,7 +259,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .queryProvider(queryProvider)
             //.parameterValues(parameterValues)
             .rowMapper(new CcdViewRowMapper())
-            .pageSize(100)
+            .saveState(false)
+            .pageSize(1000)
             .build();
     }
 
@@ -265,14 +268,29 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public SqlPagingQueryProviderFactoryBean queryProvider() {
         SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
 
+        provider.setSelectClause("select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date");
         provider.setSelectClause("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
                 + "begin_date");
         provider.setFromClause("from ccd_view");
         //provider.setWhereClause("where status=:status");
-        provider.setSortKey("case_data_id");
+        provider.setSortKey("id");
         provider.setDataSource(dataSource);
 
         return provider;
+    }
+
+    @Bean
+    public JdbcCursorItemReader<CcdCaseUser> jdbcCursorItemReader() {
+        return new JdbcCursorItemReaderBuilder<CcdCaseUser>()
+            .dataSource(this.dataSource)
+            .name("JdbcCursorItemReader")
+            .sql("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date from ccd_view order by case_data_id")
+            .rowMapper(new CcdViewRowMapper())
+            .saveState(false)
+            .fetchSize(1000)
+            //.verifyCursorPosition(true)
+            .build();
+
     }
 
     public class CcdViewRowMapper implements RowMapper<CcdCaseUser> {
@@ -381,7 +399,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Bean
     public TaskExecutor taskExecutor() {
-        return new SimpleAsyncTaskExecutor("spring_batch");
+        return new SimpleAsyncTaskExecutor("ccd_migration");
     }
 
     @Bean

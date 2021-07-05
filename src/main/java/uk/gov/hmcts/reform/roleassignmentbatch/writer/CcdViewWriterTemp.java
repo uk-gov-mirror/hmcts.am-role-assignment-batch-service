@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.writer;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.item.ItemWriter;
@@ -15,11 +16,12 @@ public class CcdViewWriterTemp implements ItemWriter<CcdCaseUser> {
     JdbcBatchItemWriter<CcdCaseUser> ccdCaseUserJdbcBatchItemWriter;
     @Override
     public void write(List<? extends CcdCaseUser> items) throws Exception {
-        for (CcdCaseUser user: items) {
-            user.setJurisdiction("The Database One");
-            user.setCaseRole("I am being read from the db");
-        }
-        ccdCaseUserJdbcBatchItemWriter.write(items);
+        //ccdCaseUserJdbcBatchItemWriter.write(items);
+        for(int i = 0; i<=33; i++) {
+            for(CcdCaseUser user: items) {
+                ccdCaseUserJdbcBatchItemWriter.write(Collections.singletonList(user));
+            }
 
+        }
     }
 }
