@@ -26,11 +26,9 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
-import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -134,8 +132,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .names("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category")
             .lineMapper(lineMapper())
             .fieldSetMapper(new BeanWrapperFieldSetMapper<CcdCaseUser>() {{
-                    setTargetType(CcdCaseUser.class);
-                }})
+                setTargetType(CcdCaseUser.class);
+            }})
             .build();
     }
 
@@ -146,7 +144,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
         lineTokenizer.setNames("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category",
-                "begin_date");
+                               "begin_date");
         final CcdFieldSetMapper ccdFieldSetMapper = new CcdFieldSetMapper();
         defaultLineMapper.setLineTokenizer(lineTokenizer);
         defaultLineMapper.setFieldSetMapper(ccdFieldSetMapper);
@@ -215,15 +213,14 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
 
-
     @Bean
     public JdbcBatchItemWriter<HistoryEntity> insertIntoHistoryTable() {
         return
-                new JdbcBatchItemWriterBuilder<HistoryEntity>()
-                        .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                        .sql(Constants.HISTORY_QUERY)
-                        .dataSource(dataSource)
-                        .build();
+            new JdbcBatchItemWriterBuilder<HistoryEntity>()
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .sql(Constants.HISTORY_QUERY)
+                .dataSource(dataSource)
+                .build();
     }
 
     @Bean
@@ -232,8 +229,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
             new JdbcBatchItemWriterBuilder<CcdCaseUser>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
                 .sql("insert into ccd_view(case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
-                        + "begin_date) values (:caseDataId,:userId,:caseRole,:jurisdiction,:caseType,:roleCategory,"
-                        + ":beginDate)")
+                     + "begin_date) values (:caseDataId,:userId,:caseRole,:jurisdiction,:caseType,:roleCategory,"
+                     + ":beginDate)")
                 .dataSource(dataSource)
                 .build();
     }
@@ -241,11 +238,11 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public JdbcBatchItemWriter<RoleAssignmentEntity> insertIntoRoleAssignmentTable() {
         return
-                new JdbcBatchItemWriterBuilder<RoleAssignmentEntity>()
-                        .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                        .sql(Constants.ROLE_ASSIGNMENT_LIVE_TABLE)
-                        .dataSource(dataSource)
-                        .build();
+            new JdbcBatchItemWriterBuilder<RoleAssignmentEntity>()
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .sql(Constants.ROLE_ASSIGNMENT_LIVE_TABLE)
+                .dataSource(dataSource)
+                .build();
     }
 
     @Bean
@@ -269,28 +266,13 @@ public class BatchConfig extends DefaultBatchConfigurer {
         SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
 
         provider.setSelectClause("select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
-                + "begin_date");
+                                 + "begin_date");
         provider.setFromClause("from ccd_view");
         //provider.setWhereClause("where status=:status");
         provider.setSortKey("id");
         provider.setDataSource(dataSource);
 
         return provider;
-    }
-
-    @Bean
-    public JdbcCursorItemReader<CcdCaseUser> jdbcCursorItemReader() {
-        return new JdbcCursorItemReaderBuilder<CcdCaseUser>()
-            .dataSource(this.dataSource)
-            .name("JdbcCursorItemReader")
-            .sql("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date from ccd_view"
-                    + " order by case_data_id")
-            .rowMapper(new CcdViewRowMapper())
-            .saveState(false)
-            .fetchSize(1000)
-            //.verifyCursorPosition(true)
-            .build();
-
     }
 
     public class CcdViewRowMapper implements RowMapper<CcdCaseUser> {
@@ -306,10 +288,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
             ccdCaseUser.setBeginDate(rs.getString("begin_date"));
             ccdCaseUser.setRoleCategory(rs.getString("role_category"));
             ccdCaseUser.setJurisdiction(rs.getString("jurisdiction"));
-
-
             return ccdCaseUser;
-
         }
     }
 
@@ -348,15 +327,15 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Step ccdToRasSetupStep() {
         return steps.get("ccdToRasSetupStep")
-                .tasklet(ccdToRasSetupTasklet())
-                .build();
+                    .tasklet(ccdToRasSetupTasklet())
+                    .build();
     }
 
     @Bean
     public Step validationStep() {
         return steps.get("validationStep")
-                .tasklet(validationTasklet())
-                .build();
+                    .tasklet(validationTasklet())
+                    .build();
     }
 
     @Bean
@@ -395,7 +374,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
 
-
     @Bean
     public TaskExecutor taskExecutor() {
         return new SimpleAsyncTaskExecutor("ccd_migration");
@@ -419,17 +397,17 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Step firstStep() {
         return steps.get("LdValidation")
-                .tasklet((contribution,chunkContext) ->  RepeatStatus.FINISHED)
-                .build();
+                    .tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
+                    .build();
     }
 
     @Bean
     public Flow processCcdDataToTempTablesFlow() {
         return new FlowBuilder<Flow>("processCcdDataToTempTables")
-                .start(replicateTables())
-                .next(injectDataIntoView())
-                .next(ccdToRasStep())
-                .build();
+            .start(replicateTables())
+            .next(injectDataIntoView())
+            .next(ccdToRasStep())
+            .build();
     }
 
     /**
@@ -437,25 +415,25 @@ public class BatchConfig extends DefaultBatchConfigurer {
      * otherwise will check or CCD migration flag, In case flag is enabled will process the CCD data to temp tables
      * otherwise will check migration rename to live tables, In case flag is enabled will rename the temp tables to
      * live tables otherwise it will end the job.
+     *
      * @param listener Pre/post operation handler
      * @return job
      */
     @Bean
     public Job ccdToRasBatchJob(@Autowired NotificationListener listener) {
         return jobs.get("ccdToRasBatchJob")
-                .incrementer(new RunIdIncrementer())
-                .listener(listener)
-                .start(firstStep()) //Dummy step as Decider will work after Step
-                .next(checkLdStatus()).on(DISABLED).end(STOPPED)
-                .from(checkLdStatus()).on(ANY).to(checkCcdProcessStatus())
-                .from(checkCcdProcessStatus()).on(DISABLED).to(checkRenamingTablesStatus())
-                .from(checkCcdProcessStatus()).on(ANY).to(processCcdDataToTempTablesFlow())
-                                              .on(ANY).to(checkRenamingTablesStatus())
-                .from(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
-                .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
-
-                .end()
-                .build();
+                   .incrementer(new RunIdIncrementer())
+                   .listener(listener)
+                   .start(firstStep()) //Dummy step as Decider will work after Step
+                   .next(checkLdStatus()).on(DISABLED).end(STOPPED)
+                   .from(checkLdStatus()).on(ANY).to(checkCcdProcessStatus())
+                   .from(checkCcdProcessStatus()).on(DISABLED).to(checkRenamingTablesStatus())
+                   .from(checkCcdProcessStatus()).on(ANY).to(processCcdDataToTempTablesFlow())
+                   .on(ANY).to(checkRenamingTablesStatus())
+                   .from(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
+                   .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
+                   .end()
+                   .build();
 
     }
 
