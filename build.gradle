@@ -14,7 +14,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.12'
     id 'pmd'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.5.1'
+    id 'org.springframework.boot' version '2.5.2'
     id 'info.solidsoft.pitest' version '1.6.0'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
@@ -44,7 +44,7 @@ def versions = [
         feign_jackson      : '9.7.0'
 ]
 
-mainClassName = 'uk.gov.hmcts.reform.RoleAssignmentBatchApplication'
+mainClassName = 'uk.gov.hmcts.reform.roleassignmentbatch.RoleAssignmentBatchApplication'
 def jarName = 'am-role-assignment-batch-service.jar'
 
 pmd {
@@ -201,7 +201,7 @@ dependencies {
 
     implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
 
-    compile group: 'org.flywaydb', name: 'flyway-core', version: '7.10.0'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '7.11.0'
 
     implementation group: 'com.azure', name: 'azure-storage-blob', version: '12.12.0'
 
