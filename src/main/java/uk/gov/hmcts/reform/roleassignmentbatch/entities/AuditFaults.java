@@ -37,4 +37,7 @@ public class AuditFaults implements Serializable {
     private String history;
 
     private String live;
+
+    @Column(name = "actor_cache")
+    private String actorCache;
 }

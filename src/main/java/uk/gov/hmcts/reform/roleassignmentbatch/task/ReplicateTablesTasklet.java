@@ -84,6 +84,7 @@ create view myview as (select
                     "ccd_users varchar NULL," +
                     "request varchar NULL," +
                     "history varchar NULL," +
+                    "actor_cache varchar NULL," +
                     "live varchar NULL);");
         jdbcTemplate.update("CREATE SEQUENCE IF NOT EXISTS AUDIT_ID_SEQ");
         jdbcTemplate.update("ALTER TABLE audit_faults ALTER COLUMN id SET DEFAULT nextval('AUDIT_ID_SEQ');");

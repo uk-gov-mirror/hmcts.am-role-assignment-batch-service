@@ -21,7 +21,8 @@ public class Constants {
                                         + ":roleAssignmentId,:log,:created)";
 
     public static final String AUDIT_QUERY = "insert into audit_faults(failed_at, reason, ccd_users, request, history, "
-                                             + "live) values(:failedAt, :reason, :ccdUsers, :request, :history, :live)";
+                                             + "actor_cache, live) values(:failedAt, :reason, :ccdUsers, :request, "
+                                             + ":history, :actorCache, :live)";
 
     public static final String HISTORY_QUERY = "insert into replica_role_assignment_history(id, status, actor_id_type, "
                                                + "role_type, role_name, status_sequence, classification, grant_type, "

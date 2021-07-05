@@ -31,7 +31,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
      *
      * @param ccdCaseUser to be processed
      * @return potentially modified or new item for continued processing, {@code null} if processing of the
-     * provided item should not continue.
+     *     provided item should not continue.
      * @throws Exception thrown if exception occurs during processing.
      */
     @Override
@@ -94,6 +94,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
                         .roleAssignmentResponse(convertValueJsonNode(attributes).toString())
                         .build();
         return EntityWrapper.builder()
+                .ccdCaseUser(ccdCaseUser)
                 .actorCacheEntity(actorCacheEntity)
                 .requestEntity(requestEntity)
                 .roleAssignmentHistoryEntity(roleAssignmentHistoryEntity)

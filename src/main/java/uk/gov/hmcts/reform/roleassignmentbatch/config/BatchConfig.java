@@ -268,8 +268,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public SqlPagingQueryProviderFactoryBean queryProvider() {
         SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
 
-        provider.setSelectClause("select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date");
-        provider.setSelectClause("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
+        provider.setSelectClause("select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
                 + "begin_date");
         provider.setFromClause("from ccd_view");
         //provider.setWhereClause("where status=:status");
@@ -284,7 +283,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new JdbcCursorItemReaderBuilder<CcdCaseUser>()
             .dataSource(this.dataSource)
             .name("JdbcCursorItemReader")
-            .sql("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date from ccd_view order by case_data_id")
+            .sql("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date from ccd_view"
+                    + " order by case_data_id")
             .rowMapper(new CcdViewRowMapper())
             .saveState(false)
             .fetchSize(1000)
