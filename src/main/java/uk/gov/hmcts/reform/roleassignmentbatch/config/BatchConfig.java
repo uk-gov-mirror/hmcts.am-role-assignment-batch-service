@@ -130,9 +130,11 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .delimited()
             .names("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category")
             .lineMapper(lineMapper())
-            .fieldSetMapper(new BeanWrapperFieldSetMapper<CcdCaseUser>() {{
-                setTargetType(CcdCaseUser.class);
-            }})
+            .fieldSetMapper(new BeanWrapperFieldSetMapper<CcdCaseUser>() {
+                {
+                    setTargetType(CcdCaseUser.class);
+                }
+            })
             .build();
     }
 
