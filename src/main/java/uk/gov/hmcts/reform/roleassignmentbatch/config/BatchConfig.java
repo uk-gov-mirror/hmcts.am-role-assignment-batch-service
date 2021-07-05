@@ -59,7 +59,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.CcdToRasSetupTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
@@ -297,10 +296,10 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new EntityWrapperWriter();
     }
 
-    @Bean
+    /*@Bean
     CcdToRasSetupTasklet ccdToRasSetupTasklet() {
         return new CcdToRasSetupTasklet(fileName, filePath, containerName, accountName, accountKey);
-    }
+    }*/
 
     @Bean
     ValidationTasklet validationTasklet() {
@@ -324,12 +323,12 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .build();
     }
 
-    @Bean
+    /*@Bean
     public Step ccdToRasSetupStep() {
         return steps.get("ccdToRasSetupStep")
                     .tasklet(ccdToRasSetupTasklet())
                     .build();
-    }
+    }*/
 
     @Bean
     public Step validationStep() {

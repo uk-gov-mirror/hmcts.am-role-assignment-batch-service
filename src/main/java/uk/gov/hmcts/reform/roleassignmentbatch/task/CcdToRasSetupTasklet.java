@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
 import java.io.File;
@@ -83,3 +84,4 @@ public class CcdToRasSetupTasklet implements Tasklet {
     }
 
 }
+*/
