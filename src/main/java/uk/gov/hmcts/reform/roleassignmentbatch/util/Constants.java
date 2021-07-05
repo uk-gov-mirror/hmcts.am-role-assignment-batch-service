@@ -33,9 +33,10 @@ public class Constants {
                                                + ":readOnly, :created, "
                                                + ":actorId, :attributes::jsonb, :requestId)";
 
-    public static final String ACTOR_CACHE_QUERY = "insert into replica_actor_cache_control(actor_id,etag,json_response) "
-                                                   + "values(:actorIds,:etag, :roleAssignmentResponse) on "
-                                                   + "conflict(actor_id) do nothing;";
+    public static final String ACTOR_CACHE_QUERY = "insert into replica_actor_cache_control"
+                                                   + "(actor_id,etag,json_response)"
+                                                   + " values(:actorIds,:etag, :roleAssignmentResponse) on "
+                                                   + " conflict(actor_id) do nothing;";
 
     public static final String ROLE_ASSIGNMENT_LIVE_TABLE = "insert into replica_role_assignment(id, actor_id_type,"
         + " actor_id, role_type, role_name, "

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import java.io.File;
+
 import com.netflix.config.validation.ValidationException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -10,8 +12,6 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
-
-import java.io.File;
 
 @Component
 public class ValidationTasklet implements Tasklet {
@@ -46,7 +46,7 @@ public class ValidationTasklet implements Tasklet {
     }
 
     protected void validateCaseId(String caseId) {
-        if(caseId.length() > 16) {
+        if (caseId.length() > 16) {
             throw new ValidationException("caseId invalid");
         }
     }

@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -48,8 +52,8 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.ApplicationParams;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
@@ -65,10 +69,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.CcdViewWriterTemp;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
-
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
 
 @Slf4j
 @Configuration
@@ -380,7 +380,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
                     .taskExecutor(taskExecutor())
-                    .throttleLimit(10)
                     .build();
     }
 
@@ -454,6 +453,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                                               .on(ANY).to(checkRenamingTablesStatus())
                 .from(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
                 .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
+
                 .end()
                 .build();
 
