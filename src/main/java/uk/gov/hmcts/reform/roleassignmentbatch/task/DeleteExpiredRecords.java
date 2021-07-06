@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -63,25 +62,6 @@ public class DeleteExpiredRecords implements Tasklet {
         } catch (Exception e) {
             log.info(e.getMessage());
         }
-        String dbPass = System.getenv("ROLE_ASSIGNMENT_DB_PASSWORD");
-        if (null == dbPass || StringUtils.isEmpty(dbPass)) {
-            log.info("The database password is null or empty");
-        } else {
-            log.info("the length of dbPass is : " + dbPass.length());
-        }
-
-        String s2sValue = System.getenv("AM_ROLE_ASSIGNMENT_SERVICE_SECRET");
-        if (null == s2sValue || StringUtils.isEmpty(s2sValue)) {
-            log.info("The s2sValue is null or empty");
-        } else {
-            log.info("the length of s2sValue is : " + s2sValue.length());
-        }
-        log.info("Delete expired records is successful");
-        log.info("Sys outing the details");
-        log.info("userName: " + System.getenv("ROLE_ASSIGNMENT_DB_USERNAME"));
-        log.info("ROLE_ASSIGNMENT_DB_HOST: " + System.getenv("ROLE_ASSIGNMENT_DB_HOST"));
-        log.info("ROLE_ASSIGNMENT_DB_NAME: " + System.getenv("ROLE_ASSIGNMENT_DB_NAME"));
-        log.info("Sys outing the details : end");
         return RepeatStatus.FINISHED;
     }
 
