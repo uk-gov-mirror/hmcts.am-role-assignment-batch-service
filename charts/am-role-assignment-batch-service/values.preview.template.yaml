@@ -21,9 +21,9 @@ postgresql:
   enabled: true
   image:
     tag: '11.3.0'
-    postgresqlUsername: am
-    postgresqlPassword: am
-    postgresqlDatabase: role_assignment
-    postgresqlPort: 5432
+  postgresqlUsername: am
+  postgresqlPassword: am
+  postgresqlDatabase: role_assignment
+  postgresqlPort: 5432
   persistence:
     enabled: false
