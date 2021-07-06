@@ -12,6 +12,7 @@ job:
   keyVaults:
     am:
       secrets:
+        - am-role-assignment-refresh-batch-s2s-secret
         - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
         - name: am-role-assignment-service-s2s-secret
