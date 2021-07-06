@@ -5,8 +5,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -20,13 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 
 @Component
+@Slf4j
 public class DeleteExpiredRecords implements Tasklet {
 
-    private static final Logger log = LoggerFactory.getLogger(DeleteExpiredRecords.class);
     private final JdbcTemplate jdbcTemplate;
     private final int batchSize;
 
-    public DeleteExpiredRecords(@Autowired JdbcTemplate jdbcTemplate, @Value("${batch-size}")int batchSize) {
+    public DeleteExpiredRecords(@Autowired JdbcTemplate jdbcTemplate, @Value("${batch-size}") int batchSize) {
         this.jdbcTemplate = jdbcTemplate;
         this.batchSize = batchSize;
     }
@@ -39,7 +38,7 @@ public class DeleteExpiredRecords implements Tasklet {
         try {
             List<RoleAssignmentHistory> rah = this.getLiveRecordsFromHistoryTable();
             String historyLog = String.format("Retrieve History records whose End Time is less than current time."
-                    + " Number of records: %s", rah.size());
+                                              + " Number of records: %s", rah.size());
             log.info(historyLog);
             for (RoleAssignmentHistory ra : rah) {
                 ra.setStatus("EXPIRED");
@@ -56,15 +55,13 @@ public class DeleteExpiredRecords implements Tasklet {
             this.insertIntoRoleAssignmentHistoryTable(rah);
 
             String numRecordsUpdatedLog = String.format("Updated number of records in History Table : %s",
-                    getCountFromHistoryTable() - currentRecordsInHistoryTable);
+                                                        getCountFromHistoryTable() - currentRecordsInHistoryTable);
             log.info(numRecordsUpdatedLog);
         } catch (DataAccessException e) {
             log.info(String.format(" DataAccessException %s", e.getMessage()));
         } catch (Exception e) {
             log.info(e.getMessage());
         }
-
-        log.info("Delete expired records is successful");
         return RepeatStatus.FINISHED;
     }
 
