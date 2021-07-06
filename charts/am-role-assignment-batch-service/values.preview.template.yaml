@@ -12,7 +12,6 @@ job:
   keyVaults:
     am:
       secrets:
-        - role-assignment-service-POSTGRES-PASS
         - AppInsightsInstrumentationKey
         - am-role-assignment-service-s2s-secret
   global:
