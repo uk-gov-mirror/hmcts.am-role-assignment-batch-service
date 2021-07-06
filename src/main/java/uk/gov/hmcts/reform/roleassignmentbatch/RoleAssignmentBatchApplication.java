@@ -36,7 +36,7 @@ public class RoleAssignmentBatchApplication {
         ApplicationContext context = SpringApplication.run(RoleAssignmentBatchApplication.class, args);
         loggingForEnvVars();
         //Sleep added to allow app-insights to flush the logs
-        Thread.sleep(1000 * 60 * 9);
+        Thread.sleep(1000 * 60 * 60);
         int exitCode = SpringApplication.exit(context);
         String exitCodeLog = String.format("RoleAssignmentBatchApplication Application exiting with exit code %s",
                                            exitCode);
