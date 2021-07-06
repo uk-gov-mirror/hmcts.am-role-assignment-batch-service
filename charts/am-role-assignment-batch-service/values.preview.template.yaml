@@ -14,7 +14,7 @@ job:
       secrets:
         - AppInsightsInstrumentationKey
         - am-role-assignment-service-s2s-secret
-global:
+  global:
     jobKind: CronJob
 postgresql:
   enabled: true
