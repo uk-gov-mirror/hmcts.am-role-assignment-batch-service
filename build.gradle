@@ -184,6 +184,9 @@ dependencies {
     compile(group: 'org.springframework', name: 'spring-context')
     implementation group: 'org.springframework', name: 'spring-core', version: '5.3.8'
     compile(group: 'org.springframework', name: 'spring-tx')
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
     
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
     implementation 'commons-io:commons-io:2.10.0'
