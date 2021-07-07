@@ -10,10 +10,12 @@ job:
     ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
     ENABLE_DB_MIGRATE: true
   keyVaults:
-    am:
+    "am":
       secrets:
-        - AppInsightsInstrumentationKey
-        - am-role-assignment-service-s2s-secret
+        - name: AppInsightsInstrumentationKey
+          alias: azure.application-insights.instrumentation-key
+        - name: am-role-assignment-service-s2s-secret
+          alias: AM_ROLE_ASSIGNMENT_SERVICE_SECRET
   global:
     jobKind: CronJob
 
