@@ -21,12 +21,28 @@ public class RoleAssignmentBatchApplication {
             log.info("the length of dbPass is : " + dbPass.length());
         }
 
-        String s2sValue = System.getenv("AM_ROLE_ASSIGNMENT_SERVICE_SECRET");
+        String s2sValue = System.getenv("AppInsightsInstrumentationKey");
         if (!StringUtils.hasText(s2sValue)) {
             log.info("The s2sValue is null or empty");
         } else {
             log.info("the length of s2sValue is : " + s2sValue.length());
         }
+
+        dbPass = System.getenv("am-role-assignment-service-s2s-secret");
+        if (!StringUtils.hasText(dbPass)) {
+            log.info("The database password is null or empty");
+        } else {
+            log.info("the length of dbPass is : " + dbPass.length());
+        }
+
+        s2sValue = System.getenv("AM_ROLE_ASSIGNMENT_SERVICE_SECRET");
+        if (!StringUtils.hasText(s2sValue)) {
+            log.info("The s2sValue is null or empty");
+        } else {
+            log.info("the length of s2sValue is : " + s2sValue.length());
+        }
+
+
         log.info("Delete expired records is successful");
         log.info("Sys outing the details");
         log.info("userName: " + System.getenv("ROLE_ASSIGNMENT_DB_USERNAME"));
