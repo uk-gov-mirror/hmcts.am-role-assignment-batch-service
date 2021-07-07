@@ -8,7 +8,7 @@ job:
   global:
     jobKind: CronJob
   keyVaults:
-    "am":
+    am:
       secrets:
         - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key

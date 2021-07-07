@@ -10,7 +10,7 @@ job:
     ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
     ENABLE_DB_MIGRATE: true
   keyVaults:
-    "am":
+    am:
       secrets:
         - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
