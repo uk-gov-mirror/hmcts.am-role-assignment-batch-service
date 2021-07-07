@@ -184,7 +184,7 @@ dependencies {
     compile(group: 'org.springframework', name: 'spring-jdbc')
     compile(group: 'org.springframework', name: 'spring-beans')
     compile(group: 'org.springframework', name: 'spring-context')
-    compile(group: 'org.springframework', name: 'spring-core')
+    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.8'
     compile(group: 'org.springframework', name: 'spring-tx')
 
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.5.RELEASE'
