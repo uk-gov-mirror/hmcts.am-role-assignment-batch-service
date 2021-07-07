@@ -13,8 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class RoleAssignmentBatchApplication {
 
     public static void main(String[] args) throws Exception {
-        ApplicationContext context = SpringApplication.run(RoleAssignmentBatchApplication.class, args);
-        //Sleep added to allow app-insights to flush the logs
+        final ApplicationContext context = SpringApplication.run(RoleAssignmentBatchApplication.class, args);
         log.info("Putting application to sleep for 5 mins");
         Thread.sleep(1000 * 60 * 5);
         log.info("The sleep is complete.");
