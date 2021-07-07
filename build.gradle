@@ -186,11 +186,8 @@ dependencies {
     compile(group: 'org.springframework', name: 'spring-context')
     implementation group: 'org.springframework', name: 'spring-core', version: '5.3.8'
     compile(group: 'org.springframework', name: 'spring-tx')
-
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.5.RELEASE'
     
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.5.RELEASE'
     implementation 'commons-io:commons-io:2.10.0'
 
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
