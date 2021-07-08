@@ -20,10 +20,10 @@ public enum ReconQuery {
     INSERT_RECONCILIATION_QUERY("insert into reconciliation_data (run_id, ccd_jurisdiction_data,"
             + "ccd_role_name_data,am_jurisdiction_data,am_role_name_data,total_count_from_ccd,"
             + "total_count_from_am,status,notes) values (?, ?,?,?,?,?,?,?,?)"),
-    CCD_JURISDICTION_KEY("ccd_jurisdiction"),
-    CCD_CASE_ROLE_KEY("ccd_case_role"),
-    AM_JURISDICTION_KEY("am_case_type_id"),
-    AM_CASE_ROLE_KEY("am_role_name"),
+    CCD_JURISDICTION_KEY("jurisdiction"),
+    CCD_CASE_ROLE_KEY("case_role"),
+    AM_JURISDICTION_KEY("caseTypeId"),
+    AM_CASE_ROLE_KEY("role_name"),
     PASSED("PASSED"),
     FAILED("FAILED"),
     SUCCESS_STATUS("Total Record are matching from both ccd_view and am_role_assignment table."),

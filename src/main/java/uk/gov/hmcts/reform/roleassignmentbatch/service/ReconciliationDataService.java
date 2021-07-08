@@ -56,9 +56,9 @@ public class ReconciliationDataService {
             long count = (long) objectMap.get("count");
             sum = sum + count;
             switch (type) {
-                case "ccd_jurisdiction":
+                case "jurisdiction":
                     CcdJurisdictionItem ccdJurisdictionItem = CcdJurisdictionItem.builder()
-                            .count(Long.valueOf(objectMap.get(ReconQuery.COUNT.getKey()).toString()))
+                            .count(Long.parseLong(objectMap.get(ReconQuery.COUNT.getKey()).toString()))
                             .jurisdiction(objectMap.get(ReconQuery.CCD_JURISDICTION_KEY.getKey()).toString())
                             .build();
                     ccdJurisdictionItemList.add(ccdJurisdictionItem);
@@ -67,9 +67,9 @@ public class ReconciliationDataService {
                             .jurisdictions(ccdJurisdictionItemList).build();
                     result = convertValueJsonNode(ccdJurisdiction).toString();
                     break;
-                case "ccd_case_role":
+                case "case_role":
                     CcdRoleNameItem ccdRoleNameItem = CcdRoleNameItem.builder()
-                            .count(Long.valueOf(objectMap.get(ReconQuery.COUNT.getKey()).toString()))
+                            .count(Long.parseLong(objectMap.get(ReconQuery.COUNT.getKey()).toString()))
                             .caseRole(objectMap.get(ReconQuery.CCD_CASE_ROLE_KEY.getKey()).toString())
                             .build();
                     ccdRoleNameItemList.add(ccdRoleNameItem);
@@ -78,7 +78,7 @@ public class ReconciliationDataService {
                             .ccdRoleNames(ccdRoleNameItemList).build();
                     result = convertValueJsonNode(ccdRoleName).toString();
                     break;
-                case "am_case_type_id":
+                case "caseTypeId":
                     AmJurisdictionItem amJurisdictionItem = AmJurisdictionItem.builder()
                             .count(Long.parseLong(objectMap.get(ReconQuery.COUNT.getKey()).toString()))
                             .caseTypeId(objectMap.get(ReconQuery.AM_JURISDICTION_KEY.getKey()).toString())
@@ -90,7 +90,7 @@ public class ReconciliationDataService {
                             .jurisdictions(amJurisdictionItemList).build();
                     result = convertValueJsonNode(amJurisdiction).toString();
                     break;
-                case "am_role_name":
+                case "role_name":
                     AmRoleNameItem amRoleNameItem = AmRoleNameItem.builder()
                             .count(Long.parseLong(objectMap.get(ReconQuery.COUNT.getKey()).toString()))
                             .roleName(objectMap.get(ReconQuery.AM_CASE_ROLE_KEY.getKey())
