@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
 import java.io.File;
 
-import com.netflix.config.validation.ValidationException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -47,7 +46,7 @@ public class ValidationTasklet implements Tasklet {
 
     protected void validateCaseId(String caseId) {
         if (caseId.length() > 16) {
-            throw new ValidationException("caseId invalid");
+            throw new RuntimeException("caseId invalid");
         }
     }
 
