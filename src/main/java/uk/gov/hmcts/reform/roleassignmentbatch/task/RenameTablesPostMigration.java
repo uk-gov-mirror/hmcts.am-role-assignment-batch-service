@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Slf4j
+@SuppressWarnings("all")
 public class RenameTablesPostMigration implements Tasklet {
 
     @Autowired

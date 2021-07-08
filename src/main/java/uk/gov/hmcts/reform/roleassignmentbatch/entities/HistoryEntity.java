@@ -60,7 +60,7 @@ public class HistoryEntity implements Serializable {
 
     //@Column(name = "authorisations")
     // @Type(type = "uk.gov.hmcts.reform.roleassignmentbatch.config.GenericArrayUserType")
-    //private String[] authorisations;
+    //private String[] authorisations
 
 }
 

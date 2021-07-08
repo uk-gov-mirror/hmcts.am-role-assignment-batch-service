@@ -18,7 +18,7 @@ public class CcdViewWriterTemp implements ItemWriter<CcdCaseUser> {
 
     @Override
     public void write(List<? extends CcdCaseUser> items) throws Exception {
-        //ccdCaseUserJdbcBatchItemWriter.write(items);
+        //ccdCaseUserJdbcBatchItemWriter.write(items)
         for (int i = 0; i <= 33; i++) {
             for (CcdCaseUser user : items) {
                 ccdCaseUserJdbcBatchItemWriter.write(Collections.singletonList(user));
