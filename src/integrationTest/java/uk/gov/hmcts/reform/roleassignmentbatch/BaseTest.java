@@ -28,7 +28,7 @@ public abstract class BaseTest {
 
     @BeforeClass
     public static void init() {
-        //mapper.registerModule(new JavaTimeModule())
+        // mapper.registerModule(new JavaTimeModule())
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
