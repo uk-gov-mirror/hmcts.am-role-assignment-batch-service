@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.domain.model;
+package uk.gov.hmcts.reform.roleassignmentbatch.domain.model;
 
 import java.util.List;
 

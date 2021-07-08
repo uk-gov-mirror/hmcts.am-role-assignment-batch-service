@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.domain.model;
+package uk.gov.hmcts.reform.roleassignmentbatch.domain.model;
 
 import java.util.List;
 
@@ -9,5 +9,5 @@ import lombok.Data;
 @Builder(toBuilder = true)
 public class CcdRoleName {
     private long totalCcdRoleNamesCount;
-    private List<uk.gov.hmcts.reform.domain.model.CcdRoleNameItem> ccdRoleNames;
+    private List<CcdRoleNameItem> ccdRoleNames;
 }

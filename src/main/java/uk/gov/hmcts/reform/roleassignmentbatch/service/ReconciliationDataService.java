@@ -9,14 +9,14 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.domain.model.AmJurisdiction;
-import uk.gov.hmcts.reform.domain.model.AmJurisdictionItem;
-import uk.gov.hmcts.reform.domain.model.AmRoleName;
-import uk.gov.hmcts.reform.domain.model.AmRoleNameItem;
-import uk.gov.hmcts.reform.domain.model.CcdJurisdiction;
-import uk.gov.hmcts.reform.domain.model.CcdJurisdictionItem;
-import uk.gov.hmcts.reform.domain.model.CcdRoleName;
-import uk.gov.hmcts.reform.domain.model.CcdRoleNameItem;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.AmJurisdiction;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.AmJurisdictionItem;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.AmRoleName;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.AmRoleNameItem;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.CcdJurisdiction;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.CcdJurisdictionItem;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.CcdRoleName;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.CcdRoleNameItem;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ReconQuery;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 
@@ -63,8 +63,8 @@ public class ReconciliationDataService {
                             .build();
                     ccdJurisdictionItemList.add(ccdJurisdictionItem);
                     CcdJurisdiction ccdJurisdiction = CcdJurisdiction.builder()
-                            .totalCcdJurisdictionsCount(sum)
-                            .jurisdictions(ccdJurisdictionItemList).build();
+                                                                     .totalCcdJurisdictionsCount(sum)
+                                                                     .jurisdictions(ccdJurisdictionItemList).build();
                     result = convertValueJsonNode(ccdJurisdiction).toString();
                     break;
                 case "case_role":
@@ -74,8 +74,8 @@ public class ReconciliationDataService {
                             .build();
                     ccdRoleNameItemList.add(ccdRoleNameItem);
                     CcdRoleName ccdRoleName = CcdRoleName.builder()
-                            .totalCcdRoleNamesCount(sum)
-                            .ccdRoleNames(ccdRoleNameItemList).build();
+                                                         .totalCcdRoleNamesCount(sum)
+                                                         .ccdRoleNames(ccdRoleNameItemList).build();
                     result = convertValueJsonNode(ccdRoleName).toString();
                     break;
                 case "caseTypeId":
@@ -86,8 +86,8 @@ public class ReconciliationDataService {
                             .build();
                     amJurisdictionItemList.add(amJurisdictionItem);
                     AmJurisdiction amJurisdiction = AmJurisdiction.builder()
-                            .totalAmJurisdictionsCount(sum)
-                            .jurisdictions(amJurisdictionItemList).build();
+                                                                  .totalAmJurisdictionsCount(sum)
+                                                                  .jurisdictions(amJurisdictionItemList).build();
                     result = convertValueJsonNode(amJurisdiction).toString();
                     break;
                 case "role_name":
@@ -98,8 +98,8 @@ public class ReconciliationDataService {
                             .build();
                     amRoleNameItemList.add(amRoleNameItem);
                     AmRoleName amRoleName = AmRoleName.builder()
-                            .totalAmRoleNamesCount(sum)
-                            .amRoleNames(amRoleNameItemList).build();
+                                                      .totalAmRoleNamesCount(sum)
+                                                      .amRoleNames(amRoleNameItemList).build();
                     result = convertValueJsonNode(amRoleName).toString();
                     break;
                 default:
