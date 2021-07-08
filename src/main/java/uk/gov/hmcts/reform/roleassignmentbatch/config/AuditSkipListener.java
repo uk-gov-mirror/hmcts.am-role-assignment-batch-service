@@ -33,7 +33,7 @@ public class AuditSkipListener implements SkipListener<CcdCaseUser, EntityWrappe
 
     @Override
     public void onSkipInRead(Throwable t) {
-        LOG.warn("onSkipInRead " + t.getMessage());
+        LOG.warn("onSkipInRead {}", t.getMessage());
     }
 
     @SneakyThrows

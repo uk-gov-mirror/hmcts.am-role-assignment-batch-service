@@ -15,7 +15,7 @@ public class RoleAssignmentBatchApplication {
     public static void main(String[] args) throws Exception {
         final ApplicationContext context = SpringApplication.run(RoleAssignmentBatchApplication.class, args);
         log.info("Putting application to sleep");
-        Thread.sleep(1000 * 5);
+        Thread.sleep(1000 * 5L);
         log.info("The sleep is complete.");
         int exitCode = SpringApplication.exit(context);
         String exitCodeLog = String.format("RoleAssignmentBatchApplication Application exiting with exit code %s",

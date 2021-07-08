@@ -89,6 +89,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Autowired
     JobBuilderFactory jobs;
+
     @Autowired
     StepBuilderFactory steps;
 
