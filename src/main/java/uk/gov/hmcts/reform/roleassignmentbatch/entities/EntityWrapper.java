@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.roleassignmentbatch.entities;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 
 @Getter
 @Setter

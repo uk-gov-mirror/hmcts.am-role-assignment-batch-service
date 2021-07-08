@@ -1,11 +1,17 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
 
+import com.launchdarkly.sdk.server.LDClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
@@ -13,14 +19,16 @@ import org.springframework.batch.core.configuration.annotation.DefaultBatchConfi
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.FlowBuilder;
+import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
+import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
-import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -31,6 +39,7 @@ import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +50,8 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.ApplicationParams;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
@@ -49,7 +59,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.CcdToRasSetupTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
@@ -58,6 +67,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.CcdViewWriterTemp;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
+@Slf4j
 @Configuration
 @EnableBatchProcessing
 public class BatchConfig extends DefaultBatchConfigurer {
@@ -77,9 +87,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Value("${azure.account-key}")
     String accountKey;
 
-    @Value("${caseuser-filepath}")
-    String ccdCaseUserFilePath;
-
     @Autowired
     JobBuilderFactory jobs;
     @Autowired
@@ -90,6 +97,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Autowired
     PagingQueryProvider queryProvider;
+
+    @Autowired
+    ApplicationParams applicationParams;
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
@@ -115,13 +125,16 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new FlatFileItemReaderBuilder<CcdCaseUser>()
             .name("historyEntityReader")
             .linesToSkip(1)
-            .resource(new PathResource(ccdCaseUserFilePath))
+            .saveState(false)
+            .resource(new PathResource(filePath + fileName))
             .delimited()
             .names("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category")
             .lineMapper(lineMapper())
-            .fieldSetMapper(new BeanWrapperFieldSetMapper<CcdCaseUser>() {{
-                setTargetType(CcdCaseUser.class);
-            }})
+            .fieldSetMapper(new BeanWrapperFieldSetMapper<CcdCaseUser>() {
+                {
+                    setTargetType(CcdCaseUser.class);
+                }
+            })
             .build();
     }
 
@@ -131,7 +144,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
         final DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
-        lineTokenizer.setNames("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category", "begin_date");
+        lineTokenizer.setNames("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category",
+                               "begin_date");
         final CcdFieldSetMapper ccdFieldSetMapper = new CcdFieldSetMapper();
         defaultLineMapper.setLineTokenizer(lineTokenizer);
         defaultLineMapper.setFieldSetMapper(ccdFieldSetMapper);
@@ -200,15 +214,14 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
 
-
     @Bean
     public JdbcBatchItemWriter<HistoryEntity> insertIntoHistoryTable() {
         return
-                new JdbcBatchItemWriterBuilder<HistoryEntity>()
-                        .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                        .sql(Constants.HISTORY_QUERY)
-                        .dataSource(dataSource)
-                        .build();
+            new JdbcBatchItemWriterBuilder<HistoryEntity>()
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .sql(Constants.HISTORY_QUERY)
+                .dataSource(dataSource)
+                .build();
     }
 
     @Bean
@@ -216,8 +229,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return
             new JdbcBatchItemWriterBuilder<CcdCaseUser>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("insert into ccd_view(case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date) values " +
-                     "(:caseDataId,:userId,:caseRole,:jurisdiction,:caseType,:roleCategory,:beginDate)")
+                .sql("insert into ccd_view(case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
+                     + "begin_date) values (:caseDataId,:userId,:caseRole,:jurisdiction,:caseType,:roleCategory,"
+                     + ":beginDate)")
                 .dataSource(dataSource)
                 .build();
     }
@@ -225,11 +239,11 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public JdbcBatchItemWriter<RoleAssignmentEntity> insertIntoRoleAssignmentTable() {
         return
-                new JdbcBatchItemWriterBuilder<RoleAssignmentEntity>()
-                        .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                        .sql(Constants.ROLE_ASSIGNMENT_LIVE_TABLE)
-                        .dataSource(dataSource)
-                        .build();
+            new JdbcBatchItemWriterBuilder<RoleAssignmentEntity>()
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .sql(Constants.ROLE_ASSIGNMENT_LIVE_TABLE)
+                .dataSource(dataSource)
+                .build();
     }
 
     @Bean
@@ -252,27 +266,14 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public SqlPagingQueryProviderFactoryBean queryProvider() {
         SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
 
-        provider.setSelectClause("select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date");
+        provider.setSelectClause("select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
+                                 + "begin_date");
         provider.setFromClause("from ccd_view");
         //provider.setWhereClause("where status=:status");
         provider.setSortKey("id");
         provider.setDataSource(dataSource);
 
         return provider;
-    }
-
-    @Bean
-    public JdbcCursorItemReader<CcdCaseUser> jdbcCursorItemReader() {
-        return new JdbcCursorItemReaderBuilder<CcdCaseUser>()
-            .dataSource(this.dataSource)
-            .name("JdbcCursorItemReader")
-            .sql("select case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date from ccd_view order by case_data_id")
-            .rowMapper(new CcdViewRowMapper())
-            .saveState(false)
-            .fetchSize(1000)
-            //.verifyCursorPosition(true)
-            .build();
-
     }
 
     public class CcdViewRowMapper implements RowMapper<CcdCaseUser> {
@@ -288,10 +289,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
             ccdCaseUser.setBeginDate(rs.getString("begin_date"));
             ccdCaseUser.setRoleCategory(rs.getString("role_category"));
             ccdCaseUser.setJurisdiction(rs.getString("jurisdiction"));
-
-
             return ccdCaseUser;
-
         }
     }
 
@@ -300,10 +298,10 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new EntityWrapperWriter();
     }
 
-    @Bean
+    /*@Bean
     CcdToRasSetupTasklet ccdToRasSetupTasklet() {
         return new CcdToRasSetupTasklet(fileName, filePath, containerName, accountName, accountKey);
-    }
+    }*/
 
     @Bean
     ValidationTasklet validationTasklet() {
@@ -327,18 +325,18 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .build();
     }
 
-    @Bean
+    /*@Bean
     public Step ccdToRasSetupStep() {
         return steps.get("ccdToRasSetupStep")
-                .tasklet(ccdToRasSetupTasklet())
-                .build();
-    }
+                    .tasklet(ccdToRasSetupTasklet())
+                    .build();
+    }*/
 
     @Bean
-    public Step validationStep(){
+    public Step validationStep() {
         return steps.get("validationStep")
-                .tasklet(validationTasklet())
-                .build();
+                    .tasklet(validationTasklet())
+                    .build();
     }
 
     @Bean
@@ -362,7 +360,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
                     .taskExecutor(taskExecutor())
-                    .throttleLimit(10)
                     .build();
     }
 
@@ -378,25 +375,71 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
 
-
     @Bean
     public TaskExecutor taskExecutor() {
         return new SimpleAsyncTaskExecutor("ccd_migration");
     }
 
     @Bean
+    public JobExecutionDecider checkLdStatus() {
+        return new JobRunnableDecider();
+    }
+
+    @Bean
+    public JobExecutionDecider checkCcdProcessStatus() {
+        return (job, step) -> new FlowExecutionStatus(applicationParams.getProcessCcdDataEnabled());
+    }
+
+    @Bean
+    public JobExecutionDecider checkRenamingTablesStatus() {
+        return (job, step) -> new FlowExecutionStatus(applicationParams.getRenamingPostMigrationTablesEnabled());
+    }
+
+    @Bean
+    public Step firstStep() {
+        return steps.get("LdValidation")
+                    .tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
+                    .build();
+    }
+
+    @Bean
+    public Flow processCcdDataToTempTablesFlow() {
+        return new FlowBuilder<Flow>("processCcdDataToTempTables")
+            .start(replicateTables())
+            .next(injectDataIntoView())
+            .next(ccdToRasStep())
+            .build();
+    }
+
+    /**
+     * Job will start and check for LD flag, In case LD flag is disabled it will end the JOB
+     * otherwise will check or CCD migration flag, In case flag is enabled will process the CCD data to temp tables
+     * otherwise will check migration rename to live tables, In case flag is enabled will rename the temp tables to
+     * live tables otherwise it will end the job.
+     *
+     * @param listener Pre/post operation handler
+     * @return job
+     */
+    @Bean
     public Job ccdToRasBatchJob(@Autowired NotificationListener listener) {
         return jobs.get("ccdToRasBatchJob")
                    .incrementer(new RunIdIncrementer())
                    .listener(listener)
-                   //.start(ccdToRasSetupStep())
-                   //.next(validationStep())
-                   .start(replicateTables())
-                   .next(injectDataIntoView())
-                   .next(ccdToRasStep())
-                   .next(renameTablesPostMigrationStep())
+                   .start(firstStep()) //Dummy step as Decider will work after Step
+                   .next(checkLdStatus()).on(DISABLED).end(STOPPED)
+                   .from(checkLdStatus()).on(ANY).to(checkCcdProcessStatus())
+                   .from(checkCcdProcessStatus()).on(DISABLED).to(checkRenamingTablesStatus())
+                   .from(checkCcdProcessStatus()).on(ANY).to(processCcdDataToTempTablesFlow())
+                   .on(ANY).to(checkRenamingTablesStatus())
+                   .from(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
+                   .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
+                   .end()
                    .build();
 
     }
 
+    @Bean
+    public LDClient ldClient(@Value("${launchdarkly.sdk.key}") String sdkKey) {
+        return new LDClient(sdkKey);
+    }
 }

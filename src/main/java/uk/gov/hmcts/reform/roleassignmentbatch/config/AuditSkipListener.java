@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.AuditOperationType;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
@@ -55,8 +55,10 @@ public class AuditSkipListener implements SkipListener<CcdCaseUser, EntityWrappe
         auditFaults.setReason(t.getMessage());
         auditFaults.setFailedAt(AuditOperationType.WRITE.getLabel());
         auditFaults.setCcdUsers(getJson(item.getCcdCaseUser()));
+        auditFaults.setActorCache(getJson(item.getActorCacheEntity()));
         auditFaults.setRequest(getJson(item.getRequestEntity()));
         auditFaults.setHistory(getJson(item.getRoleAssignmentHistoryEntity()));
+        auditFaults.setLive(getJson(item.getRoleAssignmentEntity()));
         auditWriter.write(Collections.singletonList(auditFaults));
     }
 

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.entities;
 
 import java.io.Serializable;
-import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,12 +23,10 @@ public class AuditFaults implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "failed_at")
     private String failedAt;
 
     private String reason;
 
-    @Column(name = "ccd_users")
     private String ccdUsers;
 
     private String request;
@@ -37,4 +34,6 @@ public class AuditFaults implements Serializable {
     private String history;
 
     private String live;
+
+    private String actorCache;
 }

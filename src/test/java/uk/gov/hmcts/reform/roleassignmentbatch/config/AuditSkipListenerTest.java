@@ -12,7 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
@@ -30,7 +30,7 @@ public class AuditSkipListenerTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

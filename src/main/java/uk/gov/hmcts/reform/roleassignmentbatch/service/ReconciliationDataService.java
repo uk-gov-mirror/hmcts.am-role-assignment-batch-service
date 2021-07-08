@@ -41,9 +41,9 @@ public class ReconciliationDataService {
     /**
      * This generic method is used group by key with count and return with Json string.
      *
-     * @param source
-     * @param type
-     * @return
+     * @param source source
+     * @param type type
+     * @return String
      */
     public String populateAsJsonData(List<Map<String, Object>> source, String type) {
         List<CcdJurisdictionItem> ccdJurisdictionItemList = new ArrayList<>();
@@ -112,8 +112,8 @@ public class ReconciliationDataService {
     /**
      * This is used to persist data into Reconciliation_table.
      *
-     * @param reconciliationData
-     * @return
+     * @param reconciliationData reconciliationData
+     * @return int
      */
     public int saveReconciliationData(ReconciliationData reconciliationData) {
         int success = jdbcTemplate.update(ReconQuery.INSERT_RECONCILIATION_QUERY.getKey(),

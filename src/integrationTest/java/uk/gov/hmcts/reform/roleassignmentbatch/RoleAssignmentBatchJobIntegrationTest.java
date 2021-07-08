@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.roleassignment;
+package uk.gov.hmcts.reform.roleassignmentbatch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

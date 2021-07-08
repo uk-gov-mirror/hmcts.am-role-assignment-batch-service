@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.batch.item.ItemProcessor;
-import uk.gov.hmcts.reform.domain.model.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.GrantType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
@@ -31,7 +31,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
      *
      * @param ccdCaseUser to be processed
      * @return potentially modified or new item for continued processing, {@code null} if processing of the
-     * provided item should not continue.
+     *     provided item should not continue.
      * @throws Exception thrown if exception occurs during processing.
      */
     @Override
@@ -41,63 +41,68 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
         attributes.put("caseId", convertValueJsonNode(ccdCaseUser.getCaseDataId()));
         attributes.put("caseTypeId", convertValueJsonNode(ccdCaseUser.getCaseType()));
         RequestEntity requestEntity = RequestEntity.builder()
-                .id(requestUuid)
-                .correlationId(UUID.randomUUID().toString())
-                .clientId("ccd")
-                .authenticatedUserId("A fixed Authenticated User Id")
-                .assignerId(ccdCaseUser.getUserId())
-                .requestType("CREATE")
-                .status("APPROVED")
-                .process("CCD")
-                .replaceExisting(false)
-                .roleAssignmentId(UUID.randomUUID())
-                .reference(ccdCaseUser.getCaseDataId()
-                        .concat(ccdCaseUser.getUserId()))
-                .log(null)
-                .created(LocalDateTime.now())
-                .build();
+                                                   .id(requestUuid)
+                                                   .correlationId(UUID.randomUUID().toString())
+                                                   .clientId("ccd")
+                                                   .authenticatedUserId("A fixed Authenticated User Id")
+                                                   .assignerId(ccdCaseUser.getUserId())
+                                                   .requestType("CREATE")
+                                                   .status("APPROVED")
+                                                   .process("CCD")
+                                                   .replaceExisting(false)
+                                                   .roleAssignmentId(UUID.randomUUID())
+                                                   .reference(ccdCaseUser.getCaseDataId()
+                                                                         .concat(ccdCaseUser.getUserId()))
+                                                   .log(null)
+                                                   .created(LocalDateTime.now())
+                                                   .build();
         HistoryEntity roleAssignmentHistoryEntity =
-                HistoryEntity.builder()
-                        .id(UUID.randomUUID())
-                        .status(Status.APPROVED.name())
-                        .requestId(requestUuid)
-                        .actorId(ccdCaseUser.getUserId())
-                        .actorIdType("IDAM")
-                        .roleType(RoleType.CASE.name())
-                        .roleName(ccdCaseUser.getCaseRole())
-                        .sequence(1)
-                        .classification("CLASSIFIED")
-                        .grantType(GrantType.STANDARD.name())
-                        .roleCategory(RoleCategory.JUDICIAL.name())
-                        .readOnly(false)
-                        .created(LocalDateTime.now())
-                        .attributes(convertValueJsonNode(attributes).toString())
-                        .build();
+            HistoryEntity.builder()
+                         .id(UUID.randomUUID())
+                         .status(Status.APPROVED.name())
+                         .requestId(requestUuid)
+                         .actorId(ccdCaseUser.getUserId())
+                         .actorIdType("IDAM")
+                         .roleType(RoleType.CASE.name())
+                         .roleName(ccdCaseUser.getCaseRole())
+                         .sequence(1)
+                         .classification("CLASSIFIED")
+                         .grantType(GrantType.STANDARD.name())
+                         .roleCategory(RoleCategory.JUDICIAL.name())
+                         .readOnly(false)
+                         .created(LocalDateTime.now())
+                         .attributes(convertValueJsonNode(attributes).toString())
+                         .build();
         RoleAssignmentEntity roleAssignmentEntity =
-                RoleAssignmentEntity.builder()
-                        .id(requestUuid)
-                        .actorIdType("IDAM")
-                        .actorId(ccdCaseUser.getUserId())
-                        .roleType(RoleType.CASE.name())
-                        .roleName(ccdCaseUser.getCaseRole())
-                        .classification("CLASSIFIED")
-                        .grantType(GrantType.STANDARD.name())
-                        .roleCategory(RoleCategory.JUDICIAL.name())
-                        .readOnly(false)
-                        .created(LocalDateTime.now())
-                        .attributes(convertValueJsonNode(attributes).toString())
-                        .build();
+            RoleAssignmentEntity.builder()
+                                .id(requestUuid)
+                                .actorIdType("IDAM")
+                                .actorId(ccdCaseUser.getUserId())
+                                .roleType(RoleType.CASE.name())
+                                .roleName(ccdCaseUser.getCaseRole())
+                                .classification("CLASSIFIED")
+                                .grantType(GrantType.STANDARD.name())
+                                .roleCategory(RoleCategory.JUDICIAL.name())
+                                .readOnly(false)
+                                .created(LocalDateTime.now())
+                                .attributes(convertValueJsonNode(attributes).toString())
+                                .build();
         ActorCacheEntity actorCacheEntity =
-                ActorCacheEntity.builder()
-                        .actorIds(UUID.randomUUID().toString()) //using random as dummy data violates unique key rule
-                        .etag(0L)
-                        .roleAssignmentResponse(convertValueJsonNode(attributes).toString())
-                        .build();
+            ActorCacheEntity.builder()
+                            .actorIds(ccdCaseUser.getUserId()) //using random as dummy data violates unique key rule
+                            .etag(0L)
+                            .roleAssignmentResponse(convertValueJsonNode(attributes).toString())
+                            .build();
         return EntityWrapper.builder()
+
+                .ccdCaseUser(ccdCaseUser)
                 .actorCacheEntity(actorCacheEntity)
                 .requestEntity(requestEntity)
                 .roleAssignmentHistoryEntity(roleAssignmentHistoryEntity)
                 .roleAssignmentEntity(roleAssignmentEntity)
                 .build();
+
+             
+
     }
 }

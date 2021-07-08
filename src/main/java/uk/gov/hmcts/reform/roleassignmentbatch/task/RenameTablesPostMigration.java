@@ -49,7 +49,8 @@ public class RenameTablesPostMigration implements Tasklet {
         log.info("End Table renaming");
         log.info("Rebuilding the indexes");
 
-        jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_process_reference ON role_assignment_history USING btree (process, reference);");
+        jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_process_reference ON"
+                             + " role_assignment_history USING btree (process, reference);");
         jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_actor_id ON role_assignment USING btree (actor_id);");
 
         log.info("Index rebuild is complete");
