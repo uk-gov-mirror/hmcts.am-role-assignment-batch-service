@@ -6,9 +6,9 @@ import javax.transaction.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.listener.JobExecutionListenerSupport;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService
 
 @Component
 @Slf4j
-public class NotificationListener extends JobExecutionListenerSupport {
+public class NotificationListener extends StepExecutionListenerSupport {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -33,16 +33,15 @@ public class NotificationListener extends JobExecutionListenerSupport {
      * updated with grouing by role and total record
      * 4. Migration job status is updated with Failed status if there is any record in Audit_table.
      *
-     * @param jobExecution jobExecution
+     * @param stepExecution jobExecution
      */
     @Override
     @Transactional
-    public void afterJob(final JobExecution jobExecution) {
+    public ExitStatus afterStep(StepExecution stepExecution) {
 
-        log.info("!!! Current JOB FINISHED with status {}! Time to verify the results", jobExecution.getStatus());
+        log.info("!!! Current Step FINISHED with status {}! Time to verify the results", stepExecution.getStatus());
 
-        JobParameters jobParameters = jobExecution.getJobParameters();
-        String jobId = jobParameters.getParameters().get("run.id").toString();
+        String jobId = stepExecution.getJobExecutionId().toString();
 
         int totalCountFromCcdView = reconDataService.populateTotalRecord(ReconQuery.CCD_TOTAL_COUNT.getKey());
         int totalCountFromRoleAssignment = reconDataService.populateTotalRecord(ReconQuery.AM_TOTAL_COUNT.getKey());
@@ -83,9 +82,11 @@ public class NotificationListener extends JobExecutionListenerSupport {
 
         Integer integer = jdbcTemplate.queryForObject(ReconQuery.AUDIT_FAULTS_TOTAL_COUNT.getKey(), Integer.class);
         //Making Job status as failed if there are any record in Audit_Fault table.
-        if (integer > 0) {
-            jobExecution.setStatus(BatchStatus.FAILED);
-            log.info("CCD Migration job is failed. Please check Audit_Fault table");
+        if (integer > 0 || totalCountFromCcdView != totalCountFromRoleAssignment) {
+            stepExecution.getJobExecution().setStatus(BatchStatus.FAILED);
+            log.warn("CCD Migration job is failed. Please check Audit_Fault/reconciliation_data table");
+            return ExitStatus.FAILED;
         }
+        return ExitStatus.COMPLETED;
     }
 }
