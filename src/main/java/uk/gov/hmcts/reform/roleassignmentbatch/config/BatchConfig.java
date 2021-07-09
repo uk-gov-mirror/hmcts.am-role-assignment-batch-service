@@ -63,6 +63,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.WriteToActorCacheTableTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.CcdViewWriterTemp;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
@@ -315,6 +316,11 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    WriteToActorCacheTableTasklet writeToActorCacheTableTasklet() {
+        return new WriteToActorCacheTableTasklet();
+    }
+
+    @Bean
     RenameTablesPostMigration renameTablesPostMigration() {
         return new RenameTablesPostMigration();
     }
@@ -348,6 +354,13 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    public Step writeToActorCache() {
+        return steps.get("writeToActorCache")
+                    .tasklet(writeToActorCacheTableTasklet())
+                    .build();
+    }
+
+    @Bean
     public Step ccdToRasStep() {
         return steps.get("ccdToRasStep")
                     .<CcdCaseUser, EntityWrapper>chunk(1000)
@@ -361,6 +374,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
                     .taskExecutor(taskExecutor())
+                    .throttleLimit(10)
                     .build();
     }
 
@@ -409,6 +423,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .start(replicateTables())
             .next(injectDataIntoView())
             .next(ccdToRasStep())
+            .next(writeToActorCache())
             .build();
     }
 

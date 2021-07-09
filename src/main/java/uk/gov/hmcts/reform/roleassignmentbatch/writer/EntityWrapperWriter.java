@@ -32,7 +32,6 @@ public class EntityWrapperWriter implements ItemWriter<EntityWrapper> {
             requestEntityWriter.write(Collections.singletonList(item.getRequestEntity()));
             roleAssignmentHistoryWriter.write(Collections.singletonList(item.getRoleAssignmentHistoryEntity()));
             roleAssignmentWriter.write(Collections.singletonList(item.getRoleAssignmentEntity()));
-            actorCacheWriter.write(Collections.singletonList(item.getActorCacheEntity()));
         }
     }
 }
