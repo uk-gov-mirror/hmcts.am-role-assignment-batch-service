@@ -21,6 +21,7 @@ public class RenameTablesPostMigration implements Tasklet {
         renameTables();
         createIndexes();
         return RepeatStatus.FINISHED;
+
     }
 
     private void createIndexes() {
