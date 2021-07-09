@@ -9,6 +9,13 @@ public class Constants {
     public static final String ENABLED = "ENABLED";
     public static final String STOPPED = "STOPPED";
     public static final String ANY = "*";
+    public static final String CASE_DATA_ID = "case_data_id";
+    public static final String USER_ID = "user_id";
+    public static final String CASE_ROLE = "case_role";
+    public static final String JURISDICTION = "jurisdiction";
+    public static final String CASE_TYPE = "case_type";
+    public static final String ROLE_CATEGORY = "role_category";
+    public static final String BEGIN_DATE = "begin_date";
 
     public static final String REQUEST_QUERY = "INSERT INTO replica_role_assignment_request(id, correlation_id,"
                                         + "client_id,authenticated_user_id,assigner_id,request_type,"

@@ -44,12 +44,12 @@ class AuditSkipListenerTest {
     }
 
     @Test
-    public void verifyOnSkipInRead() {
+    void verifyOnSkipInRead() {
         Assertions.assertThrows(NullPointerException.class, () -> auditSkipListener.onSkipInRead(null));
     }
 
     @Test
-    public void verifyOnSkipInWrite() throws Exception {
+    void verifyOnSkipInWrite() throws Exception {
         UUID requestUuid = UUID.randomUUID();
         CcdCaseUser ccdCaseUser = TestDataBuilder.buildCcdCaseUsers();
         HistoryEntity historyEntity = TestDataBuilder.buildHistoryEntity(requestUuid, ccdCaseUser.getUserId(),

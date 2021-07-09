@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.writer;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -23,7 +24,7 @@ public class CcdViewWriterTemp implements ItemWriter<CcdCaseUser> {
         for (int i = 0; i < 1000; i++) {
             uuidList.add("userId" + i);
         }
-        Random random = new Random();
+        Random random = SecureRandom.getInstanceStrong();
         //ccdCaseUserJdbcBatchItemWriter.write(items)
 
         for (CcdCaseUser user : items) {

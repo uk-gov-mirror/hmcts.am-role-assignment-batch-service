@@ -1,8 +1,15 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.BEGIN_DATE;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_DATA_ID;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_ROLE;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_TYPE;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.JURISDICTION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ROLE_CATEGORY;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.USER_ID;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -73,6 +80,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 @EnableBatchProcessing
 public class BatchConfig extends DefaultBatchConfigurer {
 
+
     @Value("${delete-expired-records}")
     String taskParent;
     @Value("${batchjob-name}")
@@ -130,13 +138,14 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .saveState(false)
             .resource(new PathResource(filePath + fileName))
             .delimited()
-            .names("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category")
+            .names(CASE_DATA_ID, USER_ID, CASE_ROLE, JURISDICTION, CASE_TYPE, ROLE_CATEGORY, BEGIN_DATE)
             .lineMapper(lineMapper())
-            .fieldSetMapper(new BeanWrapperFieldSetMapper<CcdCaseUser>() {
+            .fieldSetMapper(new BeanWrapperFieldSetMapper<>() {
                 {
                     setTargetType(CcdCaseUser.class);
                 }
             })
+
             .build();
     }
 
@@ -146,8 +155,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         final DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
-        lineTokenizer.setNames("case_data_id", "user_id", "case_role", "jurisdiction", "case_type", "role_category",
-                               "begin_date");
+        lineTokenizer.setNames(CASE_DATA_ID, USER_ID, CASE_ROLE, JURISDICTION, CASE_TYPE, ROLE_CATEGORY, BEGIN_DATE);
         final CcdFieldSetMapper ccdFieldSetMapper = new CcdFieldSetMapper();
         defaultLineMapper.setLineTokenizer(lineTokenizer);
         defaultLineMapper.setFieldSetMapper(ccdFieldSetMapper);
@@ -160,13 +168,13 @@ public class BatchConfig extends DefaultBatchConfigurer {
         @Override
         public CcdCaseUser mapFieldSet(FieldSet fieldSet) {
             final CcdCaseUser caseUsers = new CcdCaseUser();
-            caseUsers.setCaseDataId(fieldSet.readString("case_data_id"));
-            caseUsers.setUserId(fieldSet.readString("user_id"));
-            caseUsers.setCaseRole(fieldSet.readString("case_role"));
-            caseUsers.setJurisdiction(fieldSet.readString("jurisdiction"));
-            caseUsers.setCaseType(fieldSet.readString("case_type"));
-            caseUsers.setRoleCategory(fieldSet.readString("role_category"));
-            caseUsers.setBeginDate(fieldSet.readString("begin_date"));
+            caseUsers.setCaseDataId(fieldSet.readString(CASE_DATA_ID));
+            caseUsers.setUserId(fieldSet.readString(USER_ID));
+            caseUsers.setCaseRole(fieldSet.readString(CASE_ROLE));
+            caseUsers.setJurisdiction(fieldSet.readString(JURISDICTION));
+            caseUsers.setCaseType(fieldSet.readString(CASE_TYPE));
+            caseUsers.setRoleCategory(fieldSet.readString(ROLE_CATEGORY));
+            caseUsers.setBeginDate(fieldSet.readString(BEGIN_DATE));
             return caseUsers;
         }
     }
@@ -269,7 +277,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
 
         provider.setSelectClause("select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
-                                 + "begin_date");
+                                 + BEGIN_DATE);
         provider.setFromClause("from ccd_view");
         //provider.setWhereClause("where status=:status");
         provider.setSortKey("id");
@@ -284,13 +292,13 @@ public class BatchConfig extends DefaultBatchConfigurer {
         public CcdCaseUser mapRow(ResultSet rs, int rowNum) throws SQLException {
 
             CcdCaseUser ccdCaseUser = new CcdCaseUser();
-            ccdCaseUser.setCaseDataId(rs.getString("case_data_id"));
-            ccdCaseUser.setUserId(rs.getString("user_id"));
-            ccdCaseUser.setCaseRole(rs.getString("case_role"));
-            ccdCaseUser.setCaseType(rs.getString("case_type"));
-            ccdCaseUser.setBeginDate(rs.getString("begin_date"));
-            ccdCaseUser.setRoleCategory(rs.getString("role_category"));
-            ccdCaseUser.setJurisdiction(rs.getString("jurisdiction"));
+            ccdCaseUser.setCaseDataId(rs.getString(CASE_DATA_ID));
+            ccdCaseUser.setUserId(rs.getString(USER_ID));
+            ccdCaseUser.setCaseRole(rs.getString(CASE_ROLE));
+            ccdCaseUser.setCaseType(rs.getString(CASE_TYPE));
+            ccdCaseUser.setBeginDate(rs.getString(BEGIN_DATE));
+            ccdCaseUser.setRoleCategory(rs.getString(ROLE_CATEGORY));
+            ccdCaseUser.setJurisdiction(rs.getString(JURISDICTION));
             return ccdCaseUser;
         }
     }
