@@ -315,7 +315,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Bean
     ValidationTasklet validationTasklet() {
-        return new ValidationTasklet(fileName, filePath, ccdCaseUsersReader());
+        return new ValidationTasklet();
     }
 
     @Bean
@@ -428,7 +428,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Flow processCcdDataToTempTablesFlow() {
         return new FlowBuilder<Flow>("processCcdDataToTempTables")
-            .start(replicateTables())
+            .start(validationStep())
+            .next(replicateTables())
             .next(injectDataIntoView())
             .next(ccdToRasStep())
             .next(writeToActorCache())

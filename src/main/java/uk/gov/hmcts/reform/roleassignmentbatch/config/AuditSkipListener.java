@@ -1,11 +1,7 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
 import java.util.Collections;
-import javax.annotation.PostConstruct;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +12,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.AuditOperationType;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
+import uk.gov.hmcts.reform.roleassignmentbatch.util.JacksonUtils;
 
 public class AuditSkipListener implements SkipListener<CcdCaseUser, EntityWrapper> {
 
@@ -23,13 +20,6 @@ public class AuditSkipListener implements SkipListener<CcdCaseUser, EntityWrappe
 
     @Autowired
     private JdbcBatchItemWriter<AuditFaults> auditWriter;
-
-    ObjectMapper objectMapper = new ObjectMapper();
-
-    @PostConstruct
-    public void setUp() {
-        objectMapper.registerModule(new JavaTimeModule());
-    }
 
     @Override
     public void onSkipInRead(Throwable t) {
@@ -40,10 +30,10 @@ public class AuditSkipListener implements SkipListener<CcdCaseUser, EntityWrappe
     @Override
     public void onSkipInProcess(CcdCaseUser item, Throwable t) {
         LOG.warn("onSkipInProcess Item " + item + " was skipped due to: " + t.getMessage());
-        AuditFaults auditFaults = new AuditFaults();
-        auditFaults.setReason(t.getMessage());
-        auditFaults.setFailedAt(AuditOperationType.PROCESS.getLabel());
-        auditFaults.setCcdUsers(getJson(item));
+        var auditFaults = AuditFaults.builder()
+                .reason(t.getMessage())
+                .failedAt(AuditOperationType.PROCESS.getLabel())
+                .ccdUsers(JacksonUtils.convertValueJsonNode(item).toString()).build();
         auditWriter.write(Collections.singletonList(auditFaults));
     }
 
@@ -51,24 +41,15 @@ public class AuditSkipListener implements SkipListener<CcdCaseUser, EntityWrappe
     @Override
     public void onSkipInWrite(EntityWrapper item, Throwable t) {
         LOG.warn("onSkipInWrite Item " + item + " was skipped due to: " + t.getMessage());
-        AuditFaults auditFaults = new AuditFaults();
-        auditFaults.setReason(t.getMessage());
-        auditFaults.setFailedAt(AuditOperationType.WRITE.getLabel());
-        auditFaults.setCcdUsers(getJson(item.getCcdCaseUser()));
-        auditFaults.setActorCache(getJson(item.getActorCacheEntity()));
-        auditFaults.setRequest(getJson(item.getRequestEntity()));
-        auditFaults.setHistory(getJson(item.getRoleAssignmentHistoryEntity()));
-        auditFaults.setLive(getJson(item.getRoleAssignmentEntity()));
+        var auditFaults = AuditFaults.builder()
+                .reason(t.getMessage())
+                .failedAt(AuditOperationType.WRITE.getLabel())
+                .ccdUsers(JacksonUtils.convertValueJsonNode(item.getCcdCaseUser()).toString())
+                .actorCache(JacksonUtils.convertValueJsonNode(item.getActorCacheEntity()).toString())
+                .request(JacksonUtils.convertValueJsonNode(item.getRequestEntity()).toString())
+                .history(JacksonUtils.convertValueJsonNode(item.getRoleAssignmentHistoryEntity()).toString())
+                .live(JacksonUtils.convertValueJsonNode(item.getRoleAssignmentEntity()).toString()).build();
         auditWriter.write(Collections.singletonList(auditFaults));
-    }
-
-    private String getJson(Object item) {
-        try {
-            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(item);
-        } catch (JsonProcessingException e) {
-            LOG.warn("failed conversion: Pfra object to Json", e);
-        }
-        return null;
     }
 
 }
