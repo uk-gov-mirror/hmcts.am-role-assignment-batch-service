@@ -34,12 +34,13 @@ public class Constants {
 
     public static final String HISTORY_QUERY = "insert into replica_role_assignment_history(id, status, actor_id_type, "
                                                + "role_type, role_name, status_sequence, classification, grant_type, "
-                                               + "read_only, created, "
-                                               + "actor_id, attributes, request_id) "
+                                               + "read_only, created, actor_id, attributes, request_id,"
+                                               + " role_category, begin_time, process, reference, log) "
                                                + "values(:id, :status, :actorIdType, :roleType, :roleName, "
                                                + ":sequence, :classification, :grantType,"
                                                + ":readOnly, :created, "
-                                               + ":actorId, :attributes::jsonb, :requestId)";
+                                               + ":actorId, :attributes::jsonb, :requestId, :roleCategory,"
+                                               + " :beginTime, :process, :reference, :log)";
 
     public static final String ACTOR_CACHE_QUERY = "insert into replica_actor_cache_control"
                                                    + "(actor_id,etag,json_response)"
@@ -49,8 +50,8 @@ public class Constants {
     public static final String ROLE_ASSIGNMENT_LIVE_TABLE = "insert into replica_role_assignment(id, actor_id_type,"
         + " actor_id, role_type, role_name, "
         + "classification, grant_type, role_category, read_only, created, "
-        + "attributes) "
+        + "attributes, begin_time) "
         + "values(:id, :actorIdType, :actorId, :roleType, :roleName, "
         + ":classification, :grantType, :roleCategory, :readOnly, :created, "
-        + ":attributes::jsonb)";
+        + ":attributes::jsonb, :beginTime)";
 }
