@@ -91,6 +91,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
     String filePath;
     @Value("${azure.container-name}")
     String containerName;
+    @Value("${migration.chunkSuze}")
+    private int chunkSize;
+
     @Value("${azure.account-name}")
     String accountName;
     @Value("${azure.account-key}")
@@ -184,6 +187,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new EntityWrapperProcessor();
     }
 
+    //TODO: Remove later
     @Bean
     public CcdViewWriterTemp ccdViewWriterTemp() {
         return new CcdViewWriterTemp();
@@ -212,6 +216,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new AuditSkipListener();
     }
 
+    //TODO: Remove later as we are inserting into actor cache in a separate step.
     @Bean
     public JdbcBatchItemWriter<ActorCacheEntity> insertIntoActorCacheTable() {
         return
@@ -234,6 +239,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                 .build();
     }
 
+    //TODO: Remove once actual CCD View is available.
     @Bean
     public JdbcBatchItemWriter<CcdCaseUser> insertIntoCcdView() {
         return
@@ -268,7 +274,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
             //.parameterValues(parameterValues)
             .rowMapper(new CcdViewRowMapper())
             .saveState(false)
-            .pageSize(1000)
+            .pageSize(chunkSize)
             .build();
     }
 
@@ -277,7 +283,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
         SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
 
         provider.setSelectClause("select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
-                                 + BEGIN_DATE);
+                                 + "begin_date");
         provider.setFromClause("from ccd_view");
         //provider.setWhereClause("where status=:status");
         provider.setSortKey("id");
@@ -371,7 +377,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Step ccdToRasStep() {
         return steps.get("ccdToRasStep")
-                    .<CcdCaseUser, EntityWrapper>chunk(1000)
+                    .<CcdCaseUser, EntityWrapper>chunk(chunkSize)
                     .faultTolerant()
                     .retryLimit(3)
                     .retry(DeadlockLoserDataAccessException.class)
@@ -389,7 +395,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Step injectDataIntoView() {
         return steps.get("injectDataIntoView")
-                    .<CcdCaseUser, CcdCaseUser>chunk(1000)
+                    .<CcdCaseUser, CcdCaseUser>chunk(chunkSize)
                     .reader(ccdCaseUsersReader())
                     .writer(ccdViewWriterTemp())
                     .taskExecutor(taskExecutor())

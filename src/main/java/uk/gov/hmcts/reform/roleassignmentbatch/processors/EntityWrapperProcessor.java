@@ -10,11 +10,10 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.batch.item.ItemProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Classification;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.GrantType;
-import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Status;
-import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
@@ -37,40 +36,47 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
     @Override
     public EntityWrapper process(CcdCaseUser ccdCaseUser) throws Exception {
         UUID requestUuid = UUID.randomUUID();
+
         Map<String, JsonNode> attributes = new HashMap<>();
         attributes.put("caseId", convertValueJsonNode(ccdCaseUser.getCaseDataId()));
         attributes.put("caseTypeId", convertValueJsonNode(ccdCaseUser.getCaseType()));
+        attributes.put("jurisdiction", convertValueJsonNode(ccdCaseUser.getJurisdiction()));
+        String reference = ccdCaseUser.getCaseDataId().concat("-").concat(ccdCaseUser.getUserId());
+
         RequestEntity requestEntity = RequestEntity.builder()
                                                    .id(requestUuid)
                                                    .correlationId(UUID.randomUUID().toString())
-                                                   .clientId("ccd")
-                                                   .authenticatedUserId("A fixed Authenticated User Id")
-                                                   .assignerId(ccdCaseUser.getUserId())
+                                                   .clientId("ccd_gw")
+                                                   .authenticatedUserId("ccd_migration")
+                                                   .assignerId("ccd_migration")
                                                    .requestType("CREATE")
                                                    .status("APPROVED")
                                                    .process("CCD")
                                                    .replaceExisting(false)
-                                                   .roleAssignmentId(UUID.randomUUID())
-                                                   .reference(ccdCaseUser.getCaseDataId()
-                                                                         .concat(ccdCaseUser.getUserId()))
-                                                   .log(null)
+                                                   //.roleAssignmentId(UUID.randomUUID())
+                                                   .reference(reference)
+                                                   .log("This is a migrated record from CCD.")
                                                    .created(LocalDateTime.now())
                                                    .build();
         HistoryEntity roleAssignmentHistoryEntity =
             HistoryEntity.builder()
                          .id(UUID.randomUUID())
-                         .status(Status.APPROVED.name())
                          .requestId(requestUuid)
+                         .status(Status.LIVE.name())
                          .actorId(ccdCaseUser.getUserId())
                          .actorIdType("IDAM")
+                         .process("CCD")
+                         .reference(reference)
                          .roleType(RoleType.CASE.name())
                          .roleName(ccdCaseUser.getCaseRole())
                          .sequence(1)
-                         .classification("CLASSIFIED")
-                         .grantType(GrantType.STANDARD.name())
-                         .roleCategory(RoleCategory.JUDICIAL.name())
+                         .classification(Classification.RESTRICTED.name())
+                         .grantType(GrantType.SPECIFIC.name())
+                         .roleCategory(ccdCaseUser.getRoleCategory())
                          .readOnly(false)
+                         .beginTime(ccdCaseUser.getBeginDate())
                          .created(LocalDateTime.now())
+                         .log("This is a migrated record from CCD.")
                          .attributes(convertValueJsonNode(attributes).toString())
                          .build();
         RoleAssignmentEntity roleAssignmentEntity =
@@ -80,23 +86,24 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
                                 .actorId(ccdCaseUser.getUserId())
                                 .roleType(RoleType.CASE.name())
                                 .roleName(ccdCaseUser.getCaseRole())
-                                .classification("CLASSIFIED")
-                                .grantType(GrantType.STANDARD.name())
-                                .roleCategory(RoleCategory.JUDICIAL.name())
+                                .classification(Classification.RESTRICTED.name())
+                                .grantType(GrantType.SPECIFIC.name())
+                                .roleCategory(ccdCaseUser.getRoleCategory())
                                 .readOnly(false)
+                                .beginTime(ccdCaseUser.getBeginDate())
                                 .created(LocalDateTime.now())
                                 .attributes(convertValueJsonNode(attributes).toString())
                                 .build();
-        ActorCacheEntity actorCacheEntity =
+
+        /*ActorCacheEntity actorCacheEntity =
             ActorCacheEntity.builder()
                             .actorIds(ccdCaseUser.getUserId()) //using random as dummy data violates unique key rule
                             .etag(0L)
                             .roleAssignmentResponse("{}")
-                            .build();
+                            .build()*/
         return EntityWrapper.builder()
-
                 .ccdCaseUser(ccdCaseUser)
-                .actorCacheEntity(actorCacheEntity)
+                //.actorCacheEntity(actorCacheEntity)
                 .requestEntity(requestEntity)
                 .roleAssignmentHistoryEntity(roleAssignmentHistoryEntity)
                 .roleAssignmentEntity(roleAssignmentEntity)

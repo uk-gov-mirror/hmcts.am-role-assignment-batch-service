@@ -35,9 +35,9 @@ public class RoleAssignmentEntity implements Serializable {
 
     private boolean readOnly;
 
-    private LocalDateTime beginTime;
+    private String beginTime;
 
-    private LocalDateTime endTime;
+    private String endTime;
 
     private LocalDateTime created;
 

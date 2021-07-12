@@ -52,7 +52,7 @@ public class HistoryEntity implements Serializable {
 
     private LocalDateTime created;
 
-    private LocalDateTime beginTime;
+    private String beginTime;
 
     private String attributes;
 
