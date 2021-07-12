@@ -6,6 +6,8 @@ import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_DATA_I
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_ROLE;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_TYPE;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ENABLED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.FAILED;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.JURISDICTION;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ROLE_CATEGORY;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
@@ -110,6 +112,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Autowired
     ApplicationParams applicationParams;
+
+    @Autowired
+    NotificationListener stepListener;
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
@@ -315,7 +320,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Bean
     ValidationTasklet validationTasklet() {
-        return new ValidationTasklet(fileName, filePath, ccdCaseUsersReader());
+        return new ValidationTasklet();
     }
 
     @Bean
@@ -381,6 +386,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .reader(databaseItemReader())
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
+                    .listener(stepListener)
                     .taskExecutor(taskExecutor())
                     .throttleLimit(10)
                     .build();
@@ -428,7 +434,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Flow processCcdDataToTempTablesFlow() {
         return new FlowBuilder<Flow>("processCcdDataToTempTables")
-            .start(replicateTables())
+            .start(validationStep())
+            .next(replicateTables())
             .next(injectDataIntoView())
             .next(ccdToRasStep())
             .next(writeToActorCache())
@@ -441,24 +448,21 @@ public class BatchConfig extends DefaultBatchConfigurer {
      * otherwise will check migration rename to live tables, In case flag is enabled will rename the temp tables to
      * live tables otherwise it will end the job.
      *
-     * @param listener Pre/post operation handler
      * @return job
      */
     @Bean
-    public Job ccdToRasBatchJob(@Autowired NotificationListener listener) {
+    public Job ccdToRasBatchJob() {
         return jobs.get("ccdToRasBatchJob")
-                   .incrementer(new RunIdIncrementer())
-                   .listener(listener)
-                   .start(firstStep()) //Dummy step as Decider will work after Step
-                   .next(checkLdStatus()).on(DISABLED).end(STOPPED)
-                   .from(checkLdStatus()).on(ANY).to(checkCcdProcessStatus())
-                   .from(checkCcdProcessStatus()).on(DISABLED).to(checkRenamingTablesStatus())
-                   .from(checkCcdProcessStatus()).on(ANY).to(processCcdDataToTempTablesFlow())
-                   .on(ANY).to(checkRenamingTablesStatus())
-                   .from(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
-                   .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
-                   .end()
-                   .build();
+                .incrementer(new RunIdIncrementer())
+                .start(firstStep()) //Dummy step as Decider will work after Step
+                .next(checkLdStatus()).on(DISABLED).end(STOPPED)
+                .from(checkLdStatus()).on(ANY).to(checkCcdProcessStatus())
+                .from(checkCcdProcessStatus()).on(ENABLED).to(processCcdDataToTempTablesFlow())
+                                                                .on(FAILED).end(FAILED)
+                .next(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
+                .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
+                .end()
+                .build();
 
     }
 

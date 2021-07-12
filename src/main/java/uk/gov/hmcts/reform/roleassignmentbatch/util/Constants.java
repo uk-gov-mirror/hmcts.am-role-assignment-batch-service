@@ -8,6 +8,7 @@ public class Constants {
     public static final String DISABLED = "DISABLED";
     public static final String ENABLED = "ENABLED";
     public static final String STOPPED = "STOPPED";
+    public static final String FAILED = "FAILED";
     public static final String ANY = "*";
     public static final String CASE_DATA_ID = "case_data_id";
     public static final String USER_ID = "user_id";
