@@ -10,7 +10,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.9'
+    id 'uk.gov.hmcts.java' version '0.12.12'
     id 'pmd'
     id 'jacoco'
     id 'org.springframework.boot' version '2.4.3'
