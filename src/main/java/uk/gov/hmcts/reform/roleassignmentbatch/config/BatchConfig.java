@@ -392,7 +392,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .reader(databaseItemReader())
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
-                    //.listener(notificationListener)
+                    .listener(notificationListener)
                     .taskExecutor(taskExecutor())
                     .throttleLimit(10)
                     .build();
