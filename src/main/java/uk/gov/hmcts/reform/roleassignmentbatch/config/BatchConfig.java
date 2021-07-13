@@ -117,7 +117,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     ApplicationParams applicationParams;
 
     @Autowired
-    NotificationListener stepListener;
+    NotificationListener notificationListener;
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
@@ -392,7 +392,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .reader(databaseItemReader())
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
-                    .listener(stepListener)
+                    //.listener(notificationListener)
                     .taskExecutor(taskExecutor())
                     .throttleLimit(10)
                     .build();
@@ -440,8 +440,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Flow processCcdDataToTempTablesFlow() {
         return new FlowBuilder<Flow>("processCcdDataToTempTables")
-            .start(validationStep())
-            .next(replicateTables())
+            .start(replicateTables())
+            .next(validationStep())
             .next(injectDataIntoView())
             .next(ccdToRasStep())
             .next(writeToActorCache())

@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
@@ -22,9 +21,6 @@ public class EntityWrapperWriter implements ItemWriter<EntityWrapper> {
 
     @Autowired
     private JdbcBatchItemWriter<RoleAssignmentEntity> roleAssignmentWriter;
-
-    @Autowired
-    private JdbcBatchItemWriter<ActorCacheEntity> actorCacheWriter;
 
     @Override
     public void write(List<? extends EntityWrapper> items) throws Exception {
