@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.ApplicationParams;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.BuildCcdViewMetrics;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
@@ -72,13 +73,25 @@ public class BatchConfig extends DefaultBatchConfigurer {
     ApplicationParams applicationParams;
 
     @Autowired
-    NotificationListener notificationListener;
-
-    @Autowired
     JdbcPagingItemReader<CcdCaseUser> databaseItemReader;
 
     @Autowired
     FlatFileItemReader<CcdCaseUser> ccdCaseUsersReader;
+
+    @Autowired
+    BuildCcdViewMetrics buildCcdViewMetrics;
+
+    @Autowired
+    ReplicateTablesTasklet replicateTablesTasklet;
+
+    @Autowired
+    RenameTablesPostMigration renameTablesPostMigration;
+
+    @Autowired
+    WriteToActorCacheTableTasklet writeToActorCacheTableTasklet;
+
+    @Autowired
+    ValidationTasklet validationTasklet;
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
@@ -115,57 +128,43 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new AuditSkipListener();
     }
 
-
     @Bean
     EntityWrapperWriter entityWrapperWriter() {
         return new EntityWrapperWriter();
     }
 
     @Bean
-    ValidationTasklet validationTasklet() {
-        return new ValidationTasklet();
-    }
-
-    @Bean
-    ReplicateTablesTasklet replicateTablesTasklet() {
-        return new ReplicateTablesTasklet();
-    }
-
-    @Bean
-    WriteToActorCacheTableTasklet writeToActorCacheTableTasklet() {
-        return new WriteToActorCacheTableTasklet();
-    }
-
-    @Bean
-    RenameTablesPostMigration renameTablesPostMigration() {
-        return new RenameTablesPostMigration();
-    }
-
-    @Bean
     public Step renameTablesPostMigrationStep() {
         return steps.get("renameTablesPostMigrationStep")
-                    .tasklet(renameTablesPostMigration())
+                    .tasklet(renameTablesPostMigration)
+                    .build();
+    }
+
+    @Bean
+    public Step buildCCdViewMetricsStep() {
+        return steps.get("buildCCdViewMetricsStep")
+                    .tasklet(buildCcdViewMetrics)
                     .build();
     }
 
     @Bean
     public Step validationStep() {
         return steps.get("validationStep")
-                    .tasklet(validationTasklet())
+                    .tasklet(validationTasklet)
                     .build();
     }
 
     @Bean
     public Step replicateTables() {
         return steps.get("ReplicateTables")
-                    .tasklet(replicateTablesTasklet())
+                    .tasklet(replicateTablesTasklet)
                     .build();
     }
 
     @Bean
     public Step writeToActorCache() {
         return steps.get("writeToActorCache")
-                    .tasklet(writeToActorCacheTableTasklet())
+                    .tasklet(writeToActorCacheTableTasklet)
                     .build();
     }
 
@@ -182,7 +181,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .reader(databaseItemReader)
                     .processor(entityWrapperProcessor())
                     .writer(entityWrapperWriter())
-                    .listener(notificationListener)
                     .taskExecutor(taskExecutor())
                     .throttleLimit(10)
                     .build();
@@ -233,6 +231,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .start(replicateTables())
             .next(validationStep())
             .next(injectDataIntoView())
+            .next(buildCCdViewMetricsStep())
             .next(ccdToRasStep())
             .next(writeToActorCache())
             .build();
