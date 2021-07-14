@@ -24,8 +24,10 @@ public enum ReconQuery {
     CCD_CASE_ROLE_KEY("case_role"),
     AM_JURISDICTION_KEY("caseTypeId"),
     AM_CASE_ROLE_KEY("role_name"),
+    BATCH_IN_PROGRESS("BATCH_IN_PROGRESS"),
     PASSED("PASSED"),
     FAILED("FAILED"),
+    IN_PROGRESS("The batch operation is in progress."),
     SUCCESS_STATUS("Total Record are matching from both ccd_view and am_role_assignment table."),
     FAILED_STATUS("Total Record are NOT matching from both ccd_view and am_role_assignment table."),
     COUNT("count");

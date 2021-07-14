@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.AmJurisdiction;
@@ -24,11 +25,8 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 @Slf4j
 public class ReconciliationDataService {
 
-    private final JdbcTemplate jdbcTemplate;
-
-    public ReconciliationDataService(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     public int populateTotalRecord(String sql) {
         return jdbcTemplate.queryForObject(sql, Integer.class);
