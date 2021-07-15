@@ -8,6 +8,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AM_TABLES;
 
 @Component
 @Slf4j
@@ -56,22 +57,6 @@ public class ReplicateTablesTasklet implements Tasklet {
         jdbcTemplate.update("DROP TABLE IF EXISTS audit_faults");
         log.info("Drop Table audit_faults: Successful");
 
-        log.info("Dropping replica_actor_cache");
-        jdbcTemplate.update("DROP TABLE IF EXISTS replica_actor_cache_control");
-        log.info("Drop Table replica_role_assignment: Successful");
-
-        log.info("Dropping replica_role_assignment");
-        jdbcTemplate.update("DROP TABLE IF EXISTS replica_role_assignment");
-        log.info("Drop Table replica_role_assignment: Successful");
-
-        log.info("Dropping replica_role_assignment_history");
-        jdbcTemplate.update("DROP TABLE IF EXISTS replica_role_assignment_history");
-        log.info("Drop Table replica_role_assignment_history: Successful");
-
-        log.info("Dropping replicated Request Table");
-        jdbcTemplate.update("DROP TABLE IF EXISTS replica_role_assignment_request");
-        log.info("Drop Table: Successful");
-
         log.info("Creating audit_faults Table");
         jdbcTemplate
             .update("CREATE TABLE audit_faults (id int8 NOT NULL,"
@@ -87,26 +72,12 @@ public class ReplicateTablesTasklet implements Tasklet {
         log.info("Creating audit_faults Table: Successful");
 
         log.info("Starting table replication");
-
-        log.info("Replicating Request Table");
-        jdbcTemplate.update("CREATE TABLE replica_role_assignment_request"
-                            + " (LIKE role_assignment_request INCLUDING ALL);");
-        log.info("Replicating Request Table: Successful");
-
-        log.info("Replicating History Table");
-
-        jdbcTemplate.update("CREATE TABLE replica_role_assignment_history"
-                            + " (LIKE role_assignment_history INCLUDING ALL);");
-        log.info("Replicating History Table: Successful");
-
-        log.info("Replicating Live Table");
-        jdbcTemplate.update("CREATE TABLE replica_role_assignment (LIKE role_assignment INCLUDING ALL);");
-        log.info("Replicating Live Table: Successful");
-
-        log.info("Replicating Actor Cache Table");
-        jdbcTemplate.update("CREATE TABLE replica_actor_cache_control (LIKE actor_cache_control INCLUDING ALL);");
-        log.info("Replicating Actor Cache Table: Successful");
-
+        AM_TABLES.forEach(table -> {
+            log.info("Replicating {} Table...", table);
+            jdbcTemplate.update(String.format("DROP TABLE IF EXISTS replica_%s", table));
+            jdbcTemplate.update(String.format("CREATE TABLE replica_%s (LIKE %s INCLUDING ALL);", table, table));
+            log.info("Replicating {} Table: Successful", table);
+        });
 
         jdbcTemplate.update("ALTER TABLE replica_role_assignment_history"
                             + " ADD CONSTRAINT fk_role_assignment_history_role_assignment_request"

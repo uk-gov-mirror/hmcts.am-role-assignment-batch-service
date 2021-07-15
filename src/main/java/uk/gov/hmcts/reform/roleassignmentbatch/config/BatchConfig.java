@@ -260,16 +260,18 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Bean
     public Job ccdToRasBatchJob() {
         return jobs.get("ccdToRasBatchJob")
-                   .incrementer(new RunIdIncrementer())
-                   .start(firstStep()) //Dummy step as Decider will work after Step
-                   .next(checkLdStatus()).on(DISABLED).end(STOPPED)
-                   .from(checkLdStatus()).on(ANY).to(checkCcdProcessStatus())
-                   .from(checkCcdProcessStatus()).on(ENABLED).to(processCcdDataToTempTablesFlow())
-                   .on(FAILED).end(FAILED)
-                   .next(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
-                   .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
-                   .end()
-                   .build();
+                .incrementer(new RunIdIncrementer())
+                .start(firstStep()) //Dummy step as Decider will work after Step
+                .next(checkLdStatus()).on(DISABLED).end(STOPPED)
+                .from(checkLdStatus()).on(ANY).to(checkCcdProcessStatus())
+                .from(checkCcdProcessStatus()).on(DISABLED).to(checkRenamingTablesStatus())
+                .from(checkCcdProcessStatus()).on(ANY).to(processCcdDataToTempTablesFlow())
+                                                        .on(FAILED).end(FAILED)
+                                                        .on(ANY).to(checkRenamingTablesStatus())
+                .from(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
+                .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
+                .end()
+                .build();
 
     }
 }
