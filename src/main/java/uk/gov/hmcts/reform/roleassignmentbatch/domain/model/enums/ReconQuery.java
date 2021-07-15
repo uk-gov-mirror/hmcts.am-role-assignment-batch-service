@@ -17,9 +17,35 @@ public enum ReconQuery {
     GROUP_BY_AM_CASE_ROLE("select role_name,count(1) from replica_role_assignment group by role_name order by role_name"),
 
     //Reconciliation
-    INSERT_RECONCILIATION_QUERY("insert into reconciliation_data (run_id, ccd_jurisdiction_data,"
+/*    INSERT_RECONCILIATION_QUERY("insert into reconciliation_data (run_id, ccd_jurisdiction_data,"
             + "ccd_role_name_data,am_jurisdiction_data,am_role_name_data,total_count_from_ccd,"
-            + "total_count_from_am,status,notes) values (?, ?,?,?,?,?,?,?,?)"),
+            + "total_count_from_am,status,notes) values (?, ?,?,?,?,?,?,?,?)"),*/
+    INSERT_RECONCILIATION_QUERY("insert into reconciliation_data (run_id, ccd_jurisdiction_data,ccd_role_name_data,am_jurisdiction_data,am_role_name_data," +
+                                "total_count_from_ccd,\n" +
+                                "           total_count_from_am,status,notes)\n" +
+                                "        values (?, ?,?,?,?,?,?,?,?) on conflict (run_id) do update \n" +
+                                "    set ccd_jurisdiction_data = EXCLUDED.ccd_jurisdiction_data, \n" +
+                                "ccd_role_name_data = EXCLUDED.ccd_role_name_data,\n" +
+                                "am_jurisdiction_data = EXCLUDED.am_jurisdiction_data,\n" +
+                                "am_role_name_data = EXCLUDED.am_role_name_data,\n" +
+                                "total_count_from_ccd = EXCLUDED.total_count_from_ccd,\n" +
+                                "total_count_from_am = EXCLUDED.total_count_from_am,\n" +
+                                "status = EXCLUDED.status,\n" +
+                                "notes = EXCLUDED.notes;"),
+    
+    /*insert into reconciliation_data (run_id, ccd_jurisdiction_data,ccd_role_name_data,am_jurisdiction_data,am_role_name_data,total_count_from_ccd,
+           total_count_from_am,status,notes)
+        values (?, ?,?,?,?,?,?,?,?) on conflict (run_id) do update 
+	    set ccd_jurisdiction_data = EXCLUDED.ccd_jurisdiction_data, 
+		ccd_role_name_data = EXCLUDED.ccd_role_name_data,
+		am_jurisdiction_data = EXCLUDED.am_jurisdiction_data,
+		am_role_name_data = EXCLUDED.am_role_name_data,
+		total_count_from_ccd = EXCLUDED.total_count_from_ccd,
+		total_count_from_am = EXCLUDED.total_count_from_am,
+		status = EXCLUDED.status,
+		notes = EXCLUDED.notes;*/
+    
+    
     CCD_JURISDICTION_KEY("jurisdiction"),
     CCD_CASE_ROLE_KEY("case_role"),
     AM_JURISDICTION_KEY("caseTypeId"),

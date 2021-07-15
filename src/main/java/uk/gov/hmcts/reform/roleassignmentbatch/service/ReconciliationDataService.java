@@ -56,48 +56,49 @@ public class ReconciliationDataService {
             switch (type) {
                 case "jurisdiction":
                     CcdJurisdictionItem ccdJurisdictionItem = CcdJurisdictionItem.builder()
-                            .count(Long.parseLong(objectMap.get(ReconQuery.COUNT.getKey()).toString()))
+                            .count(objectMap.get(ReconQuery.COUNT.getKey()).toString())
                             .jurisdiction(objectMap.get(ReconQuery.CCD_JURISDICTION_KEY.getKey()).toString())
                             .build();
                     ccdJurisdictionItemList.add(ccdJurisdictionItem);
                     CcdJurisdiction ccdJurisdiction = CcdJurisdiction.builder()
-                                                                     .totalCcdJurisdictionsCount(sum)
+                                                                     .count(String.valueOf(sum))
                                                                      .jurisdictions(ccdJurisdictionItemList).build();
                     result = convertValueJsonNode(ccdJurisdiction).toString();
                     break;
                 case "case_role":
                     CcdRoleNameItem ccdRoleNameItem = CcdRoleNameItem.builder()
-                            .count(Long.parseLong(objectMap.get(ReconQuery.COUNT.getKey()).toString()))
-                            .caseRole(objectMap.get(ReconQuery.CCD_CASE_ROLE_KEY.getKey()).toString())
+                            .count(objectMap.get(ReconQuery.COUNT.getKey()).toString())
+                            .roleName(objectMap.get(ReconQuery.CCD_CASE_ROLE_KEY.getKey()).toString())
                             .build();
                     ccdRoleNameItemList.add(ccdRoleNameItem);
                     CcdRoleName ccdRoleName = CcdRoleName.builder()
-                                                         .totalCcdRoleNamesCount(sum)
-                                                         .ccdRoleNames(ccdRoleNameItemList).build();
+                                                         .count(String.valueOf(sum))
+                                                         .roleNames(ccdRoleNameItemList)
+                                                         .build();
                     result = convertValueJsonNode(ccdRoleName).toString();
                     break;
                 case "caseTypeId":
                     AmJurisdictionItem amJurisdictionItem = AmJurisdictionItem.builder()
-                            .count(Long.parseLong(objectMap.get(ReconQuery.COUNT.getKey()).toString()))
-                            .caseTypeId(objectMap.get(ReconQuery.AM_JURISDICTION_KEY.getKey()).toString())
+                            .count(objectMap.get(ReconQuery.COUNT.getKey()).toString())
+                            .jurisdiction(objectMap.get(ReconQuery.AM_JURISDICTION_KEY.getKey()).toString())
 
                             .build();
                     amJurisdictionItemList.add(amJurisdictionItem);
                     AmJurisdiction amJurisdiction = AmJurisdiction.builder()
-                                                                  .totalAmJurisdictionsCount(sum)
+                                                                  .count(String.valueOf(sum))
                                                                   .jurisdictions(amJurisdictionItemList).build();
                     result = convertValueJsonNode(amJurisdiction).toString();
                     break;
                 case "role_name":
                     AmRoleNameItem amRoleNameItem = AmRoleNameItem.builder()
-                            .count(Long.parseLong(objectMap.get(ReconQuery.COUNT.getKey()).toString()))
+                            .count(objectMap.get(ReconQuery.COUNT.getKey()).toString())
                             .roleName(objectMap.get(ReconQuery.AM_CASE_ROLE_KEY.getKey())
                                     .toString())
                             .build();
                     amRoleNameItemList.add(amRoleNameItem);
                     AmRoleName amRoleName = AmRoleName.builder()
-                                                      .totalAmRoleNamesCount(sum)
-                                                      .amRoleNames(amRoleNameItemList).build();
+                                                      .count(String.valueOf(sum))
+                                                      .roleNames(amRoleNameItemList).build();
                     result = convertValueJsonNode(amRoleName).toString();
                     break;
                 default:

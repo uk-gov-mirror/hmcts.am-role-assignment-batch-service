@@ -1,23 +1,23 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.entities;
 
+import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.Id;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import java.time.ZonedDateTime;
 
 @Builder(toBuilder = true)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReconciliationData {
 
     @Id
@@ -26,7 +26,7 @@ public class ReconciliationData {
 
     @CreationTimestamp
     @Column(name = "created_date", nullable = false)
-    private ZonedDateTime createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "ccd_jurisdiction_data", nullable = false, columnDefinition = "jsonb")
     private String ccdJurisdictionData;

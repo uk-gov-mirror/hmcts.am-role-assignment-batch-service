@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BuildCcdViewMetrics;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.ReconcileDataTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
@@ -89,6 +90,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Autowired
     WriteToActorCacheTableTasklet writeToActorCacheTableTasklet;
+
+    @Autowired
+    ReconcileDataTasklet reconcileDataTasklet;
 
     @Autowired
     ValidationTasklet validationTasklet;
@@ -169,6 +173,13 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    public Step reconcileData() {
+        return steps.get("reconcileDataTasklet")
+                    .tasklet(reconcileDataTasklet)
+                    .build();
+    }
+
+    @Bean
     public Step ccdToRasStep() {
         return steps.get("ccdToRasStep")
                     .<CcdCaseUser, EntityWrapper>chunk(chunkSize)
@@ -234,6 +245,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .next(buildCCdViewMetricsStep())
             .next(ccdToRasStep())
             .next(writeToActorCache())
+            .next(reconcileData())
             .build();
     }
 
