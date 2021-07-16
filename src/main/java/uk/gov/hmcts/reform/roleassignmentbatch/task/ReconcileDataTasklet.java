@@ -110,7 +110,7 @@ public class ReconcileDataTasklet implements Tasklet {
         if (!status) {
             setJobExitStatus(contribution);
         }
-
+        reconcileData.setTotalCountFromAm(totalCountFromRoleAssignment);
         reconcileData.setStatus(status ? ReconQuery.PASSED.getKey() : ReconQuery.FAILED.getKey());
         reconcileData.setNotes(StringUtils.hasText(notes) ? notes : ReconQuery.SUCCESS_STATUS.getKey());
         reconDataService.saveReconciliationData(reconcileData);
