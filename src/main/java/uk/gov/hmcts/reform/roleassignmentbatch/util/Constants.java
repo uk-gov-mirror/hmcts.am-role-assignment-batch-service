@@ -54,18 +54,6 @@ public class Constants {
         + "values(:id, :actorIdType, :actorId, :roleType, :roleName, "
         + ":classification, :grantType, :roleCategory, :readOnly, :created, "
         + ":attributes::jsonb, :beginTime)";
-/*
-    public static final String GET_RECONCILIATION_DATA = "select run_id," +
-                                                         "created_date," +
-                                                         "ccd_jurisdiction_data," +
-                                                         "ccd_role_name_data," +
-                                                         "am_jurisdiction_data," +
-                                                         "am_role_name_data," +
-                                                         "total_count_from_ccd," +
-                                                         "total_count_from_am," +
-                                                         "status," +
-                                                         "notes from reconciliation_data where run_id =?";*/
-
 
     public static final String GET_RECONCILIATION_DATA = "select * from reconciliation_data where run_id =?";
 }

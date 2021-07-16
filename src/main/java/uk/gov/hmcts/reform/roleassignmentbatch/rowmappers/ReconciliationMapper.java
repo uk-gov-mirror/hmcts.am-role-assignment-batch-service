@@ -51,14 +51,17 @@ public class ReconciliationMapper implements RowMapper<ReconciliationData> {
                           .notes(rs.getString("notes"))
                           .build();
 
-       /* return ReconciliationDataModel.builder()
+        /* return ReconciliationDataModel.builder()
                                       .runId(data.getRunId())
                                       .createdDate(data.getCreatedDate())
-                                      .ccdJurisdictionData(convertObject(data.getCcdJurisdictionData(), CcdJurisdiction.class))
+                                      .ccdJurisdictionData(convertObject(data.getCcdJurisdictionData(),
+                                       CcdJurisdiction.class))
                                       .ccdRoleNameData(convertObject(data.getCcdRoleNameData(), CcdRoleName.class))
-                                      .amJurisdictionData(convertObject(data.getAmJurisdictionData(), AmJurisdiction.class))
+                                      .amJurisdictionData(convertObject(data.getAmJurisdictionData(),
+                                       AmJurisdiction.class))
                                       .amRoleNameData(convertObject(data.getAmRoleNameData(), AmRoleName.class))
-                                      .ccdJurisdictionData(convertObject(data.getCcdJurisdictionData(), CcdJurisdiction.class))
+                                      .ccdJurisdictionData(convertObject(data.getCcdJurisdictionData(),
+                                       CcdJurisdiction.class))
                                       .totalCountFromCcd(data.getTotalCountFromCcd())
                                       .totalCountFromAm(data.getTotalCountFromAm())
                                       .status(data.getStatus())

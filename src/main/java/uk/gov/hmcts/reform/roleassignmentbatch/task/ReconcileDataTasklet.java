@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -14,6 +15,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ReconQuery;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.ReconciliationMapper;
@@ -42,15 +44,13 @@ public class ReconcileDataTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
-        mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES,false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         log.info("Reconciling the CCD and AM Data.");
 
         String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
         log.info("Starting the reconciliation for job id: {}", jobId);
-
-        int totalCountFromRoleAssignment = reconDataService.populateTotalRecord(ReconQuery.AM_TOTAL_COUNT.getKey());
 
         List<Map<String, Object>> groupByAmJurisdiction = reconDataService
             .groupByFieldNameAndCount(ReconQuery.GROUP_BY_AM_JURISDICTION.getKey());
@@ -62,47 +62,63 @@ public class ReconcileDataTasklet implements Tasklet {
         String amRoleNameData = reconDataService
             .populateAsJsonData(groupByAmRoleName, ReconQuery.AM_CASE_ROLE_KEY.getKey());
 
-     ReconciliationData reconcileData = jdbcTemplate.queryForObject(Constants.GET_RECONCILIATION_DATA, new ReconciliationMapper() , jobId);
-        System.out.println("am Jurisdiction Data" );
-        System.out.println((mapper.readTree(amJurisdictionData)));
-        System.out.println("CCD Jurisdiction Data" );
-        System.out.println((mapper.readTree(reconcileData.getCcdJurisdictionData())));
-       boolean isJurisdictionDataEqual = (mapper.readTree(amJurisdictionData)).equals(mapper.readTree(reconcileData.getCcdJurisdictionData()));
-        System.out.println("isEquals:" + isJurisdictionDataEqual);
+        ReconciliationData reconcileData = jdbcTemplate.queryForObject(Constants.GET_RECONCILIATION_DATA,
+                                                                       new ReconciliationMapper(), jobId);
+        log.info("am Jurisdiction Data");
+        log.info(String.valueOf((mapper.readTree(amJurisdictionData))));
+        log.info("CCD Jurisdiction Data");
+        log.info(String.valueOf((mapper.readTree(reconcileData.getCcdJurisdictionData()))));
+        boolean isJurisdictionDataEqual = (mapper.readTree(amJurisdictionData))
+            .equals(mapper.readTree(reconcileData.getCcdJurisdictionData()));
+        log.info("isEquals:" + isJurisdictionDataEqual);
 
-        System.out.println("Am Role Name Data");
-        System.out.println((mapper.readTree(amRoleNameData)));
-        System.out.println("CCD Role Name Data");
-        System.out.println(mapper.readTree(reconcileData.getCcdRoleNameData()));
-        boolean isRoleDataEqual = (mapper.readTree(amRoleNameData)).equals(mapper.readTree(reconcileData.getCcdRoleNameData()));
-        System.out.println("is Role data equals: "+ isRoleDataEqual);
-
-        boolean isTotalMatching = totalCountFromRoleAssignment == reconcileData.getTotalCountFromCcd();
+        log.info("Am Role Name Data");
+        log.info(String.valueOf((mapper.readTree(amRoleNameData))));
+        log.info("CCD Role Name Data");
+        log.info(String.valueOf(mapper.readTree(reconcileData.getCcdRoleNameData())));
+        boolean isRoleDataEqual = (mapper.readTree(amRoleNameData))
+            .equals(mapper.readTree(reconcileData.getCcdRoleNameData()));
+        log.info("is Role data equals: " + isRoleDataEqual);
 
         reconcileData.setAmJurisdictionData(amJurisdictionData);
         reconcileData.setAmRoleNameData(amRoleNameData);
-        reconcileData.setStatus((isRoleDataEqual && isJurisdictionDataEqual && isTotalMatching)
-                                        ? ReconQuery.SUCCESS_STATUS.getKey(): ReconQuery.FAILED_STATUS.getKey());
-            /*ReconciliationData reconciliationData =
-            ReconciliationData.builder()
-                              .runId(jobId)
-                              .amJurisdictionData(amJurisdictionData)
-                              .amRoleNameData(amRoleNameData)
-                              .totalCountFromAm(totalCountFromRoleAssignment)
-                              .status(totalCountFromCcdView == totalCountFromRoleAssignment
-                                      ? ReconQuery.PASSED.getKey() : ReconQuery.FAILED.getKey())
-                              .notes(totalCountFromCcdView == totalCountFromRoleAssignment
-                                     ? ReconQuery.SUCCESS_STATUS.getKey() : ReconQuery.FAILED_STATUS.getKey())
-                              .build();*/
+
+        Integer auditRecords = jdbcTemplate.queryForObject(ReconQuery.AUDIT_FAULTS_TOTAL_COUNT.getKey(), Integer.class);
+        int totalCountFromRoleAssignment = reconDataService.populateTotalRecord(ReconQuery.AM_TOTAL_COUNT.getKey());
+        boolean status = true;
+        String notes = "";
+        boolean isTotalMatching = totalCountFromRoleAssignment == reconcileData.getTotalCountFromCcd();
+        if (auditRecords != null && auditRecords > 0) {
+            status = false;
+            notes = ReconQuery.CHECK_AUDIT_TABLE.getKey();
+        }
+
+        if (!isTotalMatching) {
+            status = false;
+            notes = notes.concat(ReconQuery.FAILED_STATUS.getKey());
+        }
+
+        if (!isJurisdictionDataEqual) {
+            status = false;
+            notes = notes.concat(ReconQuery.CHECK_JURISDICTION_DATA.getKey());
+        }
+
+        if (!isRoleDataEqual) {
+            status = false;
+            notes = notes.concat(ReconQuery.CHECK_ROLENAME_DATA.getKey());
+        }
+        if (!status) {
+            setJobExitStatus(contribution);
+        }
+
+        reconcileData.setStatus(status ? ReconQuery.PASSED.getKey() : ReconQuery.FAILED.getKey());
+        reconcileData.setNotes(StringUtils.hasText(notes) ? notes : ReconQuery.SUCCESS_STATUS.getKey());
         reconDataService.saveReconciliationData(reconcileData);
-
-        Integer integer = jdbcTemplate.queryForObject(ReconQuery.AUDIT_FAULTS_TOTAL_COUNT.getKey(), Integer.class);
-        //Making Job status as failed if there are any record in Audit_Fault table.
-        /*if (!(isRoleDataEqual && isJurisdictionDataEqual && isTotalMatching)) {
-            stepExecution.getJobExecution().setStatus(BatchStatus.FAILED);
-            log.warn("CCD Migration job is failed. Please check Audit_Fault/reconciliation_data table");*/
-
-
         return RepeatStatus.FINISHED;
+    }
+
+    private void setJobExitStatus(StepContribution contribution) {
+        log.error(ReconQuery.MIGRATION_JOB_FAILED.getKey());
+        contribution.setExitStatus(ExitStatus.FAILED);
     }
 }
