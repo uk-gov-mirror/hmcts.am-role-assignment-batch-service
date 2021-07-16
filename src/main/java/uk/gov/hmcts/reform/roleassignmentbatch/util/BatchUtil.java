@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.roleassignmentbatch.util;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 
@@ -37,5 +40,14 @@ public class BatchUtil {
                 ps.setTimestamp(20, roleAssignmentHistory.getCreated());
             }
         };
+    }
+
+    public static ObjectMapper getObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        return mapper;
     }
 }
