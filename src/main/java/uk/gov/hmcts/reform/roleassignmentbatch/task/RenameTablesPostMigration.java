@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -19,11 +20,14 @@ public class RenameTablesPostMigration implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
-        dropTables();
-        renameTables();
-        createIndexes();
+        if (jdbcTemplate.queryForObject("SELECT to_regclass('replica_role_assignment');",String.class) == null) {
+            contribution.setExitStatus(new ExitStatus("FAILED", "Replica Tables not exist"));
+        } else {
+            dropTables();
+            renameTables();
+            createIndexes();
+        }
         return RepeatStatus.FINISHED;
-
     }
 
     private void createIndexes() {
@@ -45,6 +49,7 @@ public class RenameTablesPostMigration implements Tasklet {
 
     private void renameTables() {
         log.info("Starting renaming the tables.");
+        jdbcTemplate.update("ALTER INDEX IF EXISTS pk_role_assignment_history RENAME TO role_assignment_history_pkey;");
         AM_TABLES.forEach(table -> {
             log.info("Renaming the {} table...", table);
             jdbcTemplate.update(String.format("ALTER TABLE IF EXISTS %s RENAME TO temp_%s;", table, table));
@@ -54,6 +59,7 @@ public class RenameTablesPostMigration implements Tasklet {
             jdbcTemplate.update(String.format("ALTER INDEX IF EXISTS replica_%s_pkey RENAME TO %s_pkey;",table,table));
             log.info("Rename {} table is Successful", table);
         });
+
         log.info("End Table renaming");
     }
 

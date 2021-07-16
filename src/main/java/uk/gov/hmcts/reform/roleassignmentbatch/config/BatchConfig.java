@@ -270,6 +270,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
                                                         .on(ANY).to(checkRenamingTablesStatus())
                 .from(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
                 .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
+                                                        .on(FAILED).end(FAILED)
+                                                        .on(ANY).end()
                 .end()
                 .build();
 
