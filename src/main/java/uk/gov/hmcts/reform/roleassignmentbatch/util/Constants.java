@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.util;
 
+import java.util.List;
+
 public class Constants {
 
     private Constants(){
@@ -17,6 +19,8 @@ public class Constants {
     public static final String CASE_TYPE = "case_type";
     public static final String ROLE_CATEGORY = "role_category";
     public static final String BEGIN_DATE = "begin_date";
+    public static final List<String> AM_TABLES = List.of("role_assignment","role_assignment_history",
+            "role_assignment_request","actor_cache_control");
 
     public static final String REQUEST_QUERY = "INSERT INTO replica_role_assignment_request(id, correlation_id,"
                                         + "client_id,authenticated_user_id,assigner_id,request_type,"
