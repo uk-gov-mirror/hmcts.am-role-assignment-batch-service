@@ -4,12 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
@@ -17,21 +11,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 @Component
 public class ReconciliationMapper implements RowMapper<ReconciliationData> {
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
-    ObjectMapper mapper;
-
-    public ReconciliationMapper() {
-        mapper = new ObjectMapper();
-        mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    }
-
-
-    @SneakyThrows
     @Override
     public ReconciliationData mapRow(ResultSet rs, int rowNum) throws SQLException {
         return ReconciliationData.builder()
