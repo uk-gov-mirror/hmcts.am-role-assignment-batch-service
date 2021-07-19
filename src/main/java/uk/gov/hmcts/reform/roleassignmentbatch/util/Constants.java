@@ -60,4 +60,5 @@ public class Constants {
         + ":attributes::jsonb, :beginTime)";
 
     public static final String GET_RECONCILIATION_DATA = "select * from reconciliation_data where run_id =?";
+    public static final String NO_RECONCILIATION_DATA_FOUND = "No reconciliation data found for Job Id: %s";
 }

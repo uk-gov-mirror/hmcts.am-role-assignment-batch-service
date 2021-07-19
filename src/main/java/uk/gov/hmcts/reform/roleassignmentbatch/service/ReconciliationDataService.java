@@ -80,7 +80,7 @@ public class ReconciliationDataService {
                 case "caseTypeId":
                     AmJurisdictionItem amJurisdictionItem = AmJurisdictionItem.builder()
                             .count(objectMap.get(ReconQuery.COUNT.getKey()).toString())
-                            .jurisdiction(objectMap.get(ReconQuery.AM_JURISDICTION_KEY.getKey()).toString())
+                            .jurisdiction(objectMap.get(ReconQuery.CASE_TYPE.getKey()).toString())
 
                             .build();
                     amJurisdictionItemList.add(amJurisdictionItem);
@@ -92,7 +92,7 @@ public class ReconciliationDataService {
                 case "role_name":
                     AmRoleNameItem amRoleNameItem = AmRoleNameItem.builder()
                             .count(objectMap.get(ReconQuery.COUNT.getKey()).toString())
-                            .roleName(objectMap.get(ReconQuery.AM_CASE_ROLE_KEY.getKey())
+                            .roleName(objectMap.get(ReconQuery.ROLE_NAME.getKey())
                                     .toString())
                             .build();
                     amRoleNameItemList.add(amRoleNameItem);

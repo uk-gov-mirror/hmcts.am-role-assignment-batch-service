@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ReconQuery;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
+import uk.gov.hmcts.reform.roleassignmentbatch.exception.NoReconciliationDataFound;
 import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.ReconciliationMapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
@@ -53,12 +54,16 @@ public class ReconcileDataTasklet implements Tasklet {
             .groupByFieldNameAndCount(ReconQuery.GROUP_BY_AM_CASE_ROLE.getKey());
 
         String amJurisdictionData = reconDataService
-            .populateAsJsonData(groupByAmJurisdiction, ReconQuery.AM_JURISDICTION_KEY.getKey());
+            .populateAsJsonData(groupByAmJurisdiction, ReconQuery.CASE_TYPE.getKey());
         String amRoleNameData = reconDataService
-            .populateAsJsonData(groupByAmRoleName, ReconQuery.AM_CASE_ROLE_KEY.getKey());
+            .populateAsJsonData(groupByAmRoleName, ReconQuery.ROLE_NAME.getKey());
 
         ReconciliationData reconcileData = jdbcTemplate.queryForObject(Constants.GET_RECONCILIATION_DATA,
                                                                        new ReconciliationMapper(), jobId);
+        if (reconcileData == null) {
+            setJobExitStatus(Boolean.FALSE, contribution);
+            throw new NoReconciliationDataFound(String.format(Constants.NO_RECONCILIATION_DATA_FOUND, jobId));
+        }
 
         reconcileData.setAmJurisdictionData(amJurisdictionData);
         reconcileData.setAmRoleNameData(amRoleNameData);

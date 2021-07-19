@@ -33,8 +33,8 @@ public enum ReconQuery {
 
     CCD_JURISDICTION_KEY("jurisdiction"),
     CCD_CASE_ROLE_KEY("case_role"),
-    AM_JURISDICTION_KEY("caseTypeId"),
-    AM_CASE_ROLE_KEY("role_name"),
+    CASE_TYPE("caseTypeId"),
+    ROLE_NAME("role_name"),
     BATCH_IN_PROGRESS("BATCH_IN_PROGRESS"),
     PASSED("PASSED"),
     FAILED("FAILED"),
