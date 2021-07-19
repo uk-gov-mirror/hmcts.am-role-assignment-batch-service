@@ -159,7 +159,7 @@ public class ConfigurationBeans {
         return provider;
     }
 
-    public class CcdViewRowMapper implements RowMapper<CcdCaseUser> {
+    public static class CcdViewRowMapper implements RowMapper<CcdCaseUser> {
 
         @Override
         public CcdCaseUser mapRow(ResultSet rs, int rowNum) throws SQLException {

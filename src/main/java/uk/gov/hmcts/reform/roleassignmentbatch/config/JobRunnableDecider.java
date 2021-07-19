@@ -19,9 +19,9 @@ public class JobRunnableDecider implements JobExecutionDecider {
     FeatureConditionEvaluator featureConditionEvaluator;
 
     @Override
-    public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
-        boolean isEnabled = featureConditionEvaluator.isFlagEnabled(SERVICE_NAME, "ccd-am-migration");
-        log.info("***** LdFlag for CCD to AM migration is enabled {} *****", isEnabled);
+    public FlowExecutionStatus decide(JobExecution job, StepExecution stepExecution) {
+        boolean isEnabled = featureConditionEvaluator.isFlagEnabled(SERVICE_NAME, job.getJobInstance().getJobName());
+        log.info("***** LdFlag for {} is enabled {} *****", job.getJobInstance().getJobName(), isEnabled);
         return new FlowExecutionStatus(isEnabled ? ENABLED : DISABLED);
     }
 }

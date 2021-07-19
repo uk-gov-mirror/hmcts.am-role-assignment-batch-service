@@ -251,28 +251,45 @@ public class BatchConfig extends DefaultBatchConfigurer {
     /**
      * Job will start and check for LD flag, In case LD flag is disabled it will end the JOB
      * otherwise will check or CCD migration flag, In case flag is enabled will process the CCD data to temp tables
-     * otherwise will check migration rename to live tables, In case flag is enabled will rename the temp tables to
+     * otherwise it will end the job.
+     *
+     * @return job
+    */
+    @Bean
+    public Job ccdToRasBatchJob() {
+        return jobs.get("ccd-am-migration")
+                .incrementer(new RunIdIncrementer())
+                .start(firstStep()) //Dummy step as Decider will work after Step
+                .next(checkLdStatus()).on(DISABLED).end(STOPPED)
+                .from(checkLdStatus()).on(ANY).to(checkCcdProcessStatus())
+                .from(checkCcdProcessStatus()).on(DISABLED).end(STOPPED)
+                .from(checkCcdProcessStatus()).on(ANY).to(processCcdDataToTempTablesFlow())
+                                                        .on(FAILED).end(FAILED)
+                                                        .on(ANY).end()
+                .end()
+                .build();
+    }
+
+    /**
+     * Job will start and check for LD flag, In case LD flag is disabled it will end the JOB
+     * otherwise will check migration rename to live tables flag, In case flag is enabled will rename the temp tables to
      * live tables otherwise it will end the job.
      *
      * @return job
      */
     @Bean
-    public Job ccdToRasBatchJob() {
-        return jobs.get("ccdToRasBatchJob")
+    public Job renameTableRasBatchJob() {
+        return jobs.get("ccd-am-migration-rename-tables")
                 .incrementer(new RunIdIncrementer())
                 .start(firstStep()) //Dummy step as Decider will work after Step
                 .next(checkLdStatus()).on(DISABLED).end(STOPPED)
-                .from(checkLdStatus()).on(ANY).to(checkCcdProcessStatus())
-                .from(checkCcdProcessStatus()).on(DISABLED).to(checkRenamingTablesStatus())
-                .from(checkCcdProcessStatus()).on(ANY).to(processCcdDataToTempTablesFlow())
-                                                        .on(FAILED).end(FAILED)
-                                                        .on(ANY).to(checkRenamingTablesStatus())
+                .from(checkLdStatus()).on(ANY).to(checkRenamingTablesStatus())
                 .from(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
                 .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
-                                                        .on(FAILED).end(FAILED)
-                                                        .on(ANY).end()
+                                                            .on(FAILED).end(FAILED)
+                                                            .on(ANY).end()
                 .end()
                 .build();
-
     }
+
 }
