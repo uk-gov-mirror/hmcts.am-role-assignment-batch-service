@@ -66,33 +66,33 @@ public class ReconcileDataTasklet implements Tasklet {
         Integer auditRecords = jdbcTemplate.queryForObject(ReconQuery.AUDIT_FAULTS_TOTAL_COUNT.getKey(), Integer.class);
         int totalCountFromRoleAssignment = reconDataService.populateTotalRecord(ReconQuery.AM_TOTAL_COUNT.getKey());
 
-        boolean status = true;
+        boolean jobPassed = true;
         String notes = "";
 
         if (auditRecords != null && auditRecords > 0) {
-            status = false;
+            jobPassed = false;
             notes = ReconQuery.CHECK_AUDIT_TABLE.getKey();
         }
 
         if (totalCountFromRoleAssignment != reconcileData.getTotalCountFromCcd()) {
-            status = false;
+            jobPassed = false;
             notes = notes.concat(ReconQuery.FAILED_STATUS.getKey());
         }
 
         if (!isJurisdictionDataEqual(BatchUtil.getObjectMapper(), amJurisdictionData, reconcileData)) {
-            status = false;
+            jobPassed = false;
             notes = notes.concat(ReconQuery.CHECK_JURISDICTION_DATA.getKey());
         }
 
         if (!isRoleDataEqual(BatchUtil.getObjectMapper(), amRoleNameData, reconcileData)) {
-            status = false;
+            jobPassed = false;
             notes = notes.concat(ReconQuery.CHECK_ROLENAME_DATA.getKey());
         }
 
-        setJobExitStatus(status, contribution);
+        setJobExitStatus(jobPassed, contribution);
 
         reconcileData.setTotalCountFromAm(totalCountFromRoleAssignment);
-        reconcileData.setStatus(status ? ReconQuery.PASSED.getKey() : ReconQuery.FAILED.getKey());
+        reconcileData.setStatus(jobPassed ? ReconQuery.PASSED.getKey() : ReconQuery.FAILED.getKey());
         reconcileData.setNotes(StringUtils.hasText(notes) ? notes : ReconQuery.SUCCESS_STATUS.getKey());
         reconDataService.saveReconciliationData(reconcileData);
 

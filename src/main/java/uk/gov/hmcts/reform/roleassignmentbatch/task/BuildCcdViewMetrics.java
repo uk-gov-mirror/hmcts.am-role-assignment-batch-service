@@ -45,6 +45,7 @@ public class BuildCcdViewMetrics implements Tasklet {
 
         List<Map<String, Object>> groupByCcdRoleName = reconDataService
             .groupByFieldNameAndCount(ReconQuery.GROUP_BY_CCD_CASE_ROLE.getKey());
+
         String ccdJurisdictionData = reconDataService
             .populateAsJsonData(groupByCcdJurisdiction, ReconQuery.CCD_JURISDICTION_KEY.getKey());
         String ccdRoleNameData = reconDataService
