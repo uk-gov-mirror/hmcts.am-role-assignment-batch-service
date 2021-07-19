@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ENABLED;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.FAILED;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
 
