@@ -114,7 +114,7 @@ public class ReconcileDataTasklet implements Tasklet {
 
     private boolean isJurisdictionDataEqual(ObjectMapper mapper, String amJurisdictionData,
                                             ReconciliationData reconcileData) throws JsonProcessingException {
-        log.info("am Jurisdiction Data");
+        log.info("AM Jurisdiction Data");
         log.info(String.valueOf(mapper.readTree(amJurisdictionData)));
         log.info("CCD Jurisdiction Data");
         log.info(String.valueOf(mapper.readTree(reconcileData.getCcdJurisdictionData())));
