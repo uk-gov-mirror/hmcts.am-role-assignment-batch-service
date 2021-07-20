@@ -78,4 +78,6 @@ public class Constants {
     public static final String NO_RECONCILIATION_DATA_FOUND = "No reconciliation data found for Job Id: %s";
     public static final String INVALID_ROLES = "The following roles are invalid : %s";
     public static final String INVALID_CASE_IDS = "The following caseIds is not of valid length: %s";
+    public static final String ERROR_BUILDIND_CCD_RECONCILIATION_DATA = "The total records do not match with sum(groupBy(jurisdiction/roleName))";
+    public static final String EMPTY_STRING = "";
 }

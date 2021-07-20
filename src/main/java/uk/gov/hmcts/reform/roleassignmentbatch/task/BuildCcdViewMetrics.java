@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -11,9 +12,11 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ReconQuery;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
+import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 
 @Slf4j
 @Component
@@ -46,6 +49,11 @@ public class BuildCcdViewMetrics implements Tasklet {
         List<Map<String, Object>> groupByCcdRoleName = reconDataService
             .groupByFieldNameAndCount(ReconQuery.GROUP_BY_CCD_CASE_ROLE.getKey());
 
+        String notes = Constants.EMPTY_STRING;
+
+        notes = notes.concat(validateCounts(groupByCcdJurisdiction, totalCountFromCcdView, contribution));
+        notes = notes.concat(validateCounts(groupByCcdRoleName, totalCountFromCcdView, contribution));
+
         String ccdJurisdictionData = reconDataService
             .populateAsJsonData(groupByCcdJurisdiction, ReconQuery.CCD_JURISDICTION_KEY.getKey());
         String ccdRoleNameData = reconDataService
@@ -57,12 +65,35 @@ public class BuildCcdViewMetrics implements Tasklet {
                               .ccdJurisdictionData(ccdJurisdictionData)
                               .ccdRoleNameData(ccdRoleNameData)
                               .totalCountFromCcd(totalCountFromCcdView)
-                              .status(ReconQuery.BATCH_IN_PROGRESS.getKey())
-                              .notes(ReconQuery.IN_PROGRESS.name())
+                              .status(StringUtils.hasText(notes) ? ReconQuery.FAILED.getKey() : ReconQuery.IN_PROGRESS.getKey())
+                              .notes(StringUtils.hasText(notes) ? notes : ReconQuery.IN_PROGRESS.name())
                               .build();
         reconDataService.saveReconciliationData(reconciliationData);
 
         log.info("CCD Reconciliation data built successfully");
         return RepeatStatus.FINISHED;
+    }
+
+    private String validateCounts(List<Map<String, Object>> groupByCcdFields,
+                                  int totalCountFromCcdView, StepContribution contribution) {
+        if (totalCountFromCcdView != getCounts(groupByCcdFields)) {
+            log.error(Constants.ERROR_BUILDIND_CCD_RECONCILIATION_DATA);
+            contribution.setExitStatus(ExitStatus.FAILED);
+            return Constants.ERROR_BUILDIND_CCD_RECONCILIATION_DATA;
+        }
+        return Constants.EMPTY_STRING;
+
+    }
+
+    private long getCounts(List<Map<String, Object>> list) {
+        return list.stream()
+                   .map(m -> m.values()
+                              .stream()
+                              .filter(Long.class::isInstance)
+                              .mapToLong(val -> (long) val)
+                              .sum())
+                   .mapToLong(Long::longValue)
+                   .sum();
+
     }
 }
