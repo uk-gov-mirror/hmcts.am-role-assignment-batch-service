@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AM_TABLES;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -8,7 +10,6 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AM_TABLES;
 
 @Component
 @Slf4j
@@ -60,6 +61,7 @@ public class ReplicateTablesTasklet implements Tasklet {
         log.info("Creating audit_faults Table");
         jdbcTemplate
             .update("CREATE TABLE audit_faults (id int8 NOT NULL,"
+                    + "created_date timestamp not null DEFAULT (current_timestamp AT TIME ZONE 'UTC'),"
                     + "failed_at varchar NULL,"
                     + "reason varchar NULL,"
                     + "ccd_users varchar NULL,"
