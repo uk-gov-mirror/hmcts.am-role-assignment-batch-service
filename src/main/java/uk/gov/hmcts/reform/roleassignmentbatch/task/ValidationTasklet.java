@@ -13,10 +13,10 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.roleassignmentbatch.config.ConfigurationBeans;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.AuditOperationType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
+import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.CcdViewRowMapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.JacksonUtils;
 
 @Component
@@ -29,13 +29,16 @@ public class ValidationTasklet implements Tasklet {
     @Autowired
     private JdbcBatchItemWriter<AuditFaults> auditWriter;
 
+    @Autowired
+    CcdViewRowMapper ccdViewRowMapper;
+
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         log.info("Validating CcdCaseUsers ");
         List<CcdCaseUser> ccdCaseUsers = jdbcTemplate.query("select id,case_data_id,user_id,case_role,jurisdiction,"
                 + "case_type,role_category,begin_date from ccd_view where case_data_id is null or user_id is null "
                 + "or case_role is null or jurisdiction is null or case_type is null or role_category is null or "
-                + "begin_date is null limit 100",  new ConfigurationBeans.CcdViewRowMapper());
+                + "begin_date is null limit 100",  ccdViewRowMapper);
         if (!ccdCaseUsers.isEmpty()) {
             log.warn("Validation CcdCaseUsers was skipped due to NULLS: " + ccdCaseUsers);
             var auditFaults = AuditFaults.builder()
