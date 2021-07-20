@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalLong;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
@@ -91,9 +92,8 @@ public class BuildCcdViewMetrics implements Tasklet {
                                   .stream()
                                   .filter(Long.class::isInstance)
                                   .mapToLong(val -> (long) val)
-                                  .sum())
-                   .mapToLong(Long::longValue)
+                                  .findFirst())
+                   .mapToLong(OptionalLong::getAsLong)
                    .sum();
-
     }
 }
