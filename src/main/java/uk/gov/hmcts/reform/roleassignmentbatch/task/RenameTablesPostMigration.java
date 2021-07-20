@@ -21,6 +21,7 @@ public class RenameTablesPostMigration implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         if (jdbcTemplate.queryForObject("SELECT to_regclass('replica_role_assignment');",String.class) == null) {
+            log.warn("Replica tables are not available to rename, Please run Migration job first.");
             contribution.setExitStatus(new ExitStatus("FAILED", "Replica Tables not exist"));
         } else {
             dropTables();

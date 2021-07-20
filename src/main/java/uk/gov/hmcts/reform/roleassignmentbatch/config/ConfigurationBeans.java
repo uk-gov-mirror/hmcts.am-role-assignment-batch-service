@@ -8,8 +8,6 @@ import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.JURISDICTIO
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ROLE_CATEGORY;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.USER_ID;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -34,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.PathResource;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
@@ -42,6 +39,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentEntity;
+import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.CcdViewRowMapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 
 @Component
@@ -130,7 +128,7 @@ public class ConfigurationBeans {
     }
 
     @Bean
-    public JdbcPagingItemReader<CcdCaseUser> databaseItemReader() {
+    public JdbcPagingItemReader<CcdCaseUser> databaseItemReader(@Autowired CcdViewRowMapper ccdViewRowMapper) {
         Map<String, Object> parameterValues = new HashMap<>();
         parameterValues.put("status", "NEW");
 
@@ -139,7 +137,7 @@ public class ConfigurationBeans {
             .dataSource(dataSource)
             .queryProvider(queryProvider)
             //.parameterValues(parameterValues)
-            .rowMapper(new CcdViewRowMapper())
+            .rowMapper(ccdViewRowMapper)
             .saveState(false)
             .pageSize(chunkSize)
             .build();
@@ -157,23 +155,6 @@ public class ConfigurationBeans {
         provider.setDataSource(dataSource);
 
         return provider;
-    }
-
-    public class CcdViewRowMapper implements RowMapper<CcdCaseUser> {
-
-        @Override
-        public CcdCaseUser mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-            CcdCaseUser ccdCaseUser = new CcdCaseUser();
-            ccdCaseUser.setCaseDataId(rs.getString(CASE_DATA_ID));
-            ccdCaseUser.setUserId(rs.getString(USER_ID));
-            ccdCaseUser.setCaseRole(rs.getString(CASE_ROLE));
-            ccdCaseUser.setCaseType(rs.getString(CASE_TYPE));
-            ccdCaseUser.setBeginDate(rs.getString(BEGIN_DATE));
-            ccdCaseUser.setRoleCategory(rs.getString(ROLE_CATEGORY));
-            ccdCaseUser.setJurisdiction(rs.getString(JURISDICTION));
-            return ccdCaseUser;
-        }
     }
 
     @Bean
