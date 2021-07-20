@@ -87,11 +87,11 @@ public class BuildCcdViewMetrics implements Tasklet {
 
     private long getCounts(List<Map<String, Object>> list) {
         return list.stream()
-                   .map(m -> m.values()
-                              .stream()
-                              .filter(Long.class::isInstance)
-                              .mapToLong(val -> (long) val)
-                              .sum())
+                   .map(map -> map.values()
+                                  .stream()
+                                  .filter(Long.class::isInstance)
+                                  .mapToLong(val -> (long) val)
+                                  .sum())
                    .mapToLong(Long::longValue)
                    .sum();
 
