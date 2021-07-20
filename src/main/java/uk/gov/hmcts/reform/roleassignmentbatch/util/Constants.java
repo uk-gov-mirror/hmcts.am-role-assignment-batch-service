@@ -60,15 +60,22 @@ public class Constants {
         + ":attributes::jsonb, :beginTime)";
 
     public static final String GET_RECONCILIATION_DATA = "select * from reconciliation_data where run_id =?";
-    public static final String NO_RECONCILIATION_DATA_FOUND = "No reconciliation data found for Job Id: %s";
 
+    public static final String CCD_RECORDS_HAVING_NULL_FIELDS = "select id,case_data_id,user_id,case_role,"
+        + "jurisdiction,case_type,role_category,begin_date from ccd_view where case_data_id is null "
+        + "or case_role is null or jurisdiction is null or case_type is null or role_category is null or "
+        + "begin_date is null or user_id is null limit 100";
+
+    public static final String INSERT_INTO_ACTOR_CACHE = "insert into replica_actor_cache_control"
+                                                         + " (actor_id, etag,json_response)"
+        + " select distinct(actor_id),0, '{}'::jsonb from replica_role_assignment;";
+
+    public static final String QUERY_INVALID_CASE_IDS = "SELECT distinct (case_data_id) FROM ccd_view"
+                                                        + " WHERE LENGTH(case_data_id) != 16 LIMIT 100";
+    public static final String DISTINCT_CASE_ROLES_FROM_CCD = "select distinct (case_role) from ccd_view";
+
+
+    public static final String NO_RECONCILIATION_DATA_FOUND = "No reconciliation data found for Job Id: %s";
     public static final String INVALID_ROLES = "The following roles are invalid : %s";
     public static final String INVALID_CASE_IDS = "The following caseIds is not of valid length: %s";
-    public static final String CCD_RECORDS_HAVING_NULL_FIELDS = "select id,case_data_id,user_id,case_role,jurisdiction,"
-        + "case_type,role_category,begin_date from ccd_view where case_data_id is null or user_id is null "
-        + "or case_role is null or jurisdiction is null or case_type is null or role_category is null or "
-        + "begin_date is null limit 100";
-
-    public static final String QUERY_INVALID_CASE_IDS = "SELECT distinct (case_data_id) FROM ccd_view WHERE LENGTH(case_data_id) != 16 LIMIT 100";
-    public static final String DISTINCT_CASE_ROLES_FROM_CCD = "select distinct (case_role) from ccd_view";
 }
