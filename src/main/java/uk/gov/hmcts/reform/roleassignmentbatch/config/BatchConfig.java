@@ -39,6 +39,8 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.WriteToActorCacheTableTasklet;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.BeforeMigration;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.AfterMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.CcdViewWriterTemp;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
@@ -95,6 +97,12 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Autowired
     ValidationTasklet validationTasklet;
+
+    @Autowired
+    BeforeMigration beforeMigration;
+
+    @Autowired
+    AfterMigration afterMigration;
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
@@ -179,6 +187,20 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    public Step beforeMigrationReconStep() {
+        return steps.get("beforeMigrationReconStep")
+                .tasklet(beforeMigration)
+                .build();
+    }
+
+    @Bean
+    public Step afterMigrationReconStep() {
+        return steps.get("afterMigrationReconStep")
+                .tasklet(afterMigration)
+                .build();
+    }
+
+    @Bean
     public Step ccdToRasStep() {
         return steps.get("ccdToRasStep")
                     .<CcdCaseUser, EntityWrapper>chunk(chunkSize)
@@ -242,11 +264,15 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .next(injectDataIntoView())
             .next(validationStep())
             .next(buildCCdViewMetricsStep())
+            .next(beforeMigrationReconStep())
             .next(ccdToRasStep())
             .next(writeToActorCache())
             .next(reconcileData())
+            .next(afterMigrationReconStep())
             .build();
     }
+
+
 
     /**
      * Job will start and check for LD flag, In case LD flag is disabled it will end the JOB
