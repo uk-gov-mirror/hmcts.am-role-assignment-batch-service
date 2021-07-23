@@ -32,15 +32,15 @@ import uk.gov.hmcts.reform.roleassignmentbatch.ApplicationParams;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.AfterMigration;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.BeforeMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BuildCcdViewMetrics;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.InsertDataPostMigrationTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReconcileDataTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.WriteToActorCacheTableTasklet;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.BeforeMigration;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.AfterMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.CcdViewWriterTemp;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
@@ -90,7 +90,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     RenameTablesPostMigration renameTablesPostMigration;
 
     @Autowired
-    WriteToActorCacheTableTasklet writeToActorCacheTableTasklet;
+    InsertDataPostMigrationTasklet insertDataPostMigrationTasklet;
 
     @Autowired
     ReconcileDataTasklet reconcileDataTasklet;
@@ -173,9 +173,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public Step writeToActorCache() {
-        return steps.get("writeToActorCache")
-                    .tasklet(writeToActorCacheTableTasklet)
+    public Step insertDataPostMigrationStep() {
+        return steps.get("insertDataPostMigrationTasklet")
+                    .tasklet(insertDataPostMigrationTasklet)
                     .build();
     }
 
@@ -266,9 +266,9 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .next(buildCCdViewMetricsStep())
             .next(beforeMigrationReconStep())
             .next(ccdToRasStep())
-            .next(writeToActorCache())
             .next(reconcileData())
             .next(afterMigrationReconStep())
+            .next(insertDataPostMigrationStep())
             .build();
     }
 
