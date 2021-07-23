@@ -133,8 +133,8 @@ public class EmailServiceImpl implements EmailService {
         templateMap.put("createdDate", reconData.getCreatedDate());
         templateMap.put("ccdJurisdictionData", reconData.getCcdJurisdictionData());
         templateMap.put("ccdRoleNameData", reconData.getCcdRoleNameData());
-        templateMap.put("amJurisdictionData", reconData.getAmJurisdictionData());
-        templateMap.put("amRoleNameData", reconData.getAmRoleNameData());
+        templateMap.put("amJurisdictionData", reconData.getReplicaAmJurisdictionData());
+        templateMap.put("amRoleNameData", reconData.getReplicaAmRoleNameData());
         templateMap.put("totalCountFromCcd", reconData.getTotalCountFromCcd());
         templateMap.put("totalCountFromAm", reconData.getTotalCountFromAm());
         templateMap.put("status", reconData.getStatus());

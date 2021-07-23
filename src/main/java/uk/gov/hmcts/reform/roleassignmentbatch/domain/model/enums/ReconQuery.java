@@ -18,16 +18,16 @@ public enum ReconQuery {
                           + " group by role_name order by role_name"),
 
     INSERT_RECONCILIATION_QUERY("insert into reconciliation_data (run_id, ccd_jurisdiction_data,"
-                                + "ccd_role_name_data,am_jurisdiction_data"
-                                + ",am_role_name_data,total_count_from_ccd,"
-                                + " total_count_from_am,status,notes)"
+                                + "ccd_role_name_data,replica_am_jurisdiction_data"
+                                + ",replica_am_role_name_data,total_count_from_ccd,"
+                                + " total_count_from_replica_am,status,notes)"
                                 + " values (?, ?,?,?,?,?,?,?,?) on conflict (run_id) do update "
                                 + "set ccd_jurisdiction_data = EXCLUDED.ccd_jurisdiction_data, "
                                 + "ccd_role_name_data = EXCLUDED.ccd_role_name_data,"
-                                + "am_jurisdiction_data = EXCLUDED.am_jurisdiction_data,"
-                                + "am_role_name_data = EXCLUDED.am_role_name_data,"
+                                + "replica_am_jurisdiction_data = EXCLUDED.replica_am_jurisdiction_data,"
+                                + "replica_am_role_name_data = EXCLUDED.replica_am_role_name_data,"
                                 + "total_count_from_ccd = EXCLUDED.total_count_from_ccd,"
-                                + "total_count_from_am = EXCLUDED.total_count_from_am,"
+                                + "total_count_from_replica_am = EXCLUDED.total_count_from_replica_am,"
                                 + "status = EXCLUDED.status,"
                                 + "notes = EXCLUDED.notes;"),
 

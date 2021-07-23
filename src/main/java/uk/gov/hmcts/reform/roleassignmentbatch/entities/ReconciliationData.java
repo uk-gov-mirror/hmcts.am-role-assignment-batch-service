@@ -34,16 +34,16 @@ public class ReconciliationData {
     @Column(name = "ccd_role_name_data", nullable = false, columnDefinition = "jsonb")
     private String ccdRoleNameData;
 
-    @Column(name = "am_jurisdiction_data", nullable = false, columnDefinition = "jsonb")
-    private String amJurisdictionData;
+    @Column(name = "replica_am_jurisdiction_data", nullable = false, columnDefinition = "jsonb")
+    private String replicaAmJurisdictionData;
 
     @Column(name = "am_role_name_data", nullable = false, columnDefinition = "jsonb")
-    private String amRoleNameData;
+    private String replicaAmRoleNameData;
 
     @Column(name = "total_count_from_ccd", nullable = false, columnDefinition = "jsonb")
     private int totalCountFromCcd;
 
-    @Column(name = "total_count_from_am", nullable = false, columnDefinition = "jsonb")
+    @Column(name = "total_count_from_replica_am", nullable = false, columnDefinition = "jsonb")
     private int totalCountFromAm;
 
     @Column(name = "status", nullable = false)

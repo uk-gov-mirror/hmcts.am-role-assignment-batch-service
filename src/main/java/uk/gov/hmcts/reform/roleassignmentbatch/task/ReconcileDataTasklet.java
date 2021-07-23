@@ -36,7 +36,7 @@ public class ReconcileDataTasklet implements Tasklet {
      * Reconciliation Logic with below steps.
      * 1. Ccd_view count is validate against am_role_assgnment table.
      * 2. If both count does not match then status ccolumn updated with Failed in Reconciliation_data table
-     * 3. ccd_jurisdiction_data,ccd_role_name_data,am_jurisdiction_data,am_role_name_data
+     * 3. ccd_jurisdiction_data,ccd_role_name_data,replica_am_jurisdiction_data,replica_am_role_name_data
      * updated with grouing by role and total record
      * 4. Migration job status is updated with Failed status if there is any record in Audit_table.
      */
@@ -65,8 +65,8 @@ public class ReconcileDataTasklet implements Tasklet {
             throw new NoReconciliationDataFound(String.format(Constants.NO_RECONCILIATION_DATA_FOUND, jobId));
         }
 
-        reconcileData.setAmJurisdictionData(amJurisdictionData);
-        reconcileData.setAmRoleNameData(amRoleNameData);
+        reconcileData.setReplicaAmJurisdictionData(amJurisdictionData);
+        reconcileData.setReplicaAmRoleNameData(amRoleNameData);
 
         Integer auditRecords = jdbcTemplate.queryForObject(ReconQuery.AUDIT_FAULTS_TOTAL_COUNT.getKey(), Integer.class);
         int totalCountFromRoleAssignment = reconDataService.populateTotalRecord(ReconQuery.AM_TOTAL_COUNT.getKey());

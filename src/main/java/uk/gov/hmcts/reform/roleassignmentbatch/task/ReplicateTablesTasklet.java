@@ -45,10 +45,10 @@ public class ReplicateTablesTasklet implements Tasklet {
                              + "created_date timestamp not null DEFAULT (current_timestamp AT TIME ZONE 'UTC'),"
                              + "ccd_jurisdiction_data jsonb,"
                              + "ccd_role_name_data jsonb,"
-                             + "am_jurisdiction_data jsonb,"
-                             + "am_role_name_data jsonb,"
+                             + "replica_am_jurisdiction_data jsonb,"
+                             + "replica_am_role_name_data jsonb,"
                              + "total_count_from_ccd int8,"
-                             + "total_count_from_am int8,"
+                             + "total_count_from_replica_am int8,"
                              + "status varchar,"
                              + "notes varchar"
                              + ")");
@@ -84,13 +84,6 @@ public class ReplicateTablesTasklet implements Tasklet {
         jdbcTemplate.update("ALTER TABLE replica_role_assignment_history"
                             + " ADD CONSTRAINT fk_role_assignment_history_role_assignment_request"
                             + " FOREIGN KEY (request_id) REFERENCES replica_role_assignment_request(id);");
-
-      /*  log.info("Insert data from current tables to Replicas");
-        jdbcTemplate.update("INSERT into replica_actor_cache_control(SELECT * FROM actor_cache_control);");
-        jdbcTemplate.update("INSERT into replica_role_assignment(SELECT * FROM role_assignment);");
-        jdbcTemplate.update("INSERT into replica_role_assignment_request(SELECT * FROM role_assignment_request);");
-        jdbcTemplate.update("INSERT into replica_role_assignment_history(SELECT * FROM role_assignment_history);");
-        log.info("Data insertion from Current tables to replicas is complete");*/
 
         return RepeatStatus.FINISHED;
     }
