@@ -124,7 +124,9 @@ public class ReconciliationDataService {
                 reconciliationData.getTotalCountFromCcd(),
                 reconciliationData.getTotalCountFromAm(),
                 reconciliationData.getStatus(),
-                reconciliationData.getNotes());
+                reconciliationData.getNotes(),
+                reconciliationData.getAmRecordsBeforeMigration(),
+                reconciliationData.getAmRecordsAfterMigration());
         log.info("Reconciliation data is saved successfully. Please refer final result in Reconciliation_Data table.");
         return success;
     }

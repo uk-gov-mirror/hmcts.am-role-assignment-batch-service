@@ -42,6 +42,28 @@
         </tbody>
     </table>
 
+    <table class="table table-bordered table-striped tbale-dark">
+
+        <thead class="thead-dark">
+        <tr>
+            <th>RUN_ID</th>
+            <th>CREATED_DATE</th>
+            <th>AM_RECORDS_BEFORE_MIGRATION</th>
+            <th>AM_RECORDS_AFTER_MIGRATION</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td th:text="${runId}"/>
+            <td th:text="${createdDate}"/>
+            <td th:text="${amRecordsBeforeMigration}"/>
+            <td th:text="${amRecordsAfterMigration}"/>
+        </tr>
+        </tbody>
+    </table>
+
+
     <b>Regards,<br>Access Management</br></b>
     </br>
 </head>

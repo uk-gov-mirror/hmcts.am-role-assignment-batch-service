@@ -51,4 +51,10 @@ public class ReconciliationData {
 
     @Column(name = "notes", nullable = false)
     private String notes;
+
+    @Column(name = "am_records_before_migration", nullable = false)
+    private String amRecordsBeforeMigration;
+
+    @Column(name = "am_records_after_migration", nullable = false)
+    private String amRecordsAfterMigration;
 }

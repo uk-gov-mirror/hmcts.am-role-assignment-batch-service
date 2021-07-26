@@ -67,6 +67,8 @@ public class ReconcileDataTasklet implements Tasklet {
 
         reconcileData.setReplicaAmJurisdictionData(amJurisdictionData);
         reconcileData.setReplicaAmRoleNameData(amRoleNameData);
+        // This data should be set after the table rename.
+        // reconcileData.setAmRecordsAfterMigration(BatchUtil.getAmRecordsCount(jdbcTemplate));
 
         Integer auditRecords = jdbcTemplate.queryForObject(ReconQuery.AUDIT_FAULTS_TOTAL_COUNT.getKey(), Integer.class);
         int totalCountFromRoleAssignment = reconDataService.populateTotalRecord(ReconQuery.AM_TOTAL_COUNT.getKey());

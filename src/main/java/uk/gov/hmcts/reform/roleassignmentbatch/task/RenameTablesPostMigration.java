@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_TABLE_RENAME;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AM_TABLES;
+
+import com.sendgrid.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
@@ -9,7 +13,12 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AM_TABLES;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
+import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.ReconciliationMapper;
+import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
+import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
+import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
+import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 
 @Component
 @Slf4j
@@ -17,6 +26,12 @@ public class RenameTablesPostMigration implements Tasklet {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    EmailService emailService;
+
+    @Autowired
+    ReconciliationDataService reconciliationDataService;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
@@ -27,8 +42,22 @@ public class RenameTablesPostMigration implements Tasklet {
             dropTables();
             renameTables();
             createIndexes();
+            sendEmailAfterRenamingTables(contribution);
         }
         return RepeatStatus.FINISHED;
+    }
+
+    private void sendEmailAfterRenamingTables(StepContribution contribution) {
+        String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
+
+        ReconciliationData reconcileData = jdbcTemplate.queryForObject(Constants.GET_LATEST_RECONCILIATION_DATA,
+                                                                       new ReconciliationMapper());
+        reconcileData.setAmRecordsAfterMigration(BatchUtil.getAmRecordsCount(jdbcTemplate));
+        reconciliationDataService.saveReconciliationData(reconcileData);
+        Response response = emailService.sendEmail(jobId, AFTER_TABLE_RENAME);
+        if (response != null) {
+            log.info("After Table Rename - Reconciliation Status mail has been sent to target recipients");
+        }
     }
 
     private void createIndexes() {

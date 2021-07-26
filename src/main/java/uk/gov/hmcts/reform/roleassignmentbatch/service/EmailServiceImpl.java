@@ -1,5 +1,10 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.service;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -24,11 +29,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.exception.EmailSendFailedExceptio
 import uk.gov.hmcts.reform.roleassignmentbatch.exception.NoReconciliationDataFound;
 import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.ReconciliationMapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class sends emails to intended recipients for ccd migration process
@@ -122,8 +122,8 @@ public class EmailServiceImpl implements EmailService {
      * @return
      */
     private String buildThymeleafTemplate(String runId) {
-        ReconciliationData reconData = jdbcTemplate.queryForObject(Constants.GET_RECONCILIATION_DATA,
-                new ReconciliationMapper(), runId);
+        ReconciliationData reconData = jdbcTemplate.queryForObject(Constants.GET_LATEST_RECONCILIATION_DATA,
+                new ReconciliationMapper());
         if (reconData == null) {
             throw new NoReconciliationDataFound(String.format(Constants.NO_RECONCILIATION_DATA_FOUND, runId));
         }
@@ -139,6 +139,8 @@ public class EmailServiceImpl implements EmailService {
         templateMap.put("totalCountFromAm", reconData.getTotalCountFromAm());
         templateMap.put("status", reconData.getStatus());
         templateMap.put("notes", reconData.getNotes());
+        templateMap.put("amRecordsBeforeMigration", reconData.getAmRecordsBeforeMigration());
+        templateMap.put("amRecordsAfterMigration", reconData.getAmRecordsAfterMigration());
         context.setVariables(templateMap);
         return templateEngine.process("email.html", context);
     }

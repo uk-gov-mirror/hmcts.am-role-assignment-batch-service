@@ -25,6 +25,8 @@ public class ReconciliationMapper implements RowMapper<ReconciliationData> {
                                  .totalCountFromAm(rs.getInt("total_count_from_replica_am"))
                                  .status(rs.getString("status"))
                                  .notes(rs.getString("notes"))
+                                 .amRecordsBeforeMigration(rs.getString("am_records_before_migration"))
+                                 .amRecordsAfterMigration(rs.getString("am_records_after_migration"))
                                  .build();
 
 

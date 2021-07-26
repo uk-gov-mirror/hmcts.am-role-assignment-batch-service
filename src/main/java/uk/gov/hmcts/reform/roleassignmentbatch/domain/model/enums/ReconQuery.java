@@ -20,8 +20,9 @@ public enum ReconQuery {
     INSERT_RECONCILIATION_QUERY("insert into reconciliation_data (run_id, ccd_jurisdiction_data,"
                                 + "ccd_role_name_data,replica_am_jurisdiction_data"
                                 + ",replica_am_role_name_data,total_count_from_ccd,"
-                                + " total_count_from_replica_am,status,notes)"
-                                + " values (?, ?,?,?,?,?,?,?,?) on conflict (run_id) do update "
+                                + " total_count_from_replica_am,status,notes,"
+                                + "am_records_before_migration,am_records_after_migration)"
+                                + " values (?, ?,?,?,?,?,?,?,?,?,?) on conflict (run_id) do update "
                                 + "set ccd_jurisdiction_data = EXCLUDED.ccd_jurisdiction_data, "
                                 + "ccd_role_name_data = EXCLUDED.ccd_role_name_data,"
                                 + "replica_am_jurisdiction_data = EXCLUDED.replica_am_jurisdiction_data,"
@@ -29,6 +30,8 @@ public enum ReconQuery {
                                 + "total_count_from_ccd = EXCLUDED.total_count_from_ccd,"
                                 + "total_count_from_replica_am = EXCLUDED.total_count_from_replica_am,"
                                 + "status = EXCLUDED.status,"
+                                + "am_records_after_migration = EXCLUDED.am_records_after_migration,"
+                                + "am_records_before_migration = EXCLUDED.am_records_before_migration,"
                                 + "notes = EXCLUDED.notes;"),
 
     CCD_JURISDICTION_KEY("jurisdiction"),

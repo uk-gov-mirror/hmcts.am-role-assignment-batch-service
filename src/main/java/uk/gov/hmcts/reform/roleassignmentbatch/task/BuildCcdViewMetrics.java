@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ReconQuery;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
+import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 
 @Slf4j
@@ -67,6 +68,7 @@ public class BuildCcdViewMetrics implements Tasklet {
                               .ccdRoleNameData(ccdRoleNameData)
                               .totalCountFromCcd(totalCountFromCcdView)
                               .status(StringUtils.hasText(notes) ? ReconQuery.FAILED.getKey() : ReconQuery.IN_PROGRESS.getKey())
+                              .amRecordsBeforeMigration(BatchUtil.getAmRecordsCount(jdbcTemplate))
                               .notes(StringUtils.hasText(notes) ? notes : ReconQuery.IN_PROGRESS.name())
                               .build();
         reconDataService.saveReconciliationData(reconciliationData);

@@ -49,6 +49,8 @@ public class ReplicateTablesTasklet implements Tasklet {
                              + "replica_am_role_name_data jsonb,"
                              + "total_count_from_ccd int8,"
                              + "total_count_from_replica_am int8,"
+                             + "am_records_before_migration varchar,"
+                             + "am_records_after_migration varchar,"
                              + "status varchar,"
                              + "notes varchar"
                              + ")");

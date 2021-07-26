@@ -60,6 +60,8 @@ public class Constants {
         + ":attributes::jsonb, :beginTime)";
 
     public static final String GET_RECONCILIATION_DATA = "select * from reconciliation_data where run_id =?";
+    public static final String GET_LATEST_RECONCILIATION_DATA = "select * from reconciliation_data rd where run_id"
+                                                                + " = (select max(run_id) from reconciliation_data rd2) ;";
 
     public static final String CCD_RECORDS_HAVING_NULL_FIELDS = "select id,case_data_id,user_id,case_role,"
         + "jurisdiction,case_type,role_category,begin_date from ccd_view where case_data_id is null "
@@ -73,6 +75,10 @@ public class Constants {
     public static final String QUERY_INVALID_CASE_IDS = "SELECT distinct (case_data_id) FROM ccd_view"
                                                         + " WHERE LENGTH(case_data_id) != 16 LIMIT 100";
     public static final String DISTINCT_CASE_ROLES_FROM_CCD = "select distinct (case_role) from ccd_view";
+    public static final String COUNT_AM_ROLE_ASSIGNMENT_TABLE = "select count (*) from role_assignment";
+    public static final String COUNT_AM_HISTORY_TABLE = "select count (*) from role_assignment_history";
+    public static final String COUNT_AM_REQUEST_TABLE = "select count (*) from role_assignment_request";
+    public static final String COUNT_ACTOR_CACHE_TABLE = "select count (*) from actor_cache_control";
 
 
     public static final String NO_RECONCILIATION_DATA_FOUND = "No reconciliation data found for Job Id: %s";
@@ -82,4 +88,5 @@ public class Constants {
     public static final String EMPTY_STRING = "";
     public static final String BEFORE_CCD_MIGRATION = "Before CCD Migration - Reconciliation Status";
     public static final String AFTER_CCD_MIGRATION = "After CCD Migration - Reconciliation Status";
+    public static final String AFTER_TABLE_RENAME = "After Table Rename - Reconciliation Status";
 }
