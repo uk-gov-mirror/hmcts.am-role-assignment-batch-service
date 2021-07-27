@@ -40,14 +40,17 @@ public class ValidationTasklet implements Tasklet {
     @Value("${csv-file-path}")
     String filePath;
     @Value("${ccd.roleNames}")
-    List<String> roleMappings;
+    List<String> configRoleMappings;
+    @Value("${ccd.roleCategories}")
+    List<String> configRoleCategories;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         log.info("Validating CcdCaseUsers");
         performNullChecksOnCcdFields(contribution);
         validateCaseId(contribution);
-        validateRoleMappings(roleMappings, contribution);
+        validateRoleMappings(contribution);
+        validateRoleType(contribution);
         log.info("Validating CcdCaseUsers is complete.");
         return RepeatStatus.FINISHED;
     }
@@ -76,14 +79,26 @@ public class ValidationTasklet implements Tasklet {
         }
     }
 
-    protected void validateRoleMappings(List<String> roleMappings, StepContribution contribution) throws Exception {
+    protected void validateRoleMappings(StepContribution contribution) throws Exception {
         List<String> ccdViewRoles = jdbcTemplate.query(
             Constants.DISTINCT_CASE_ROLES_FROM_CCD, (rs, rowNum) -> rs.getString(1));
 
-        if (!isASubsetOf(roleMappings, ccdViewRoles)) {
-            List<String> invalidRoles = findDifferences(roleMappings, ccdViewRoles);
+        if (!isASubsetOf(configRoleMappings, ccdViewRoles)) {
+            List<String> invalidRoles = findDifferences(configRoleMappings, ccdViewRoles);
             log.error(String.format(Constants.INVALID_ROLES, invalidRoles));
             persistFaults(invalidRoles, Constants.INVALID_ROLES);
+            contribution.setExitStatus(ExitStatus.FAILED);
+        }
+    }
+
+    protected void validateRoleType(StepContribution contribution) throws Exception {
+        List<String> ccdRoleCategories = jdbcTemplate.query(
+            Constants.DISTINCT_ROLE_CATEGORY_FROM_CCD, (rs, rowNum) -> rs.getString(1));
+
+        if (!isASubsetOf(configRoleCategories, ccdRoleCategories)) {
+            List<String> invalidRoles = findDifferences(configRoleCategories, ccdRoleCategories);
+            log.error(String.format(Constants.INVALID_ROLE_CATEGORIES, invalidRoles));
+            persistFaults(invalidRoles, Constants.INVALID_ROLE_CATEGORIES);
             contribution.setExitStatus(ExitStatus.FAILED);
         }
     }

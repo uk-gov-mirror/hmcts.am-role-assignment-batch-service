@@ -76,6 +76,7 @@ public class Constants {
     public static final String QUERY_INVALID_CASE_IDS = "SELECT distinct (case_data_id) FROM ccd_view"
                                                         + " WHERE LENGTH(case_data_id) != 16 LIMIT 100";
     public static final String DISTINCT_CASE_ROLES_FROM_CCD = "select distinct (case_role) from ccd_view";
+    public static final String DISTINCT_ROLE_CATEGORY_FROM_CCD = "select distinct (role_category) from ccd_view";
     public static final String COUNT_AM_ROLE_ASSIGNMENT_TABLE = "select count (*) from role_assignment";
     public static final String COUNT_AM_HISTORY_TABLE = "select count (*) from role_assignment_history";
     public static final String COUNT_AM_REQUEST_TABLE = "select count (*) from role_assignment_request";
@@ -91,7 +92,8 @@ public class Constants {
                                                         + " role_assignment_history) on conflict do nothing;";
 
     public static final String NO_RECONCILIATION_DATA_FOUND = "No reconciliation data found for Job Id: %s";
-    public static final String INVALID_ROLES = "The following roles are invalid : %s";
+    public static final String INVALID_ROLES = "The following roles are invalid : ";
+    public static final String INVALID_ROLE_CATEGORIES = "The following role categories are invalid : ";
     public static final String INVALID_CASE_IDS = "The following caseIds is not of valid length: %s";
     public static final String ERROR_BUILDIND_CCD_RECONCILIATION_DATA =
         "The total records do not match with sum(groupBy(jurisdiction/roleName))";
