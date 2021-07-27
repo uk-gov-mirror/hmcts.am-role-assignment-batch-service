@@ -75,10 +75,15 @@ public class ReconcileDataTasklet implements Tasklet {
 
         boolean jobPassed = true;
         String notes = "";
-
+        int currentCountFromCcdView = reconDataService.populateTotalRecord(ReconQuery.CCD_TOTAL_COUNT.getKey());
+        if (currentCountFromCcdView != reconcileData.getTotalCountFromCcd()) {
+            jobPassed = false;
+            notes = String.format(ReconQuery.CCD_VIEW_MODIFIED.getKey(),
+                                  reconcileData.getTotalCountFromCcd(), currentCountFromCcdView);
+        }
         if (auditRecords != null && auditRecords > 0) {
             jobPassed = false;
-            notes = ReconQuery.CHECK_AUDIT_TABLE.getKey();
+            notes = notes.concat(ReconQuery.CHECK_AUDIT_TABLE.getKey());
         }
 
         if (totalCountFromRoleAssignment != reconcileData.getTotalCountFromCcd()) {

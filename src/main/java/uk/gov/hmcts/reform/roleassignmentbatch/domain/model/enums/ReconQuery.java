@@ -45,6 +45,8 @@ public enum ReconQuery {
     SUCCESS_STATUS("Total Record are matching from both ccd_view and am_role_assignment table."),
     FAILED_STATUS("Total Record are NOT matching from both ccd_view and am_role_assignment table."),
     CHECK_AUDIT_TABLE("There is some failure. Please check the Audit table"),
+    CCD_VIEW_MODIFIED("The CCD view has been modified during the migration."
+                      + " Initial records were %s, and current records are %s"),
     CHECK_JURISDICTION_DATA("There is some failure. Please check the Jurisdiction Data."),
     MIGRATION_JOB_FAILED("CCD Migration job has failed. Please check Audit_Fault/reconciliation_data table"),
     CHECK_ROLENAME_DATA("There is some failure. Please check the Role Name Data."),
