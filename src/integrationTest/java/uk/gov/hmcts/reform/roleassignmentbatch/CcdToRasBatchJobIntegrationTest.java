@@ -1,5 +1,18 @@
 package uk.gov.hmcts.reform.roleassignmentbatch;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ENABLED;
+
+import java.sql.ResultSet;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javax.sql.DataSource;
+
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,21 +35,6 @@ import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.launchdarkly.FeatureConditionEvaluator;
-
-import javax.sql.DataSource;
-
-import java.sql.ResultSet;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ENABLED;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
 
 @SpringBootTest
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -61,7 +59,7 @@ public class CcdToRasBatchJobIntegrationTest extends BaseTest {
             + " read_skip_count, write_skip_count, process_skip_count, exit_code, exit_message "
             + "FROM public.batch_step_execution where job_execution_id=?";
 
-    private static final String CCD_AM_JOB = "ccdToRasBatchJob";
+    private static final String CCD_AM_JOB = "ccd-am-migration";
 
     @Autowired
     private DataSource ds;

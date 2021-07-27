@@ -67,7 +67,8 @@ public class BuildCcdViewMetrics implements Tasklet {
                               .ccdJurisdictionData(ccdJurisdictionData)
                               .ccdRoleNameData(ccdRoleNameData)
                               .totalCountFromCcd(totalCountFromCcdView)
-                              .status(StringUtils.hasText(notes) ? ReconQuery.FAILED.getKey() : ReconQuery.IN_PROGRESS.getKey())
+                              .status(StringUtils.hasText(notes) ? ReconQuery.FAILED.getKey()
+                                                                 : ReconQuery.IN_PROGRESS.getKey())
                               .amRecordsBeforeMigration(BatchUtil.getAmRecordsCount(jdbcTemplate))
                               .notes(StringUtils.hasText(notes) ? notes : ReconQuery.IN_PROGRESS.name())
                               .build();

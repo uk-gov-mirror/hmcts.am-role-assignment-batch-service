@@ -77,7 +77,8 @@ public class ValidationTasklet implements Tasklet {
     }
 
     protected void validateRoleMappings(List<String> roleMappings, StepContribution contribution) throws Exception {
-        List<String> ccdViewRoles = jdbcTemplate.query(Constants.DISTINCT_CASE_ROLES_FROM_CCD, (rs, rowNum) -> rs.getString(1));
+        List<String> ccdViewRoles = jdbcTemplate.query(
+            Constants.DISTINCT_CASE_ROLES_FROM_CCD, (rs, rowNum) -> rs.getString(1));
 
         if (!isASubsetOf(roleMappings, ccdViewRoles)) {
             List<String> invalidRoles = findDifferences(roleMappings, ccdViewRoles);

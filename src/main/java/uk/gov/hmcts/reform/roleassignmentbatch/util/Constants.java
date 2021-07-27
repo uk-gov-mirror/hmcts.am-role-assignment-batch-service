@@ -60,9 +60,10 @@ public class Constants {
         + ":attributes::jsonb, :beginTime)";
 
     public static final String GET_RECONCILIATION_DATA = "select * from reconciliation_data where run_id =?";
-    public static final String GET_LATEST_RECONCILIATION_DATA = "select * from reconciliation_data rd where run_id"
-                                                                + " = (select max(run_id) from reconciliation_data rd2) ;";
+    public static final String GET_LATEST_RECONCILIATION_DATA =
+        "select * from reconciliation_data rd where run_id = (select max(run_id) from reconciliation_data rd2);";
 
+    //check role category as well
     public static final String CCD_RECORDS_HAVING_NULL_FIELDS = "select id,case_data_id,user_id,case_role,"
         + "jurisdiction,case_type,role_category,begin_date from ccd_view where case_data_id is null "
         + "or case_role is null or jurisdiction is null or case_type is null or role_category is null or "
@@ -80,11 +81,20 @@ public class Constants {
     public static final String COUNT_AM_REQUEST_TABLE = "select count (*) from role_assignment_request";
     public static final String COUNT_ACTOR_CACHE_TABLE = "select count (*) from actor_cache_control";
 
+    public static final String COPY_DATA_INTO_ACTOR_CACHE = "INSERT into replica_actor_cache_control(SELECT * FROM"
+                                                            + " actor_cache_control) on conflict do nothing;";
+    public static final String COPY_DATA_INTO_ROLE_ASSIGNMENT = "INSERT into replica_role_assignment(SELECT * FROM"
+                                                                + " role_assignment) on conflict do nothing;";
+    public static final String COPY_DATA_INTO_HISTORY = "INSERT into replica_role_assignment_request(SELECT * FROM"
+                                                        + " role_assignment_request) on conflict do nothing;";
+    public static final String COPY_DATA_INTO_REQUEST = "INSERT into replica_role_assignment_history(SELECT * FROM"
+                                                        + " role_assignment_history) on conflict do nothing;";
 
     public static final String NO_RECONCILIATION_DATA_FOUND = "No reconciliation data found for Job Id: %s";
     public static final String INVALID_ROLES = "The following roles are invalid : %s";
     public static final String INVALID_CASE_IDS = "The following caseIds is not of valid length: %s";
-    public static final String ERROR_BUILDIND_CCD_RECONCILIATION_DATA = "The total records do not match with sum(groupBy(jurisdiction/roleName))";
+    public static final String ERROR_BUILDIND_CCD_RECONCILIATION_DATA =
+        "The total records do not match with sum(groupBy(jurisdiction/roleName))";
     public static final String EMPTY_STRING = "";
     public static final String BEFORE_CCD_MIGRATION = "Before CCD Migration - Reconciliation Status";
     public static final String AFTER_CCD_MIGRATION = "After CCD Migration - Reconciliation Status";

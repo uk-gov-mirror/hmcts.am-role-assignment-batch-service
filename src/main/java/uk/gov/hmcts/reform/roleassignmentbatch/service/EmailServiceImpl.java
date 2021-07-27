@@ -63,33 +63,33 @@ public class EmailServiceImpl implements EmailService {
     /**
      * This method is used to send CCD migration status via email.
      *
-     * @param runId
-     * @param emailSubject
-     * @return
+     * @param runId runId
+     * @param emailSubject emailSubject
+     * @return Response
      */
     @SneakyThrows
     @Override
     public Response sendEmail(String runId, String emailSubject) {
         Response response = null;
         response = sendEmail(mailTo, emailSubject, runId);
-        if (response!=null && !HttpStatus.valueOf(response.getStatusCode()).is2xxSuccessful()) {
-            EmailSendFailedException emailSendFailedException = new EmailSendFailedException(new HttpException(String.format(
-                    "SendGrid returned a non-success response (%d); body: %s",
-                    response.getStatusCode(),
-                    response.getBody()
-            )));
+        if (response != null && !HttpStatus.valueOf(response.getStatusCode()).is2xxSuccessful()) {
+            EmailSendFailedException emailSendFailedException
+                = new EmailSendFailedException(new HttpException(String.format(
+                "SendGrid returned a non-success response (%d); body: %s",
+                response.getStatusCode(),
+                response.getBody())));
             log.error("", emailSendFailedException);
         }
         return response;
     }
 
-    /***
+    /*
      * Sendgrid mail logic.
      *
-     * @param emailTo
-     * @param emailSubject
-     * @param runId
-     * @return
+     * @param emailTo emailTo
+     * @param emailSubject emailSubject
+     * @param runId runId
+     * @return Response
      */
     public Response sendEmail(List<String> emailTo, String emailSubject, String runId) throws IOException {
         Response response = null;
@@ -116,18 +116,18 @@ public class EmailServiceImpl implements EmailService {
     }
 
     /**
-     * This is used to build thymeleafe template
+     * This is used to build thymeleafe template.
      *
-     * @param runId
-     * @return
+     * @param runId runId
+     * @return template
      */
     private String buildThymeleafTemplate(String runId) {
         ReconciliationData reconData = jdbcTemplate.queryForObject(Constants.GET_LATEST_RECONCILIATION_DATA,
-                new ReconciliationMapper());
+                                                                   new ReconciliationMapper());
         if (reconData == null) {
             throw new NoReconciliationDataFound(String.format(Constants.NO_RECONCILIATION_DATA_FOUND, runId));
         }
-        Context context = new Context();
+
         Map<String, Object> templateMap = new HashMap<>();
         templateMap.put("runId", reconData.getRunId());
         templateMap.put("createdDate", reconData.getCreatedDate());
@@ -141,6 +141,7 @@ public class EmailServiceImpl implements EmailService {
         templateMap.put("notes", reconData.getNotes());
         templateMap.put("amRecordsBeforeMigration", reconData.getAmRecordsBeforeMigration());
         templateMap.put("amRecordsAfterMigration", reconData.getAmRecordsAfterMigration());
+        Context context = new Context();
         context.setVariables(templateMap);
         return templateEngine.process("email.html", context);
     }

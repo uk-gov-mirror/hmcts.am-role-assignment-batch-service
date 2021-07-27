@@ -189,6 +189,7 @@ dependencies {
     //Sendgrid
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: versions.springBoot
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
     implementation 'com.sendgrid:sendgrid-java:4.7.2'
 
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'

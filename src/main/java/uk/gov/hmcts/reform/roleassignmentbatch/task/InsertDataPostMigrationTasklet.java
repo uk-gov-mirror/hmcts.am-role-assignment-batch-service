@@ -24,10 +24,10 @@ public class InsertDataPostMigrationTasklet implements Tasklet {
         log.info("Writing to actor cache table is complete");
 
         log.info("Insert data from current tables to Replicas");
-        jdbcTemplate.update("INSERT into replica_actor_cache_control(SELECT * FROM actor_cache_control) on conflict do nothing;");
-        jdbcTemplate.update("INSERT into replica_role_assignment(SELECT * FROM role_assignment) on conflict do nothing;");
-        jdbcTemplate.update("INSERT into replica_role_assignment_request(SELECT * FROM role_assignment_request) on conflict do nothing;");
-        jdbcTemplate.update("INSERT into replica_role_assignment_history(SELECT * FROM role_assignment_history) on conflict do nothing;");
+        jdbcTemplate.update(Constants.COPY_DATA_INTO_ACTOR_CACHE);
+        jdbcTemplate.update(Constants.COPY_DATA_INTO_ROLE_ASSIGNMENT);
+        jdbcTemplate.update(Constants.COPY_DATA_INTO_HISTORY);
+        jdbcTemplate.update(Constants.COPY_DATA_INTO_REQUEST);
         log.info("Data insertion from Current tables to replicas is complete");
 
         return RepeatStatus.FINISHED;
