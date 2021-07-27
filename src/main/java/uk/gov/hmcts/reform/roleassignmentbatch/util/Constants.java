@@ -94,11 +94,12 @@ public class Constants {
     public static final String NO_RECONCILIATION_DATA_FOUND = "No reconciliation data found for Job Id: %s";
     public static final String INVALID_ROLES = "The following roles are invalid : ";
     public static final String INVALID_ROLE_CATEGORIES = "The following role categories are invalid : ";
-    public static final String INVALID_CASE_IDS = "The following caseIds is not of valid length: %s";
+    public static final String INVALID_CASE_IDS = "The following caseIds is not of valid length: ";
     public static final String ERROR_BUILDIND_CCD_RECONCILIATION_DATA =
         "The total records do not match with sum(groupBy(jurisdiction/roleName))";
     public static final String EMPTY_STRING = "";
     public static final String BEFORE_CCD_MIGRATION = "Before CCD Migration - Reconciliation Status";
     public static final String AFTER_CCD_MIGRATION = "After CCD Migration - Reconciliation Status";
     public static final String AFTER_TABLE_RENAME = "After Table Rename - Reconciliation Status";
+    public static final String AFTER_VALIDATION = "Validation - Reconciliation Status";
 }

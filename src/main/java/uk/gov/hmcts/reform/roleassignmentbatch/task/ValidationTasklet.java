@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_VALIDATION;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.sendgrid.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
@@ -15,10 +19,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.AuditOperationType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ReconQuery;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.CcdViewRowMapper;
+import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
+import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.JacksonUtils;
 
@@ -33,14 +42,23 @@ public class ValidationTasklet implements Tasklet {
     private JdbcBatchItemWriter<AuditFaults> auditFaultsJdbcBatchItemWriter;
 
     @Autowired
+    ReconciliationDataService reconciliationDataService;
+
+    @Autowired
+    EmailService emailService;
+
+    @Autowired
     CcdViewRowMapper ccdViewRowMapper;
 
     @Value("${csv-file-name}")
     String fileName;
+
     @Value("${csv-file-path}")
     String filePath;
+
     @Value("${ccd.roleNames}")
     List<String> configRoleMappings;
+
     @Value("${ccd.roleCategories}")
     List<String> configRoleCategories;
 
@@ -52,7 +70,32 @@ public class ValidationTasklet implements Tasklet {
         validateRoleMappings(contribution);
         validateRoleType(contribution);
         log.info("Validating CcdCaseUsers is complete.");
+        sendEmailForAnyValidationError(contribution);
         return RepeatStatus.FINISHED;
+    }
+
+    private void sendEmailForAnyValidationError(StepContribution contribution) {
+        List<Map<String, Object>> validationErrors = jdbcTemplate.queryForList("select reason from audit_faults");
+        if (!CollectionUtils.isEmpty(validationErrors)) {
+            String errors = validationErrors.stream()
+                            .map(Map::values)
+                            .collect(Collectors.toList())
+                            .stream()
+                            .map(Object::toString)
+                            .collect(Collectors.joining(","));
+            String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
+            ReconciliationData reconciliationData =
+                ReconciliationData.builder()
+                                  .runId(jobId)
+                                  .status(ReconQuery.FAILED.getKey())
+                                  .notes(errors)
+                                  .build();
+            reconciliationDataService.saveReconciliationData(reconciliationData);
+            Response response = emailService.sendEmail(jobId, AFTER_VALIDATION);
+            if (response != null) {
+                log.info("Error during Validation - Reconciliation Status mail has been sent to target recipients");
+            }
+        }
     }
 
     private void performNullChecksOnCcdFields(StepContribution contribution) throws Exception {
