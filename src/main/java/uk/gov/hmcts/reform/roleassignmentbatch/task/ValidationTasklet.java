@@ -50,12 +50,6 @@ public class ValidationTasklet implements Tasklet {
     @Autowired
     CcdViewRowMapper ccdViewRowMapper;
 
-    @Value("${csv-file-name}")
-    String fileName;
-
-    @Value("${csv-file-path}")
-    String filePath;
-
     @Value("${ccd.roleNames}")
     List<String> configRoleMappings;
 
@@ -80,9 +74,10 @@ public class ValidationTasklet implements Tasklet {
             String errors = validationErrors.stream()
                             .map(Map::values)
                             .collect(Collectors.toList())
-                            .stream()
-                            .map(Object::toString)
-                            .collect(Collectors.joining(","));
+                        .stream()
+                        .map(Object::toString)
+                        .collect(Collectors.joining(","));
+
             String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
             ReconciliationData reconciliationData =
                 ReconciliationData.builder()
@@ -116,7 +111,7 @@ public class ValidationTasklet implements Tasklet {
         List<String> invalidCcdViewCaseIds
             = jdbcTemplate.query(Constants.QUERY_INVALID_CASE_IDS, (rs, rowNum) -> rs.getString(1));
         if (!invalidCcdViewCaseIds.isEmpty()) {
-            log.error(String.format(Constants.INVALID_CASE_IDS, invalidCcdViewCaseIds));
+            log.error(Constants.INVALID_CASE_IDS);
             persistFaults(invalidCcdViewCaseIds, Constants.INVALID_CASE_IDS);
             contribution.setExitStatus(ExitStatus.FAILED);
         }
