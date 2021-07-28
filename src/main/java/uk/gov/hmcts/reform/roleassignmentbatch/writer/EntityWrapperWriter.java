@@ -28,22 +28,19 @@ public class EntityWrapperWriter implements ItemWriter<EntityWrapper> {
     public void write(List<? extends EntityWrapper> items) throws Exception {
         final long currentTime = System.currentTimeMillis();
 
-        List<RequestEntity> requestEntities = items.stream()
-                                                   .map(EntityWrapper::getRequestEntity)
-                                                   .collect(Collectors.toList());
-        requestEntityWriter.write(requestEntities);
+        requestEntityWriter.write(items.stream()
+                                       .map(EntityWrapper::getRequestEntity)
+                                       .collect(Collectors.toList()));
 
-        List<HistoryEntity> historyEntities = items.stream()
-                                                   .map(EntityWrapper::getRoleAssignmentHistoryEntity)
-                                                   .collect(Collectors.toList());
-        roleAssignmentHistoryWriter.write(historyEntities);
+        roleAssignmentHistoryWriter.write(items.stream()
+                                               .map(EntityWrapper::getRoleAssignmentHistoryEntity)
+                                               .collect(Collectors.toList()));
 
-        List<RoleAssignmentEntity> roleAssignmentEntities = items.stream()
-                                                                 .map(EntityWrapper::getRoleAssignmentEntity)
-                                                                 .collect(Collectors.toList());
-        roleAssignmentWriter.write(roleAssignmentEntities);
+        roleAssignmentWriter.write(items.stream()
+                                        .map(EntityWrapper::getRoleAssignmentEntity)
+                                        .collect(Collectors.toList()));
 
         log.info("Time taken for :" + items.size() + " items is : "
-                           + (System.currentTimeMillis() - currentTime));
+                 + (System.currentTimeMillis() - currentTime));
     }
 }
