@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.domain.model;
 
-import java.io.Serializable;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -12,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class CcdRoleName implements Serializable {
+public class CcdRoleName {
     private String count;
     private List<CcdRoleNameItem> roleNames;
 }
