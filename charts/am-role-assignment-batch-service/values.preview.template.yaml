@@ -16,6 +16,9 @@ job:
           alias: azure.application-insights.instrumentation-key
         - name: am-role-assignment-service-s2s-secret
           alias: AM_ROLE_ASSIGNMENT_SERVICE_SECRET
+        - name: role-assignment-service-LD-SDK-KEY
+          alias: LD_SDK_KEY
+
   global:
     jobKind: CronJob
 
