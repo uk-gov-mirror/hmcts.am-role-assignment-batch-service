@@ -57,7 +57,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Value("${azure.container-name}")
     String containerName;
-    @Value("${migration.chunkSuze}")
+    @Value("${migration.chunkSize}")
     private int chunkSize;
 
     @Value("${azure.account-name}")

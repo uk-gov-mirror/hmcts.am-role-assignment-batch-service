@@ -51,7 +51,7 @@ public class ConfigurationBeans {
     @Autowired
     PagingQueryProvider queryProvider;
 
-    @Value("${migration.chunkSuze}")
+    @Value("${migration.chunkSize}")
     private int chunkSize;
 
     @Value("${csv-file-name}")
