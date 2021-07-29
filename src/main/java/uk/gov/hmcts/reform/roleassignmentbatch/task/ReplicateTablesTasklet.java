@@ -22,9 +22,9 @@ public class ReplicateTablesTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-        log.info("Dropping CCD_VIEW");
-        jdbcTemplate.update("DROP TABLE IF EXISTS CCD_VIEW");
-        log.info("Drop Table CCD_VIEW: Successful");
+        //log.info("Dropping CCD_VIEW");
+        //jdbcTemplate.update("DROP TABLE IF EXISTS CCD_VIEW");
+        //log.info("Drop Table CCD_VIEW: Successful");
 
         log.info("Creating CCD_VIEW ");
         jdbcTemplate.execute("create table if not exists ccd_view("
