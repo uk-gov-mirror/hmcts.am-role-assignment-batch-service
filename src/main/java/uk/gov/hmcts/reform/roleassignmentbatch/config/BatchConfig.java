@@ -261,7 +261,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public Flow processCcdDataToTempTablesFlow() {
         return new FlowBuilder<Flow>("processCcdDataToTempTables")
             .start(replicateTables())
-            .next(injectDataIntoView())
+            //.next(injectDataIntoView())
             .next(validationStep())
             .next(buildCCdViewMetricsStep())
             .next(beforeMigrationReconStep())
