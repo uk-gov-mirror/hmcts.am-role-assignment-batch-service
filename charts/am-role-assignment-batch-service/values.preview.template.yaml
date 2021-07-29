@@ -2,10 +2,10 @@ job:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   environment:
-    ROLE_ASSIGNMENT_DB_HOST: "{{ .Release.Name }}-postgresql"
+    ROLE_ASSIGNMENT_DB_HOST: am-role-assignment-service-pr-908-postgresql-0
     ROLE_ASSIGNMENT_DB_NAME: role_assignment
-    ROLE_ASSIGNMENT_DB_USERNAME: am
-    ROLE_ASSIGNMENT_DB_PASSWORD: am
+    ROLE_ASSIGNMENT_DB_USERNAME: role_assignment
+    ROLE_ASSIGNMENT_DB_PASSWORD: role_assignment
     ROLE_ASSIGNMENT_DB_PORT: 5432
     ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
     ENABLE_DB_MIGRATE: true
@@ -26,8 +26,8 @@ postgresql:
   enabled: true
   image:
     tag: '11.3.0'
-  postgresqlUsername: am
-  postgresqlPassword: am
+  postgresqlUsername: role_assignment
+  postgresqlPassword: role_assignment
   postgresqlDatabase: role_assignment
   postgresqlPort: 5432
   persistence:
