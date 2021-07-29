@@ -9,6 +9,7 @@ job:
     ROLE_ASSIGNMENT_DB_PORT: 5432
     ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
     ENABLE_DB_MIGRATE: true
+    EMAIL_ENABLED: false
   keyVaults:
     am:
       secrets:
