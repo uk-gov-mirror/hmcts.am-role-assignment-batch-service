@@ -94,7 +94,7 @@ public class BuildCcdViewMetrics implements Tasklet {
                    .map(map -> map.values()
                                   .stream()
                                   .filter(Long.class::isInstance)
-                                  .mapToLong(long.class::cast)
+                                  .mapToLong(val -> (long) val)
                                   .findFirst())
                    .mapToLong(OptionalLong::getAsLong)
                    .sum();

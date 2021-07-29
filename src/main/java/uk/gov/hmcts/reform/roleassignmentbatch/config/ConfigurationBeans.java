@@ -31,7 +31,7 @@ import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.PathResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
@@ -56,8 +56,6 @@ public class ConfigurationBeans {
 
     @Value("${csv-file-name}")
     String fileName;
-    @Value("${csv-file-path}")
-    String filePath;
 
     @Bean
     public JdbcBatchItemWriter<RequestEntity> insertInRequestTable() {
@@ -163,7 +161,7 @@ public class ConfigurationBeans {
             .name("historyEntityReader")
             .linesToSkip(1)
             .saveState(false)
-            .resource(new PathResource(filePath + fileName))
+            .resource(new ClassPathResource(fileName))
             .delimited()
             .names(CASE_DATA_ID, USER_ID, CASE_ROLE, JURISDICTION, CASE_TYPE, ROLE_CATEGORY, BEGIN_DATE)
             .lineMapper(lineMapper())
