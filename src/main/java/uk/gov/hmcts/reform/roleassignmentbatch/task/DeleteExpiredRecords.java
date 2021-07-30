@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -16,8 +11,22 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
+import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
+
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_RECORD_JOB_STATUS;
 
 @Component
 @Slf4j
@@ -25,6 +34,8 @@ public class DeleteExpiredRecords implements Tasklet {
 
     private final JdbcTemplate jdbcTemplate;
     private final int batchSize;
+    @Autowired
+    private EmailService emailService;
 
     public DeleteExpiredRecords(@Autowired JdbcTemplate jdbcTemplate, @Value("${batch-size}") int batchSize) {
         this.jdbcTemplate = jdbcTemplate;
@@ -35,6 +46,8 @@ public class DeleteExpiredRecords implements Tasklet {
     @Transactional
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         log.info("Delete Expired records task starts::");
+        Instant startTime = Instant.now();
+        String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
         int currentRecordsInHistoryTable = getCountFromHistoryTable();
         try {
             List<RoleAssignmentHistory> rah = this.getLiveRecordsFromHistoryTable();
@@ -58,6 +71,23 @@ public class DeleteExpiredRecords implements Tasklet {
             String numRecordsUpdatedLog = String.format("Updated number of records in History Table : %s",
                                                         getCountFromHistoryTable() - currentRecordsInHistoryTable);
             log.info(numRecordsUpdatedLog);
+            Instant endTime = Instant.now();
+            long timeElapsed = Duration.between(startTime, endTime).toMillis();
+            Map<String,Object> templateMap=new HashMap<>();
+            templateMap.put("jobId",jobId);
+            templateMap.put("startTime",startTime);
+            templateMap.put("endTime",endTime);
+            templateMap.put("elapsedTime",timeElapsed);
+            templateMap.put("liveCount",rowsDeleted);
+            templateMap.put("updatedRecordCount",getCountFromHistoryTable() - currentRecordsInHistoryTable);
+            EmailData emailData = EmailData
+                    .builder()
+                    .runId(jobId)
+                    .emailSubject(DELETE_EXPIRED_RECORD_JOB_STATUS)
+                    .module(DELETE_EXPIRED_JOB)
+                    .templateMap(templateMap)
+                    .build();
+            emailService.sendEmail(emailData);
         } catch (DataAccessException e) {
             log.info(String.format(" DataAccessException %s", e.getMessage()));
         } catch (Exception e) {

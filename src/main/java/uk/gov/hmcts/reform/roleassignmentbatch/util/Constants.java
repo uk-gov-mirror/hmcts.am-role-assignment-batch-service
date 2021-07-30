@@ -102,4 +102,8 @@ public class Constants {
     public static final String AFTER_CCD_MIGRATION = "After CCD Migration - Reconciliation Status";
     public static final String AFTER_TABLE_RENAME = "After Table Rename - Reconciliation Status";
     public static final String AFTER_VALIDATION = "Validation - Reconciliation Status";
+
+    public static final String RECONCILIATION = "Reconciliation";
+    public static final String DELETE_EXPIRED_JOB = "DeleteExpiredJob";
+    public static final String DELETE_EXPIRED_RECORD_JOB_STATUS = "Delete Expired Record Job Status";
 }

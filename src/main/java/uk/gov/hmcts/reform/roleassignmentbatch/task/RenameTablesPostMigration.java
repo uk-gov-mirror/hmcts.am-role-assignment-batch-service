@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_TABLE_RENAME;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AM_TABLES;
-
 import com.sendgrid.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
@@ -13,12 +10,17 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.ReconciliationMapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
+
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_TABLE_RENAME;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AM_TABLES;
 
 @Component
 @Slf4j
@@ -54,7 +56,13 @@ public class RenameTablesPostMigration implements Tasklet {
                                                                        new ReconciliationMapper());
         reconcileData.setAmRecordsAfterMigration(BatchUtil.getAmRecordsCount(jdbcTemplate));
         reconciliationDataService.saveReconciliationData(reconcileData);
-        Response response = emailService.sendEmail(jobId, AFTER_TABLE_RENAME);
+        EmailData emailData = EmailData
+                .builder()
+                .runId(jobId)
+                .emailSubject(AFTER_TABLE_RENAME)
+                .module(RECONCILIATION)
+                .build();
+        Response response = emailService.sendEmail(emailData);
         if (response != null) {
             log.info("After Table Rename - Reconciliation Status mail has been sent to target recipients");
         }

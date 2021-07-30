@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.AuditOperationType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ReconQuery;
@@ -30,6 +31,9 @@ import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.JacksonUtils;
+
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_VALIDATION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
 
 @Component
 @Slf4j
@@ -86,7 +90,13 @@ public class ValidationTasklet implements Tasklet {
                                   .notes(errors)
                                   .build();
             reconciliationDataService.saveReconciliationData(reconciliationData);
-            Response response = emailService.sendEmail(jobId, AFTER_VALIDATION);
+            EmailData emailData = EmailData
+                    .builder()
+                    .runId(jobId)
+                    .emailSubject(AFTER_VALIDATION)
+                    .module(RECONCILIATION)
+                    .build();
+            Response response = emailService.sendEmail(emailData);
             if (response != null) {
                 log.info("Error during Validation - Reconciliation Status mail has been sent to target recipients");
             }
