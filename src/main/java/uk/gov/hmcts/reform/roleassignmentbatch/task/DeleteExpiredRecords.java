@@ -73,7 +73,7 @@ public class DeleteExpiredRecords implements Tasklet {
             log.info(numRecordsUpdatedLog);
             Instant endTime = Instant.now();
             long timeElapsed = Duration.between(startTime, endTime).toMillis();
-            Map<String,Object> templateMap=new HashMap<>();
+            Map<String,Object> templateMap = new HashMap<>();
             templateMap.put("jobId",jobId);
             templateMap.put("startTime",startTime);
             templateMap.put("endTime",endTime);

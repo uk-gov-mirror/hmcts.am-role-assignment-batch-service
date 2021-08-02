@@ -10,8 +10,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,10 +43,28 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
 
     private JdbcTemplate template;
 
+    @Mock
+    StepExecution stepExecution = Mockito.mock(StepExecution.class);
+
+    @Mock
+    JobExecution jobExecution = Mockito.mock(JobExecution.class);
+
+    @Mock
+    StepContribution stepContribution = new StepContribution(stepExecution);
+
+    @Mock
+    StepContext stepContext = new StepContext(stepExecution);
+
+    @Mock
+    ChunkContext chunkContext = new ChunkContext(stepContext);
+
     @Before
     public void setUp() {
         template = new JdbcTemplate(ds);
         sut = new DeleteExpiredRecords(template, 2);
+        Mockito.when(stepContribution.getStepExecution()).thenReturn(stepExecution);
+        Mockito.when(stepContribution.getStepExecution().getJobExecution()).thenReturn(jobExecution);
+        Mockito.when(stepContribution.getStepExecution().getJobExecution().getId()).thenReturn(Long.valueOf(1));
     }
 
     @Test
@@ -66,7 +91,7 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
         Integer count = template.queryForObject(COUNT_RECORDS_FROM_LIVE_TABLE, Integer.class);
         logger.info(" Total number of records fetched from role assignment Live table...{}", count);
         logger.info(" Deleting the records from Live table.");
-        sut.execute(null, null);
+        sut.execute(stepContribution, chunkContext);
         count = template.queryForObject(COUNT_RECORDS_FROM_LIVE_TABLE, Integer.class);
         logger.info(" Total number of records fetched from role assignment Live table...{}", count);
         Assert.assertEquals("The live records were not deleted", Integer.valueOf(0), count);
@@ -83,7 +108,7 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
         logger.info(" Total number of expired records fetched from History table...{}", count);
         Assert.assertEquals("The live records were not deleted", Integer.valueOf(0), count);
         logger.info(" Deleting the records from Live table. Insert the records in History table.");
-        sut.execute(null, null);
+        sut.execute(stepContribution, chunkContext);
         count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
         logger.info(" Total number of Expired records fetched from History table...{}", count);
         Assert.assertEquals("The EXPIRED records were not inserted", Integer.valueOf(5), count);
@@ -100,7 +125,7 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
         logger.info(" Total number of expired records fetched from History table...{}", count);
         Assert.assertEquals("The live records were not deleted", Integer.valueOf(0), count);
         logger.info(" Deleting the records from Live table. Insert the records in History table.");
-        sut.execute(null, null);
+        sut.execute(stepContribution, chunkContext);
         count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
         logger.info(" Total number of Expired records fetched from History table...{}", count);
         Assert.assertEquals("The EXPIRED records were not inserted", Integer.valueOf(3), count);
