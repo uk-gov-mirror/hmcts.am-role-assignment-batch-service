@@ -96,21 +96,11 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
                                 .attributes(convertValueJsonNode(attributes).toString())
                                 .build();
 
-        /*ActorCacheEntity actorCacheEntity =
-            ActorCacheEntity.builder()
-                            .actorIds(ccdCaseUser.getUserId()) //using random as dummy data violates unique key rule
-                            .etag(0L)
-                            .roleAssignmentResponse("{}")
-                            .build()*/
         return EntityWrapper.builder()
                 .ccdCaseUser(ccdCaseUser)
-                //.actorCacheEntity(actorCacheEntity)
                 .requestEntity(requestEntity)
                 .roleAssignmentHistoryEntity(roleAssignmentHistoryEntity)
                 .roleAssignmentEntity(roleAssignmentEntity)
                 .build();
-
-             
-
     }
 }
