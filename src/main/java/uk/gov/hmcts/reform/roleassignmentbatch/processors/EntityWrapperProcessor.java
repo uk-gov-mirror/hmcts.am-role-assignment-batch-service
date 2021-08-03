@@ -58,9 +58,10 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
                                                    .log("This is a migrated record from CCD.")
                                                    .created(LocalDateTime.now())
                                                    .build();
+        UUID assignmentId = UUID.randomUUID();
         HistoryEntity roleAssignmentHistoryEntity =
             HistoryEntity.builder()
-                         .id(UUID.randomUUID())
+                         .id(assignmentId)
                          .requestId(requestUuid)
                          .status(Status.LIVE.name())
                          .actorId(ccdCaseUser.getUserId())
@@ -81,7 +82,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
                          .build();
         RoleAssignmentEntity roleAssignmentEntity =
             RoleAssignmentEntity.builder()
-                                .id(requestUuid)
+                                .id(assignmentId)
                                 .actorIdType("IDAM")
                                 .actorId(ccdCaseUser.getUserId())
                                 .roleType(RoleType.CASE.name())
