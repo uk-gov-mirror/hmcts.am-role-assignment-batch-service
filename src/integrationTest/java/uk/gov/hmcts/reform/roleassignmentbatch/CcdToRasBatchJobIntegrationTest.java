@@ -1,18 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ENABLED;
-
-import java.sql.ResultSet;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.sql.DataSource;
-
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,12 +23,28 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.launchdarkly.FeatureConditionEvaluator;
 
+import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ENABLED;
+
 @SpringBootTest
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ContextConfiguration(classes = {BaseTest.class})
 @ComponentScan(basePackages = "uk.gov.hmcts.reform.roleassignmentbatch")
 @EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
-@TestPropertySource(properties = {"csv-file-path=src/integrationTest/resources/"})
+@TestPropertySource(properties = {
+        "spring.config.location=classpath:application-test.yaml",
+        "csv-file-path=src/integrationTest/resources/"
+})
 public class CcdToRasBatchJobIntegrationTest extends BaseTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CcdToRasBatchJobIntegrationTest.class);
