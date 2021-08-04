@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_VALIDATION;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +31,8 @@ import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_VALIDATION;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ZERO_COUNT_IN_CCD_VIEW;
+
 
 @Component
 @Slf4j
@@ -103,6 +103,21 @@ public class ValidationTasklet implements Tasklet {
     }
 
     private void performNullChecksOnCcdFields(StepContribution contribution) throws Exception {
+        Integer integer = jdbcTemplate.queryForObject(ReconQuery.CCD_TOTAL_COUNT.getKey(), Integer.class);
+        if (integer == 0) {
+            String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
+            EmailData emailData = EmailData
+                    .builder()
+                    .runId(jobId)
+                    .emailSubject("CCD_VIEW Validation")
+                    .module(ZERO_COUNT_IN_CCD_VIEW)
+                    .build();
+            Response response = emailService.sendEmail(emailData);
+            if (response != null) {
+                log.error("No record found in ccd_view-Reconciliation Status mail has been sent to target recipients");
+            }
+            contribution.setExitStatus(ExitStatus.FAILED);
+        }
         List<CcdCaseUser> ccdCaseUsers = jdbcTemplate.query(Constants.CCD_RECORDS_HAVING_NULL_FIELDS, ccdViewRowMapper);
         if (!ccdCaseUsers.isEmpty()) {
             List<String> invalidIds = ccdCaseUsers.stream().map(CcdCaseUser::getId).collect(Collectors.toList());

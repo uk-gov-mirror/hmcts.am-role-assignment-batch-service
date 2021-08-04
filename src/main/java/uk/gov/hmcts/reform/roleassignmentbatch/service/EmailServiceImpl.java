@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ReconQuery;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 import uk.gov.hmcts.reform.roleassignmentbatch.exception.EmailSendFailedException;
 import uk.gov.hmcts.reform.roleassignmentbatch.exception.NoReconciliationDataFound;
@@ -32,6 +34,9 @@ import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ZERO_COUNT_IN_CCD_VIEW;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.EMPTY_STRING;
+
 
 /**
  * This class sends emails to intended recipients for ccd migration process
@@ -96,6 +101,12 @@ public class EmailServiceImpl implements EmailService {
                 String process = templateEngine.process("delete-count.html", context);
                 content = new Content("text/html", process);
             }
+            if (ZERO_COUNT_IN_CCD_VIEW.equals(emailData.getModule())) {
+                emailData.setTemplateMap(ccdValidationThymeleafTemplate(emailData.getRunId()));
+                context.setVariables(emailData.getTemplateMap());
+                String process = templateEngine.process("recon-email.html", context);
+                content = new Content("text/html", process);
+            }
             Mail mail = new Mail();
             mail.setFrom(new Email(mailFrom));
             mail.setSubject(concatEmailSubject);
@@ -146,6 +157,30 @@ public class EmailServiceImpl implements EmailService {
         templateMap.put("notes", reconData.getNotes());
         templateMap.put("amRecordsBeforeMigration", reconData.getAmRecordsBeforeMigration());
         templateMap.put("amRecordsAfterMigration", reconData.getAmRecordsAfterMigration());
+        return templateMap;
+    }
+
+    /**
+     * Thymeleaf builder template for ccd_view  validation mail notification.
+     *
+     * @param runId JobId is the parameter
+     * @return
+     */
+    private Map<String, Object> ccdValidationThymeleafTemplate(String runId) {
+
+        Map<String, Object> templateMap = new HashMap<>();
+        templateMap.put("runId", runId);
+        templateMap.put("createdDate", LocalDateTime.now());
+        templateMap.put("ccdJurisdictionData", EMPTY_STRING);
+        templateMap.put("ccdRoleNameData", EMPTY_STRING);
+        templateMap.put("amJurisdictionData", EMPTY_STRING);
+        templateMap.put("amRoleNameData", EMPTY_STRING);
+        templateMap.put("totalCountFromCcd", 0);
+        templateMap.put("totalCountFromAm", EMPTY_STRING);
+        templateMap.put("status", ReconQuery.FAILED.getKey());
+        templateMap.put("notes", "No record found in ccd_view");
+        templateMap.put("amRecordsBeforeMigration", EMPTY_STRING);
+        templateMap.put("amRecordsAfterMigration", EMPTY_STRING);
         return templateMap;
     }
 }

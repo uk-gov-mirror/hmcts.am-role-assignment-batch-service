@@ -107,4 +107,5 @@ public class Constants {
     public static final String RECONCILIATION = "Reconciliation";
     public static final String DELETE_EXPIRED_JOB = "DeleteExpiredJob";
     public static final String DELETE_EXPIRED_RECORD_JOB_STATUS = "Delete Expired Record Job Status";
+    public static final String ZERO_COUNT_IN_CCD_VIEW = "ZERO";
 }
