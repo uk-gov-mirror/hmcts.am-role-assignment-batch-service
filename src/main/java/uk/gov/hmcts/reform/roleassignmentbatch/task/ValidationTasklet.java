@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.CcdViewRowMapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
-import uk.gov.hmcts.reform.roleassignmentbatch.util.JacksonUtils;
 
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_VALIDATION;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
@@ -106,11 +105,13 @@ public class ValidationTasklet implements Tasklet {
     private void performNullChecksOnCcdFields(StepContribution contribution) throws Exception {
         List<CcdCaseUser> ccdCaseUsers = jdbcTemplate.query(Constants.CCD_RECORDS_HAVING_NULL_FIELDS, ccdViewRowMapper);
         if (!ccdCaseUsers.isEmpty()) {
-            log.error("Validation CcdCaseUsers was skipped due to NULLS: " + ccdCaseUsers);
-            var auditFaults = AuditFaults.builder()
-                                         .reason("Validation CcdCaseUsers was skipped due to NULLs")
-                                         .failedAt(AuditOperationType.VALIDATION.getLabel())
-                                         .ccdUsers(JacksonUtils.convertValueJsonNode(ccdCaseUsers).toString()).build();
+            List<String> invalidIds = ccdCaseUsers.stream().map(CcdCaseUser::getId).collect(Collectors.toList());
+            log.error("CCD View has null fields. The ID's are as follows: {}", invalidIds);
+            AuditFaults auditFaults =
+                AuditFaults.builder()
+                           .reason(String.format("CCD View has null fields.The ID's are as follows: %s", invalidIds))
+                           .failedAt(AuditOperationType.VALIDATION.getLabel())
+                           .ccdUsers(invalidIds.toString()).build();
             auditFaultsJdbcBatchItemWriter.write(Collections.singletonList(auditFaults));
             contribution.setExitStatus(ExitStatus.FAILED);
         }
@@ -145,7 +146,7 @@ public class ValidationTasklet implements Tasklet {
 
         if (!isASubsetOf(configRoleCategories, ccdRoleCategories)) {
             List<String> invalidRoles = findDifferences(configRoleCategories, ccdRoleCategories);
-            log.error(String.format(Constants.INVALID_ROLE_CATEGORIES, invalidRoles));
+            log.error(Constants.INVALID_ROLE_CATEGORIES +  invalidRoles);
             persistFaults(invalidRoles, Constants.INVALID_ROLE_CATEGORIES);
             contribution.setExitStatus(ExitStatus.FAILED);
         }
