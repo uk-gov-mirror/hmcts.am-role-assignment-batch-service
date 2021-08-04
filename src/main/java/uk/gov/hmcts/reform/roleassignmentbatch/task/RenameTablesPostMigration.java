@@ -89,8 +89,7 @@ public class RenameTablesPostMigration implements Tasklet {
             jdbcTemplate.update(String.format("ALTER INDEX IF EXISTS replica_%s_pkey RENAME TO %s_pkey;", table, table));
             log.info("Rename {} table is Successful", table);
         });
-        jdbcTemplate.update("ALTER TABLE role_assignment_history"
-                            + " RENAME CONSTRAINT role_assignment_history_pkey TO pk_role_assignment_history;");
+
         log.info("End Table renaming");
     }
 
