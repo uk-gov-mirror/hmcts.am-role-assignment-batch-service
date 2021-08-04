@@ -21,8 +21,6 @@ public class BeforeMigration implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
-        log.info("Printing the sendgrid key");
-        System.out.println(System.getenv("AM_SENDGRID_API_KEY"));
         String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
         Response response = emailService.sendEmail(jobId, BEFORE_CCD_MIGRATION);
         if (response != null) {
