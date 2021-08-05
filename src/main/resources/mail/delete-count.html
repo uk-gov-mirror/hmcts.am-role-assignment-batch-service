@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <h3 align="center">Delete Expired Record Job Notification</h3>
+    <table class="table table-bordered table-striped tbale-dark">
+
+        <thead class="thead-dark">
+        <tr>
+            <th>JOB_ID</th>
+            <th>LIVE_RECORD_COUNT</th>
+            <th>UPDATED_RECORD_COUNT</th>
+            <th>START_DATE</th>
+            <th>END_TIME</th>
+            <th>TOTAL_JOB_DURATION(ms)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td th:text="${jobId}"/>
+            <td th:text="${liveCount}"/>
+            <td th:text="${updatedRecordCount}"/>
+            <td th:text="${startTime}"/>
+            <td th:text="${endTime}"/>
+            <td th:text="${elapsedTime}"ms/>
+        </tr>
+        </tbody>
+    </table>
+
+    <b>Regards,<br>Access Management</br></b>
+    </br>
+</head>
+</html>

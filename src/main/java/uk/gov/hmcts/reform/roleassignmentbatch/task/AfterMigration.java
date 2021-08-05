@@ -10,6 +10,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 
 @Slf4j
@@ -22,7 +23,13 @@ public class AfterMigration implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
-        Response response = emailService.sendEmail(jobId, AFTER_CCD_MIGRATION);
+        EmailData emailData = EmailData
+                .builder()
+                .runId(jobId)
+                .emailSubject(AFTER_CCD_MIGRATION)
+                .module("Reconciliation")
+                .build();
+        Response response = emailService.sendEmail(emailData);
         if (response != null) {
             log.info("After CCD Migration - Reconciliation Status mail has been sent to target recipients");
         }

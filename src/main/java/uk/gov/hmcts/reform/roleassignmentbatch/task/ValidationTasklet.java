@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_VALIDATION;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.AuditOperationType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ReconQuery;
@@ -29,6 +28,11 @@ import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.CcdViewRowMapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
+
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_VALIDATION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ZERO_COUNT_IN_CCD_VIEW;
+
 
 @Component
 @Slf4j
@@ -85,7 +89,13 @@ public class ValidationTasklet implements Tasklet {
                                   .notes(errors)
                                   .build();
             reconciliationDataService.saveReconciliationData(reconciliationData);
-            Response response = emailService.sendEmail(jobId, AFTER_VALIDATION);
+            EmailData emailData = EmailData
+                    .builder()
+                    .runId(jobId)
+                    .emailSubject(AFTER_VALIDATION)
+                    .module(RECONCILIATION)
+                    .build();
+            Response response = emailService.sendEmail(emailData);
             if (response != null) {
                 log.info("Error during Validation - Reconciliation Status mail has been sent to target recipients");
             }
@@ -93,6 +103,21 @@ public class ValidationTasklet implements Tasklet {
     }
 
     private void performNullChecksOnCcdFields(StepContribution contribution) throws Exception {
+        Integer integer = jdbcTemplate.queryForObject(ReconQuery.CCD_TOTAL_COUNT.getKey(), Integer.class);
+        if (integer == 0) {
+            String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
+            EmailData emailData = EmailData
+                    .builder()
+                    .runId(jobId)
+                    .emailSubject("CCD_VIEW Validation")
+                    .module(ZERO_COUNT_IN_CCD_VIEW)
+                    .build();
+            Response response = emailService.sendEmail(emailData);
+            if (response != null) {
+                log.error("No record found in ccd_view-Reconciliation Status mail has been sent to target recipients");
+            }
+            contribution.setExitStatus(ExitStatus.FAILED);
+        }
         List<CcdCaseUser> ccdCaseUsers = jdbcTemplate.query(Constants.CCD_RECORDS_HAVING_NULL_FIELDS, ccdViewRowMapper);
         if (!ccdCaseUsers.isEmpty()) {
             List<String> invalidIds = ccdCaseUsers.stream().map(CcdCaseUser::getId).collect(Collectors.toList());
