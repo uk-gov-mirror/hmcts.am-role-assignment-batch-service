@@ -111,6 +111,7 @@ public class ValidationTasklet implements Tasklet {
 
         List<String> invalidCcdViewCaseIds
             = jdbcTemplate.query(Constants.QUERY_INVALID_CASE_IDS, (rs, rowNum) -> rs.getString(1));
+        invalidCcdViewCaseIds.removeIf(item -> item == null || item.equals(""));
         if (!invalidCcdViewCaseIds.isEmpty()) {
             log.error(Constants.INVALID_CASE_IDS);
             persistFaults(invalidCcdViewCaseIds, Constants.INVALID_CASE_IDS);
@@ -121,7 +122,7 @@ public class ValidationTasklet implements Tasklet {
     protected void validateRoleMappings(StepContribution contribution) throws Exception {
         List<String> ccdViewRoles = jdbcTemplate.query(
             Constants.DISTINCT_CASE_ROLES_FROM_CCD, (rs, rowNum) -> rs.getString(1));
-
+        ccdViewRoles.removeIf(item -> item == null || item.equals(""));
         if (!isASubsetOf(configRoleMappings, ccdViewRoles)) {
             List<String> invalidRoles = findDifferences(configRoleMappings, ccdViewRoles);
             log.error(String.format(Constants.INVALID_ROLES, invalidRoles));
@@ -133,7 +134,7 @@ public class ValidationTasklet implements Tasklet {
     protected void validateRoleType(StepContribution contribution) throws Exception {
         List<String> ccdRoleCategories = jdbcTemplate.query(
             Constants.DISTINCT_ROLE_CATEGORY_FROM_CCD, (rs, rowNum) -> rs.getString(1));
-
+        ccdRoleCategories.removeIf(item -> item == null || item.equals(""));
         if (!isASubsetOf(configRoleCategories, ccdRoleCategories)) {
             List<String> invalidRoles = findDifferences(configRoleCategories, ccdRoleCategories);
             log.error(Constants.INVALID_ROLE_CATEGORIES +  invalidRoles);
