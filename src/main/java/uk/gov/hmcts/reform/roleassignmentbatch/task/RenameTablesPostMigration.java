@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_TABLE_RENAME;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AM_TABLES;
-
 import com.sendgrid.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
@@ -13,12 +10,17 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.ReconciliationMapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
+
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_TABLE_RENAME;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AM_TABLES;
 
 @Component
 @Slf4j
@@ -35,7 +37,7 @@ public class RenameTablesPostMigration implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
-        if (jdbcTemplate.queryForObject("SELECT to_regclass('replica_role_assignment');",String.class) == null) {
+        if (jdbcTemplate.queryForObject("SELECT to_regclass('replica_role_assignment');", String.class) == null) {
             log.warn("Replica tables are not available to rename, Please run Migration job first.");
             contribution.setExitStatus(new ExitStatus("FAILED", "Replica Tables not exist"));
         } else {
@@ -54,7 +56,13 @@ public class RenameTablesPostMigration implements Tasklet {
                                                                        new ReconciliationMapper());
         reconcileData.setAmRecordsAfterMigration(BatchUtil.getAmRecordsCount(jdbcTemplate));
         reconciliationDataService.saveReconciliationData(reconcileData);
-        Response response = emailService.sendEmail(jobId, AFTER_TABLE_RENAME);
+        EmailData emailData = EmailData
+                .builder()
+                .runId(jobId)
+                .emailSubject(AFTER_TABLE_RENAME)
+                .module(RECONCILIATION)
+                .build();
+        Response response = emailService.sendEmail(emailData);
         if (response != null) {
             log.info("After Table Rename - Reconciliation Status mail has been sent to target recipients");
         }
@@ -68,10 +76,10 @@ public class RenameTablesPostMigration implements Tasklet {
 
         jdbcTemplate.execute("ALTER INDEX IF EXISTS replica_role_assignment_actor_id_idx RENAME TO idx_actor_id;");
         jdbcTemplate.execute("ALTER INDEX IF EXISTS replica_role_assignment_history_process_reference_idx RENAME TO"
-                + " idx_process_reference;");
+                             + " idx_process_reference;");
 
         jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_process_reference ON"
-                                    + " role_assignment_history USING btree (process, reference);");
+                             + " role_assignment_history USING btree (process, reference);");
         jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_actor_id ON role_assignment USING btree (actor_id);");
 
         log.info("Index rebuild is complete");
@@ -79,14 +87,15 @@ public class RenameTablesPostMigration implements Tasklet {
 
     private void renameTables() {
         log.info("Starting renaming the tables.");
-        jdbcTemplate.update("ALTER INDEX IF EXISTS pk_role_assignment_history RENAME TO role_assignment_history_pkey;");
+
         AM_TABLES.forEach(table -> {
             log.info("Renaming the {} table...", table);
             jdbcTemplate.update(String.format("ALTER TABLE IF EXISTS %s RENAME TO temp_%s;", table, table));
             jdbcTemplate.update(String.format("ALTER INDEX IF EXISTS %s_pkey RENAME TO temp_%s_pkey;", table, table));
 
             jdbcTemplate.update(String.format("ALTER TABLE IF EXISTS replica_%s RENAME TO %s;", table, table));
-            jdbcTemplate.update(String.format("ALTER INDEX IF EXISTS replica_%s_pkey RENAME TO %s_pkey;",table,table));
+            jdbcTemplate.update(String.format(
+                "ALTER INDEX IF EXISTS replica_%s_pkey RENAME TO %s_pkey;", table, table));
             log.info("Rename {} table is Successful", table);
         });
 
@@ -95,7 +104,7 @@ public class RenameTablesPostMigration implements Tasklet {
 
     private void dropTables() {
         log.info("Dropping the existing temp tables.");
-        AM_TABLES.forEach(table -> jdbcTemplate.update(String.format("DROP TABLE IF EXISTS temp_%s CASCADE;",table)));
+        AM_TABLES.forEach(table -> jdbcTemplate.update(String.format("DROP TABLE IF EXISTS temp_%s CASCADE;", table)));
         log.info("Drop temp table is Successful");
     }
 }

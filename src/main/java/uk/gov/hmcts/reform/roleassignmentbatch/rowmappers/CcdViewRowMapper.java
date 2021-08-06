@@ -4,6 +4,7 @@ import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.BEGIN_DATE;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_DATA_ID;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_ROLE;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_TYPE;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ID;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.JURISDICTION;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ROLE_CATEGORY;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.USER_ID;
@@ -22,6 +23,7 @@ public class CcdViewRowMapper implements RowMapper<CcdCaseUser> {
     public CcdCaseUser mapRow(ResultSet rs, int rowNum) throws SQLException {
 
         CcdCaseUser ccdCaseUser = new CcdCaseUser();
+        ccdCaseUser.setId(rs.getString(ID));
         ccdCaseUser.setCaseDataId(rs.getString(CASE_DATA_ID));
         ccdCaseUser.setUserId(rs.getString(USER_ID));
         ccdCaseUser.setCaseRole(rs.getString(CASE_ROLE));

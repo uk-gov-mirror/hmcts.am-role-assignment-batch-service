@@ -12,6 +12,7 @@ public class Constants {
     public static final String STOPPED = "STOPPED";
     public static final String FAILED = "FAILED";
     public static final String ANY = "*";
+    public static final String ID = "id";
     public static final String CASE_DATA_ID = "case_data_id";
     public static final String USER_ID = "user_id";
     public static final String CASE_ROLE = "case_role";
@@ -64,10 +65,10 @@ public class Constants {
         "select * from reconciliation_data rd where run_id = (select max(run_id) from reconciliation_data rd2);";
 
     //check role category as well
-    public static final String CCD_RECORDS_HAVING_NULL_FIELDS = "select id,case_data_id,user_id,case_role,"
-        + "jurisdiction,case_type,role_category,begin_date from ccd_view where case_data_id is null "
-        + "or case_role is null or jurisdiction is null or case_type is null or role_category is null or "
-        + "begin_date is null or user_id is null limit 100";
+    public static final String CCD_RECORDS_HAVING_NULL_FIELDS =
+        "select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date from ccd_view where"
+        + " length(case_data_id) = 0 or length(case_role) = 0 or length(jurisdiction) = 0 or length(case_type) = 0"
+        + " or length(role_category) = 0 or begin_date is null or length(user_id) = 0 limit 100";
 
     public static final String INSERT_INTO_ACTOR_CACHE = "insert into replica_actor_cache_control"
                                                          + " (actor_id, etag,json_response)"
@@ -93,8 +94,8 @@ public class Constants {
 
     public static final String NO_RECONCILIATION_DATA_FOUND = "No reconciliation data found for Job Id: %s";
     public static final String INVALID_ROLES = "The following roles are invalid : ";
-    public static final String INVALID_ROLE_CATEGORIES = "The following role categories are invalid : %s";
-    public static final String INVALID_CASE_IDS = "The following caseIds is not of valid length: %s";
+    public static final String INVALID_ROLE_CATEGORIES = "The following role categories are invalid :";
+    public static final String INVALID_CASE_IDS = "The following caseIds is not of valid length: ";
     public static final String ERROR_BUILDIND_CCD_RECONCILIATION_DATA =
         "The total records do not match with sum(groupBy(jurisdiction/roleName))";
     public static final String EMPTY_STRING = "";
@@ -102,4 +103,9 @@ public class Constants {
     public static final String AFTER_CCD_MIGRATION = "After CCD Migration - Reconciliation Status";
     public static final String AFTER_TABLE_RENAME = "After Table Rename - Reconciliation Status";
     public static final String AFTER_VALIDATION = "Validation - Reconciliation Status";
+
+    public static final String RECONCILIATION = "Reconciliation";
+    public static final String DELETE_EXPIRED_JOB = "DeleteExpiredJob";
+    public static final String DELETE_EXPIRED_RECORD_JOB_STATUS = "Delete Expired Record Job Status";
+    public static final String ZERO_COUNT_IN_CCD_VIEW = "ZERO";
 }
