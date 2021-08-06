@@ -59,7 +59,7 @@ public class JobRunnableDecider implements JobExecutionDecider {
         var ldRenameTablesFlag = featureConditionEvaluator.isFlagEnabled(SERVICE_NAME,
                 "ccd-am-migration-rename-tables");
 
-        if (fluxMigrationFlag != ldMigrationFlag && fluxRenameTablesFlag != ldRenameTablesFlag) {
+        if (fluxMigrationFlag != ldMigrationFlag || fluxRenameTablesFlag != ldRenameTablesFlag) {
             log.info("LaunchDarkly and Flux flags do not match");
             job.setExitStatus(new ExitStatus(ExitStatus.STOPPED.toString(),
                     "LaunchDarkly and Flux flags do not match"));
