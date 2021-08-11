@@ -53,9 +53,9 @@ class AuditSkipListenerTest {
         UUID requestUuid = UUID.randomUUID();
         CcdCaseUser ccdCaseUser = TestDataBuilder.buildCcdCaseUsers();
         HistoryEntity historyEntity = TestDataBuilder.buildHistoryEntity(requestUuid, ccdCaseUser.getUserId(),
-                                                                         ccdCaseUser.getCaseDataId());
+                                                                         ccdCaseUser.getReference());
         RequestEntity requestEntity = TestDataBuilder.buildRequestEntity(requestUuid, ccdCaseUser.getUserId(),
-                                                                         ccdCaseUser.getCaseDataId());
+                                                                         ccdCaseUser.getReference());
         EntityWrapper entityWrapper = EntityWrapper.builder().ccdCaseUser(ccdCaseUser)
                                                    .roleAssignmentHistoryEntity(historyEntity)
                                                    .requestEntity(requestEntity).build();

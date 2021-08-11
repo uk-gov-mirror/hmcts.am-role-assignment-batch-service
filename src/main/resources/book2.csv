@@ -1,4 +1,4 @@
-﻿case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date
+﻿reference,user_id,case_role,jurisdiction,case_type_id,role_category,start_date
 1234567891234567,userId1,[PETSOLICITOR],IA,IA,PROFESSIONAL,2021-06-29 15:21:56
 1234567891234567,userId2,[SOLICITORB],IA,IA,PROFESSIONAL,2021-06-29 15:21:56
 1234567891234567,userId3,[SOLICITORC],IA,IA,PROFESSIONAL,2021-06-29 15:21:56

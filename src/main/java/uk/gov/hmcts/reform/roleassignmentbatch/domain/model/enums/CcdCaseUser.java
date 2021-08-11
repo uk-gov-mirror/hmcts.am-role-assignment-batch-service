@@ -8,12 +8,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CcdCaseUser implements Serializable {
-    private String id;
-    private String caseDataId;
+    private String rowNo;
+    private String reference;
     private String userId;
     private String caseRole;
     private String jurisdiction;
-    private String caseType;
+    private String caseTypeId;
     private String roleCategory;
-    private String beginDate;
+    private String startDate;
 }

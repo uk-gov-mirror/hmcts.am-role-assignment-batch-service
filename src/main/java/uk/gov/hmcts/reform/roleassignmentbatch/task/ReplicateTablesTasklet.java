@@ -26,18 +26,22 @@ public class ReplicateTablesTasklet implements Tasklet {
         //jdbcTemplate.update("DROP TABLE IF EXISTS CCD_VIEW");
         //log.info("Drop Table CCD_VIEW: Successful");
 
-        log.info("Creating CCD_VIEW ");
-        jdbcTemplate.execute("create table if not exists ccd_view("
-                             + "id SERIAL PRIMARY KEY,"
-                             + "case_data_id varchar not null,"
-                             + "user_id varchar not null,"
-                             + "case_role varchar not null,"
-                             + "jurisdiction varchar not null,"
-                             + "case_type varchar  not null ,"
-                             + "role_category varchar not null,"
-                             + "begin_date timestamp"
+        /*log.info("Creating CCD_VIEW ");
+        jdbcTemplate.execute()create table if not exists ccd_view(
+row_no SERIAL PRIMARY key,
+user_id varchar not null,
+case_role varchar not null,
+reference int8 not null,
+role_category varchar not null,
+jurisdiction varchar not null,
+case_type_id varchar  not null ,
+start_date timestamp
+)
+
+
                              + ")");
-        log.info("Creating CCD_VIEW : Complete ");
+
+        log.info("Creating CCD_VIEW : Complete ");*/
 
         log.info("Creating reconciliation_data ");
         jdbcTemplate.execute("create table if not exists reconciliation_data("

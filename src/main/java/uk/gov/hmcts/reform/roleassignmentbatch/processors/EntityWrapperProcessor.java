@@ -38,10 +38,10 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
         UUID requestUuid = UUID.randomUUID();
 
         Map<String, JsonNode> attributes = new HashMap<>();
-        attributes.put("caseId", convertValueJsonNode(ccdCaseUser.getCaseDataId()));
-        attributes.put("caseTypeId", convertValueJsonNode(ccdCaseUser.getCaseType()));
+        attributes.put("caseId", convertValueJsonNode(ccdCaseUser.getReference()));
+        attributes.put("caseTypeId", convertValueJsonNode(ccdCaseUser.getCaseTypeId()));
         attributes.put("jurisdiction", convertValueJsonNode(ccdCaseUser.getJurisdiction()));
-        String reference = ccdCaseUser.getCaseDataId().concat("-").concat(ccdCaseUser.getUserId());
+        String reference = ccdCaseUser.getReference().concat("-").concat(ccdCaseUser.getUserId());
 
         RequestEntity requestEntity = RequestEntity.builder()
                                                    .id(requestUuid)
@@ -75,7 +75,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
                          .grantType(GrantType.SPECIFIC.name())
                          .roleCategory(ccdCaseUser.getRoleCategory())
                          .readOnly(false)
-                         .beginTime(ccdCaseUser.getBeginDate())
+                         .beginTime(ccdCaseUser.getStartDate())
                          .created(LocalDateTime.now())
                          .log("This is a migrated record from CCD.")
                          .attributes(convertValueJsonNode(attributes).toString())
@@ -91,7 +91,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
                                 .grantType(GrantType.SPECIFIC.name())
                                 .roleCategory(ccdCaseUser.getRoleCategory())
                                 .readOnly(false)
-                                .beginTime(ccdCaseUser.getBeginDate())
+                                .beginTime(ccdCaseUser.getStartDate())
                                 .created(LocalDateTime.now())
                                 .attributes(convertValueJsonNode(attributes).toString())
                                 .build();

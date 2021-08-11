@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_VALIDATION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ZERO_COUNT_IN_CCD_VIEW;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +32,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.CcdViewRowMapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
-
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_VALIDATION;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ZERO_COUNT_IN_CCD_VIEW;
 
 
 @Component
@@ -64,7 +64,7 @@ public class ValidationTasklet implements Tasklet {
         log.info("Validating CcdCaseUsers");
         performNullChecksOnCcdFields(contribution);
         validateCaseId(contribution);
-        validateRoleMappings(contribution);
+        //validateRoleMappings(contribution); Commenting out temporarily
         validateRoleType(contribution);
         log.info("Validating CcdCaseUsers is complete.");
         sendEmailForAnyValidationError(contribution);
@@ -120,7 +120,7 @@ public class ValidationTasklet implements Tasklet {
         }
         List<CcdCaseUser> ccdCaseUsers = jdbcTemplate.query(Constants.CCD_RECORDS_HAVING_NULL_FIELDS, ccdViewRowMapper);
         if (!ccdCaseUsers.isEmpty()) {
-            List<String> invalidIds = ccdCaseUsers.stream().map(CcdCaseUser::getId).collect(Collectors.toList());
+            List<String> invalidIds = ccdCaseUsers.stream().map(CcdCaseUser::getRowNo).collect(Collectors.toList());
             log.error("CCD View has null fields. The ID's are as follows: {}", invalidIds);
             AuditFaults auditFaults =
                 AuditFaults.builder()

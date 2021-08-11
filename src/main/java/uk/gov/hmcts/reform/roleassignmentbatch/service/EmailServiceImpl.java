@@ -1,5 +1,10 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.service;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.EMPTY_STRING;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ZERO_COUNT_IN_CCD_VIEW;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -31,11 +36,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.exception.EmailSendFailedExceptio
 import uk.gov.hmcts.reform.roleassignmentbatch.exception.NoReconciliationDataFound;
 import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.ReconciliationMapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
-
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ZERO_COUNT_IN_CCD_VIEW;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.EMPTY_STRING;
 
 
 /**
@@ -178,7 +178,7 @@ public class EmailServiceImpl implements EmailService {
         templateMap.put("totalCountFromCcd", 0);
         templateMap.put("totalCountFromAm", EMPTY_STRING);
         templateMap.put("status", ReconQuery.FAILED.getKey());
-        templateMap.put("notes", "No record found in ccd_view");
+        templateMap.put("notes", "No record found in ccd_user_view");
         templateMap.put("amRecordsBeforeMigration", EMPTY_STRING);
         templateMap.put("amRecordsAfterMigration", EMPTY_STRING);
         return templateMap;

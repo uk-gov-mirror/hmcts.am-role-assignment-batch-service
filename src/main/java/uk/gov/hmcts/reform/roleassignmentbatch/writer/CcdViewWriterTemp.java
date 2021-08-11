@@ -31,7 +31,7 @@ public class CcdViewWriterTemp implements ItemWriter<CcdCaseUser> {
             user.setUserId(uuidList.get(random.nextInt(uuidList.size())));
         }
         for (int i = 0; i <= 0; i++) {
-            ccdCaseUserJdbcBatchItemWriter.write(items);
+            //ccdCaseUserJdbcBatchItemWriter.write(items);
 
         }
     }
