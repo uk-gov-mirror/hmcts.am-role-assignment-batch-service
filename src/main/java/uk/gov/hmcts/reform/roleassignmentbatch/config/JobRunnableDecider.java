@@ -70,7 +70,7 @@ public class JobRunnableDecider implements JobExecutionDecider {
                     "LaunchDarkly and Flux flags do not match"));
             isEnabled = false;
         } else if (fluxMigrationFlag && fluxRenameTablesFlag) {
-            log.info("migrationFlag and renameTablesFlag are true");
+            log.info("MigrationFlag and renameTablesFlag are true. The application will exit.");
             emailService.sendEmail(emailData);
             job.setExitStatus(new ExitStatus(ExitStatus.STOPPED.toString(),
                     "migrationFlag and renameTablesFlag are true"));
