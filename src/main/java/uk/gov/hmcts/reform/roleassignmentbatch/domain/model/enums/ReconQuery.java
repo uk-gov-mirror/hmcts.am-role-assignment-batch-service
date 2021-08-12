@@ -6,9 +6,9 @@ public enum ReconQuery {
     AUDIT_FAULTS_TOTAL_COUNT("select count(1) from audit_faults"),
 
     //CCD
-    CCD_TOTAL_COUNT("select count(1) from ccd_view"),
-    GROUP_BY_CCD_JURISDICTION("select jurisdiction,count(1) from ccd_view group by jurisdiction order by jurisdiction"),
-    GROUP_BY_CCD_CASE_ROLE("select case_role,count(1) from ccd_view group by case_role order by case_role"),
+    CCD_TOTAL_COUNT("select count(1) from ccd_user_view"),
+    GROUP_BY_CCD_JURISDICTION("select jurisdiction,count(1) from ccd_user_view group by jurisdiction order by jurisdiction"),
+    GROUP_BY_CCD_CASE_ROLE("select case_role,count(1) from ccd_user_view group by case_role order by case_role"),
     //AM
     AM_TOTAL_COUNT("select count(1) from replica_role_assignment"),
     GROUP_BY_AM_JURISDICTION("select attributes->>'jurisdiction' as caseTypeId,count(1)"
@@ -42,8 +42,8 @@ public enum ReconQuery {
     PASSED("PASSED"),
     FAILED("FAILED"),
     IN_PROGRESS("The batch operation is in progress."),
-    SUCCESS_STATUS("Total Record are matching from both ccd_view and am_role_assignment table."),
-    FAILED_STATUS("Total Record are NOT matching from both ccd_view and am_role_assignment table."),
+    SUCCESS_STATUS("Total Record are matching from both ccd_user_view and am_role_assignment table."),
+    FAILED_STATUS("Total Record are NOT matching from both ccd_user_view and am_role_assignment table."),
     CHECK_AUDIT_TABLE("There is some failure. Please check the Audit table"),
     CCD_VIEW_MODIFIED("The CCD view has been modified during the migration."
                       + " Initial records were %s, and current records are %s"),

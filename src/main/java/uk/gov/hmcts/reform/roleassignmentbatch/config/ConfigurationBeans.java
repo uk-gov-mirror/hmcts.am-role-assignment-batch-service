@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.BEGIN_DATE;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_DATA_ID;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.START_DATE;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.REFERENCE;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_ROLE;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_TYPE;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_TYPE_ID;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.JURISDICTION;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ROLE_CATEGORY;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.USER_ID;
@@ -91,9 +91,9 @@ public class ConfigurationBeans {
         return
             new JdbcBatchItemWriterBuilder<CcdCaseUser>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("insert into ccd_view(case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
-                     + "begin_date) values (:caseDataId,:userId,:caseRole,:jurisdiction,:caseType,:roleCategory,"
-                     + ":beginDate)")
+                .sql("insert into ccd_user_view(reference,user_id,case_role,jurisdiction,case_type_id,role_category,"
+                     + "start_date) values (:reference,:userId,:caseRole,:jurisdiction,:caseTypeId,:roleCategory,"
+                     + ":startDate)")
                 .dataSource(dataSource)
                 .build();
     }
@@ -145,11 +145,11 @@ public class ConfigurationBeans {
     public SqlPagingQueryProviderFactoryBean queryProvider() {
         SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
 
-        provider.setSelectClause("select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,"
-                                 + "begin_date");
-        provider.setFromClause("from ccd_view");
+        provider.setSelectClause("select row_no,reference,user_id,case_role,jurisdiction,case_type_id,role_category,"
+                                 + "start_date");
+        provider.setFromClause("from ccd_user_view");
         //provider.setWhereClause("where status=:status");
-        provider.setSortKey("id");
+        provider.setSortKey("row_no");
         provider.setDataSource(dataSource);
 
         return provider;
@@ -163,7 +163,7 @@ public class ConfigurationBeans {
             .saveState(false)
             .resource(new ClassPathResource(fileName))
             .delimited()
-            .names(CASE_DATA_ID, USER_ID, CASE_ROLE, JURISDICTION, CASE_TYPE, ROLE_CATEGORY, BEGIN_DATE)
+            .names(REFERENCE, USER_ID, CASE_ROLE, JURISDICTION, CASE_TYPE_ID, ROLE_CATEGORY, START_DATE)
             .lineMapper(lineMapper())
             .fieldSetMapper(new BeanWrapperFieldSetMapper<>() {
                 {
@@ -180,7 +180,7 @@ public class ConfigurationBeans {
         final DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
-        lineTokenizer.setNames(CASE_DATA_ID, USER_ID, CASE_ROLE, JURISDICTION, CASE_TYPE, ROLE_CATEGORY, BEGIN_DATE);
+        lineTokenizer.setNames(REFERENCE, USER_ID, CASE_ROLE, JURISDICTION, CASE_TYPE_ID, ROLE_CATEGORY, START_DATE);
         final CcdFieldSetMapper ccdFieldSetMapper = new CcdFieldSetMapper();
         defaultLineMapper.setLineTokenizer(lineTokenizer);
         defaultLineMapper.setFieldSetMapper(ccdFieldSetMapper);
@@ -193,13 +193,13 @@ public class ConfigurationBeans {
         @Override
         public CcdCaseUser mapFieldSet(FieldSet fieldSet) {
             final CcdCaseUser caseUsers = new CcdCaseUser();
-            caseUsers.setCaseDataId(fieldSet.readString(CASE_DATA_ID));
+            caseUsers.setReference(fieldSet.readString(REFERENCE));
             caseUsers.setUserId(fieldSet.readString(USER_ID));
             caseUsers.setCaseRole(fieldSet.readString(CASE_ROLE));
             caseUsers.setJurisdiction(fieldSet.readString(JURISDICTION));
-            caseUsers.setCaseType(fieldSet.readString(CASE_TYPE));
+            caseUsers.setCaseTypeId(fieldSet.readString(CASE_TYPE_ID));
             caseUsers.setRoleCategory(fieldSet.readString(ROLE_CATEGORY));
-            caseUsers.setBeginDate(fieldSet.readString(BEGIN_DATE));
+            caseUsers.setStartDate(fieldSet.readString(START_DATE));
             return caseUsers;
         }
     }

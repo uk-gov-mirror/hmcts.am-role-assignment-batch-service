@@ -12,14 +12,14 @@ public class Constants {
     public static final String STOPPED = "STOPPED";
     public static final String FAILED = "FAILED";
     public static final String ANY = "*";
-    public static final String ID = "id";
-    public static final String CASE_DATA_ID = "case_data_id";
+    public static final String ROW_NO = "row_no";
+    public static final String REFERENCE = "reference";
     public static final String USER_ID = "user_id";
     public static final String CASE_ROLE = "case_role";
     public static final String JURISDICTION = "jurisdiction";
-    public static final String CASE_TYPE = "case_type";
+    public static final String CASE_TYPE_ID = "case_type_id";
     public static final String ROLE_CATEGORY = "role_category";
-    public static final String BEGIN_DATE = "begin_date";
+    public static final String START_DATE = "start_date";
     public static final List<String> AM_TABLES = List.of("role_assignment","role_assignment_history",
             "role_assignment_request","actor_cache_control");
 
@@ -66,18 +66,18 @@ public class Constants {
 
     //check role category as well
     public static final String CCD_RECORDS_HAVING_NULL_FIELDS =
-        "select id,case_data_id,user_id,case_role,jurisdiction,case_type,role_category,begin_date from ccd_view where"
-        + " length(case_data_id) = 0 or length(case_role) = 0 or length(jurisdiction) = 0 or length(case_type) = 0"
-        + " or length(role_category) = 0 or begin_date is null or length(user_id) = 0 limit 100";
+        "select row_no,reference,user_id,case_role,jurisdiction,case_type_id,role_category,start_date from ccd_user_view where"
+        + " reference is null or length(case_role) = 0 or length(jurisdiction) = 0 or length(case_type_id) = 0"
+        + " or length(role_category) = 0 or start_date is null or length(user_id) = 0 limit 100";
 
     public static final String INSERT_INTO_ACTOR_CACHE = "insert into replica_actor_cache_control"
                                                          + " (actor_id, etag,json_response)"
         + " select distinct(actor_id),0, '{}'::jsonb from replica_role_assignment;";
 
-    public static final String QUERY_INVALID_CASE_IDS = "SELECT distinct (case_data_id) FROM ccd_view"
-                                                        + " WHERE LENGTH(case_data_id) != 16 LIMIT 100";
-    public static final String DISTINCT_CASE_ROLES_FROM_CCD = "select distinct (case_role) from ccd_view";
-    public static final String DISTINCT_ROLE_CATEGORY_FROM_CCD = "select distinct (role_category) from ccd_view";
+    public static final String QUERY_INVALID_CASE_IDS = " SELECT distinct (reference) FROM ccd_user_view cuv"
+                                                        + " WHERE length(reference::text) != 16 LIMIT 100";
+    public static final String DISTINCT_CASE_ROLES_FROM_CCD = "select distinct (case_role) from ccd_user_view";
+    public static final String DISTINCT_ROLE_CATEGORY_FROM_CCD = "select distinct (role_category) from ccd_user_view";
     public static final String COUNT_AM_ROLE_ASSIGNMENT_TABLE = "select count (*) from role_assignment";
     public static final String COUNT_AM_HISTORY_TABLE = "select count (*) from role_assignment_history";
     public static final String COUNT_AM_REQUEST_TABLE = "select count (*) from role_assignment_request";
