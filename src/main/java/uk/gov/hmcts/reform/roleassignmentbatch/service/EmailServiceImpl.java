@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.roleassignmentbatch.service;
 
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.EMPTY_STRING;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.PROCESS_FLAGS;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ZERO_COUNT_IN_CCD_VIEW;
 
