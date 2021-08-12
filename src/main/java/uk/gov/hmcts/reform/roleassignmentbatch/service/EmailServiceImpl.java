@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.roleassignmentbatch.service;
 
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.EMPTY_STRING;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.PROCESS_FLAGS;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ZERO_COUNT_IN_CCD_VIEW;
 
@@ -89,6 +90,14 @@ public class EmailServiceImpl implements EmailService {
             emailData.setEmailTo(mailTo);
             emailData.setEmailSubject(concatEmailSubject);
             emailData.setRunId(emailData.getRunId());
+            if (PROCESS_FLAGS.equals(emailData.getModule())) {
+                emailData.setTemplateMap(processFlagStatusThymeleafTemplate(
+                        emailData.getRunId(),
+                        emailData.getFlags()));
+                context.setVariables(emailData.getTemplateMap());
+                String process = templateEngine.process("broken-flags.html", context);
+                content = new Content("text/html", process);
+            }
             if (RECONCILIATION.equals(emailData.getModule())) {
                 emailData.setTemplateMap(reconThymeleafTemplate(emailData.getRunId()));
                 context.setVariables(emailData.getTemplateMap());
@@ -181,6 +190,23 @@ public class EmailServiceImpl implements EmailService {
         templateMap.put("notes", "No record found in ccd_user_view");
         templateMap.put("amRecordsBeforeMigration", EMPTY_STRING);
         templateMap.put("amRecordsAfterMigration", EMPTY_STRING);
+        return templateMap;
+    }
+
+    /**
+     * Thymeleaf builder template for process flag status mail notification.
+     *
+     * @param runId JobId is the parameter
+     * @return
+     */
+    private Map<String, Object> processFlagStatusThymeleafTemplate(String runId,
+                                                                   String flagStatus) {
+
+        Map<String, Object> templateMap = new HashMap<>();
+        templateMap.put("runId", runId);
+        templateMap.put("createdDate", LocalDateTime.now());
+        templateMap.put("status", ReconQuery.FAILED.getKey());
+        templateMap.put("flagStatus", flagStatus);
         return templateMap;
     }
 }

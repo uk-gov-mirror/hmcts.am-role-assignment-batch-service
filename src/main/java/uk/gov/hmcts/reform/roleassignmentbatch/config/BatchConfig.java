@@ -65,6 +65,11 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Value("${azure.account-key}")
     String accountKey;
 
+    @Value("${migration.masterFlag}")
+    boolean masterFlag;
+    @Value("${migration.renameTables}")
+    boolean renameTables;
+
     @Autowired
     JobBuilderFactory jobs;
 
@@ -237,7 +242,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Bean
     public JobExecutionDecider checkLdStatus() {
-        return new JobRunnableDecider();
+        return new JobRunnableDecider(masterFlag, renameTables);
     }
 
     @Bean

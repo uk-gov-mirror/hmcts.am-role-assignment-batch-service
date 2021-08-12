@@ -17,5 +17,6 @@ public class EmailData {
     private String emailSubject;
     private String runId;
     private String module;
+    private String flags;
     Map<String, Object> templateMap;
 }

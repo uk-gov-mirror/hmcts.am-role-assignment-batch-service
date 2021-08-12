@@ -66,7 +66,8 @@ public class Constants {
 
     //check role category as well
     public static final String CCD_RECORDS_HAVING_NULL_FIELDS =
-        "select row_no,reference,user_id,case_role,jurisdiction,case_type_id,role_category,start_date from ccd_user_view where"
+        "select row_no,reference,user_id,case_role,jurisdiction,case_type_id,role_category,start_date"
+        + " from ccd_user_view where"
         + " reference is null or length(case_role) = 0 or length(jurisdiction) = 0 or length(case_type_id) = 0"
         + " or length(role_category) = 0 or start_date is null or length(user_id) = 0 limit 100";
 
@@ -105,6 +106,7 @@ public class Constants {
     public static final String AFTER_VALIDATION = "Validation - Reconciliation Status";
 
     public static final String RECONCILIATION = "Reconciliation";
+    public static final String PROCESS_FLAGS = "ProcessFlags";
     public static final String DELETE_EXPIRED_JOB = "DeleteExpiredJob";
     public static final String DELETE_EXPIRED_RECORD_JOB_STATUS = "Delete Expired Record Job Status";
     public static final String ZERO_COUNT_IN_CCD_VIEW = "ZERO";
