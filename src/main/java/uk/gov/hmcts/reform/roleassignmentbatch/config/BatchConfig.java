@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.ApplicationParams;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.AfterMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BeforeMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BuildCcdViewMetrics;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
@@ -105,9 +104,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Autowired
     BeforeMigration beforeMigration;
-
-    @Autowired
-    AfterMigration afterMigration;
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
@@ -199,13 +195,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public Step afterMigrationReconStep() {
-        return steps.get("afterMigrationReconStep")
-                .tasklet(afterMigration)
-                .build();
-    }
-
-    @Bean
     public Step ccdToRasStep() {
         return steps.get("ccdToRasStep")
                     .<CcdCaseUser, EntityWrapper>chunk(chunkSize)
@@ -272,7 +261,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .next(beforeMigrationReconStep())
             .next(ccdToRasStep())
             .next(reconcileData())
-            .next(afterMigrationReconStep())
             .next(insertDataPostMigrationStep())
             .build();
     }

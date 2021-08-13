@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.AFTER_CCD_MIGRATION;
+
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sendgrid.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
@@ -15,10 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ReconQuery;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 import uk.gov.hmcts.reform.roleassignmentbatch.exception.NoReconciliationDataFound;
 import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.ReconciliationMapper;
+import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.ReconciliationDataService;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
@@ -31,6 +36,8 @@ public class ReconcileDataTasklet implements Tasklet {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private ReconciliationDataService reconDataService;
+    @Autowired
+    EmailService emailService;
 
     /**
      * Reconciliation Logic with below steps.
@@ -107,9 +114,22 @@ public class ReconcileDataTasklet implements Tasklet {
         reconcileData.setStatus(jobPassed ? ReconQuery.PASSED.getKey() : ReconQuery.FAILED.getKey());
         reconcileData.setNotes(StringUtils.hasText(notes) ? notes : ReconQuery.SUCCESS_STATUS.getKey());
         reconDataService.saveReconciliationData(reconcileData);
-
+        sendEmail(jobId);
         log.info("End the reconciliation for job id: {}", jobId);
         return RepeatStatus.FINISHED;
+    }
+
+    private void sendEmail(String jobId) {
+        EmailData emailData = EmailData
+            .builder()
+            .runId(jobId)
+            .emailSubject(AFTER_CCD_MIGRATION)
+            .module("Reconciliation")
+            .build();
+        Response response = emailService.sendEmail(emailData);
+        if (response != null) {
+            log.info("After CCD Migration - Reconciliation Status mail has been sent to target recipients");
+        }
     }
 
     private boolean isRoleDataEqual(ObjectMapper mapper, String amRoleNameData,
