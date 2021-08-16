@@ -69,8 +69,6 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private SpringTemplateEngine templateEngine;
 
-
-
     /**
      * Generic Method is used to send mail notification to the caller.
      *
