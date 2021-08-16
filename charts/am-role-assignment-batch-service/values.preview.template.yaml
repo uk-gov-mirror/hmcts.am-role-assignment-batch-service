@@ -2,7 +2,7 @@ job:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   environment:
-    ROLE_ASSIGNMENT_DB_HOST: am-role-assignment-service-pr-909-postgresql
+    ROLE_ASSIGNMENT_DB_HOST: am-role-assignment-service-pr-927-postgresql
     ROLE_ASSIGNMENT_DB_NAME: role_assignment
     ROLE_ASSIGNMENT_DB_USERNAME: role_assignment
     ROLE_ASSIGNMENT_DB_PASSWORD: role_assignment
