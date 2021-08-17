@@ -3,10 +3,16 @@ package uk.gov.hmcts.reform.roleassignmentbatch.util;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.RoleAssignmentHistory;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 
 public class BatchUtil {
+
     private BatchUtil() {
     }
 
@@ -37,5 +43,25 @@ public class BatchUtil {
                 ps.setTimestamp(20, roleAssignmentHistory.getCreated());
             }
         };
+    }
+
+    public static ObjectMapper getObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        return mapper;
+    }
+
+    public static String getAmRecordsCount(@Autowired JdbcTemplate jdbcTemplate) {
+        return "AM Role Assignment: "
+            .concat(jdbcTemplate.queryForObject(Constants.COUNT_AM_ROLE_ASSIGNMENT_TABLE, String.class)).concat("\n")
+            .concat("  :AM Role Assignment History: ")
+            .concat(jdbcTemplate.queryForObject(Constants.COUNT_AM_HISTORY_TABLE, String.class)).concat("\n")
+            .concat("  :AM Role Assignment Request: ")
+            .concat(jdbcTemplate.queryForObject(Constants.COUNT_AM_REQUEST_TABLE, String.class)).concat("\n")
+            .concat("  :AM Actor Cache Table: ")
+            .concat(jdbcTemplate.queryForObject(Constants.COUNT_ACTOR_CACHE_TABLE, String.class)).concat("\n");
     }
 }

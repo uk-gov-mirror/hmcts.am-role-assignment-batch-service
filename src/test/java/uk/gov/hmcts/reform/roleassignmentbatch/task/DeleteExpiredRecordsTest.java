@@ -21,7 +21,9 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,7 +34,9 @@ import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.GrantType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Status;
+import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 import uk.gov.hmcts.reform.roleassignmentbatch.helper.TestDataBuilder;
+import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 
 @RunWith(MockitoJUnitRunner.class)
 class DeleteExpiredRecordsTest {
@@ -51,6 +55,15 @@ class DeleteExpiredRecordsTest {
 
     private DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
 
+    @Mock
+    StepExecution stepExecution = Mockito.mock(StepExecution.class);
+
+    @Mock
+    JobExecution jobExecution = Mockito.mock(JobExecution.class);
+
+    @Mock
+    EmailService emailService = Mockito.mock(EmailService.class);
+
     @BeforeAll
     public static void setUp() {
         //MockitoAnnotations.initMocks(this);
@@ -66,6 +79,9 @@ class DeleteExpiredRecordsTest {
 
         Mockito.when(jdbcTemplate.query(anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any()))
                .thenReturn(list);
+        Mockito.when(stepContribution.getStepExecution()).thenReturn(stepExecution);
+        Mockito.when(stepContribution.getStepExecution().getJobExecution()).thenReturn(jobExecution);
+        Mockito.when(stepContribution.getStepExecution().getJobExecution().getId()).thenReturn(Long.valueOf(1));
 
         Assertions.assertEquals(RepeatStatus.FINISHED, sut.execute(stepContribution, chunkContext));
     }

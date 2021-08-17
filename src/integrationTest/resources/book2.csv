@@ -1,0 +1,5 @@
+reference,user_id,case_role,jurisdiction,case_type_id,role_category
+11111,22222,[LASOLICITOR],IA,dummycaseType,staff
+22222,22222,[LASOLICITOR],IA,dummycaseType,staff
+11111,22222,[LASOLICITOR],IA,dummycaseType,staff
+22222,22222,[LASOLICITOR],IA,dummycaseType,staff
