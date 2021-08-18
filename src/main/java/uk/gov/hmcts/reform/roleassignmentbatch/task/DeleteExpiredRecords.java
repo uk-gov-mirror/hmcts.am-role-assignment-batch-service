@@ -1,5 +1,17 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_RECORD_JOB_STATUS;
+
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -16,18 +28,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_RECORD_JOB_STATUS;
-
 @Component
 @Slf4j
 public class DeleteExpiredRecords implements Tasklet {
@@ -41,6 +41,7 @@ public class DeleteExpiredRecords implements Tasklet {
         this.jdbcTemplate = jdbcTemplate;
         this.batchSize = batchSize;
     }
+
 
     @Override
     @Transactional
