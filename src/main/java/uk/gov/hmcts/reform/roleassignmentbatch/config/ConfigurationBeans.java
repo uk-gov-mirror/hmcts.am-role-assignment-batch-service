@@ -158,7 +158,7 @@ public class ConfigurationBeans {
     @Bean
     public FlatFileItemReader<CcdCaseUser> ccdCaseUsersReader() {
         return new FlatFileItemReaderBuilder<CcdCaseUser>()
-            .name("historyEntityReader")
+            .name("ccdCaseUsersReader")
             .linesToSkip(1)
             .saveState(false)
             .resource(new ClassPathResource(fileName))
