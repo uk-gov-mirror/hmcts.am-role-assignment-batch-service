@@ -22,4 +22,3 @@ bin/main/application.yaml
 target/
 .idea
 .gradle
-src/main/resources/application.yaml

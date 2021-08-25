@@ -1,0 +1,105 @@
+server:
+  port: ${PORT:4099}
+
+management:
+  health:
+    db:
+      enabled: true
+    defaults:
+      enabled: true
+    diskspace:
+      enabled: true
+  endpoint:
+    health:
+      enabled: true
+      cache:
+        time-to-live: 5s
+      show-details: "always"
+  security:
+    enabled: false
+  endpoints:
+    health:
+      sensitive: false
+    web:
+      base-path: /
+      exposure:
+        include: 'health'
+
+#If you use a database then uncomment below lines and update db properties accordingly
+
+spring:
+  application:
+    name: Role Assignment Batch Service
+  batch:
+    initialize-schema: always
+    job:
+      enabled: true
+  main:
+    web-application-type: none
+    allow-bean-definition-overriding: true
+  jackson:
+    default-property-inclusion: NON_NULL
+  config:
+    import: "optional:configtree:/mnt/secrets/am/"
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    log_statement: all
+    properties:
+      hibernate:
+        ddl-auto: update
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  flyway.enabled: ${ENABLE_DB_MIGRATE:false}
+  flyway.locations: classpath:db/migration
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://${ROLE_ASSIGNMENT_DB_HOST:localhost}:${ROLE_ASSIGNMENT_DB_PORT:5451}/${ROLE_ASSIGNMENT_DB_NAME:role_assignment}${ROLE_ASSIGNMENT_DB_OPTIONS:?stringtype=unspecified}
+    username: ${ROLE_ASSIGNMENT_DB_USERNAME:am}
+    password: ${ROLE_ASSIGNMENT_DB_PASSWORD:am}
+    properties:
+      charSet: UTF-8
+
+## Sendgrid configuration ##
+  mail:
+    to: ${EMAIL_LIST:}
+    host: ${EMAIL_HOST:mta.reform.hmcts.net}
+    port: 25
+    enabled: ${EMAIL_ENABLED:false}
+    properties:
+      mail-smtp:
+        starttls:
+          enable: false
+        ssl:
+          trust: "*"
+
+
+delete-expired-records: deleteExpiredRecords
+batchjob-name: deleteExpiredRecords
+batch-size: 4
+
+csv-file-name: book2.csv
+migration:
+  masterFlag: ${CCD_AM_MIGRATION_MASTER_FLAG:true}
+  renameTables: ${CCD_AM_MIGRATION_RENAME_TABLES_FLAG:false}
+  chunkSize: ${CHUNK_SIZE:1000}
+
+ccd:
+  roleNames: ${ROLE_NAMES:[PETSOLICITOR],[RESPSOLICITOR],[BARRISTER],[CAFCASSSOLICITOR],[EPSMANAGING],[LABARRISTER],[LAMANAGING],
+              [LASOLICITOR],[SOLICITOR],[SOLICITORA],[SOLICITORB],[SOLICITORC],[SOLICITORD],[SOLICITORE],
+              [SOLICITORF],[SOLICITORG],[SOLICITORH],[SOLICITORI],[SOLICITORJ],[LEGALREPRESENTATIVE],[CREATOR]}
+  roleCategories: ${ROLE_CATEGORIES:PROFESSIONAL,CITIZEN,JUDICIAL,LEGAL_OPERATIONS}
+
+launchdarkly:
+  sdk:
+    key: ${LD_SDK_KEY:}
+    environment: ${LAUNCH_DARKLY_ENV:pr}
+    user: am-${LAUNCH_DARKLY_ENV:local}
+
+logging.level.org.springframework.batch.core.step.item.ChunkMonitor: ${APPLICATION_LOGGING_LEVEL:ERROR}
+
+sendgrid:
+  key: ${AM_SENDGRID_API_KEY:}
+  mail:
+    from: ${AM_SENDGRID_API_EMAIL_FROM:no-reply@mail-am-nonprod.platform.hmcts.net}
