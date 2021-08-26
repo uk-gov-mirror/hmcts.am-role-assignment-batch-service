@@ -54,15 +54,8 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Value("${batchjob-name}")
     String jobName;
 
-    @Value("${azure.container-name}")
-    String containerName;
     @Value("${migration.chunkSize}")
     private int chunkSize;
-
-    @Value("${azure.account-name}")
-    String accountName;
-    @Value("${azure.account-key}")
-    String accountKey;
 
     @Value("${migration.masterFlag}")
     boolean masterFlag;
