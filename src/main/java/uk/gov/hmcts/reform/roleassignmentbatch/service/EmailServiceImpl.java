@@ -80,7 +80,7 @@ public class EmailServiceImpl implements EmailService {
     public Response sendEmail(EmailData emailData) {
         Response response = null;
         if (mailEnabled) {
-            String concatEmailSubject = environmentName.concat("::" + emailData.getEmailSubject());
+            String concatEmailSubject = environmentName.toUpperCase().concat("::" + emailData.getEmailSubject());
             var personalization = new Personalization();
             mailTo.forEach(email -> personalization.addTo(new Email(email)));
             Context context = new Context();
