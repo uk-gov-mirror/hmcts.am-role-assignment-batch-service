@@ -12,7 +12,7 @@ public enum ReconQuery {
     GROUP_BY_CCD_CASE_ROLE("select case_role,count(1) from ccd_user_view group by case_role order by case_role"),
     //AM
     AM_TOTAL_COUNT("select count(1) from replica_role_assignment"),
-    GROUP_BY_AM_JURISDICTION("select attributes->>'jurisdiction' as caseTypeId,count(1)"
+    GROUP_BY_AM_JURISDICTION("select attributes->>'jurisdiction' as caseType,count(1)"
                              + " from replica_role_assignment ra "
                              + "group by attributes->>'jurisdiction' order by attributes->>'jurisdiction'"),
     GROUP_BY_AM_CASE_ROLE("select role_name,count(1) from replica_role_assignment"
@@ -37,7 +37,7 @@ public enum ReconQuery {
 
     CCD_JURISDICTION_KEY("jurisdiction"),
     CCD_CASE_ROLE_KEY("case_role"),
-    CASE_TYPE("caseTypeId"),
+    CASE_TYPE("caseType"),
     ROLE_NAME("role_name"),
     BATCH_IN_PROGRESS("BATCH_IN_PROGRESS"),
     PASSED("PASSED"),

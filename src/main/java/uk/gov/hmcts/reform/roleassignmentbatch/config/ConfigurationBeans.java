@@ -92,7 +92,7 @@ public class ConfigurationBeans {
             new JdbcBatchItemWriterBuilder<CcdCaseUser>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
                 .sql("insert into ccd_user_view(reference,user_id,case_role,jurisdiction,case_type_id,role_category,"
-                     + "start_date) values (:reference,:userId,:caseRole,:jurisdiction,:caseTypeId,:roleCategory,"
+                     + "start_date) values (:reference,:userId,:caseRole,:jurisdiction,:caseType,:roleCategory,"
                      + ":startDate)")
                 .dataSource(dataSource)
                 .build();
@@ -197,7 +197,7 @@ public class ConfigurationBeans {
             caseUsers.setUserId(fieldSet.readString(USER_ID));
             caseUsers.setCaseRole(fieldSet.readString(CASE_ROLE));
             caseUsers.setJurisdiction(fieldSet.readString(JURISDICTION));
-            caseUsers.setCaseTypeId(fieldSet.readString(CASE_TYPE_ID));
+            caseUsers.setCaseType(fieldSet.readString(CASE_TYPE_ID));
             caseUsers.setRoleCategory(fieldSet.readString(ROLE_CATEGORY));
             caseUsers.setStartDate(fieldSet.readString(START_DATE));
             return caseUsers;
