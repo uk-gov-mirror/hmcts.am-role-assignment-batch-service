@@ -27,7 +27,7 @@ public class CcdViewRowMapper implements RowMapper<CcdCaseUser> {
         ccdCaseUser.setReference(rs.getString(REFERENCE));
         ccdCaseUser.setUserId(rs.getString(USER_ID));
         ccdCaseUser.setCaseRole(rs.getString(CASE_ROLE));
-        ccdCaseUser.setCaseTypeId(rs.getString(CASE_TYPE_ID));
+        ccdCaseUser.setCaseType(rs.getString(CASE_TYPE_ID));
         ccdCaseUser.setStartDate(rs.getString(START_DATE));
         ccdCaseUser.setRoleCategory(rs.getString(ROLE_CATEGORY));
         ccdCaseUser.setJurisdiction(rs.getString(JURISDICTION));

@@ -77,7 +77,7 @@ public class ReconciliationDataService {
                                                          .build();
                     result = convertValueJsonNode(ccdRoleName).toString();
                     break;
-                case "caseTypeId":
+                case "caseType":
                     AmJurisdictionItem amJurisdictionItem = AmJurisdictionItem.builder()
                             .count(objectMap.get(ReconQuery.COUNT.getKey()).toString())
                             .jurisdiction(objectMap.get(ReconQuery.CASE_TYPE.getKey()).toString())

@@ -39,7 +39,7 @@ public class EntityWrapperProcessor implements ItemProcessor<CcdCaseUser, Entity
 
         Map<String, JsonNode> attributes = new HashMap<>();
         attributes.put("caseId", convertValueJsonNode(ccdCaseUser.getReference()));
-        attributes.put("caseTypeId", convertValueJsonNode(ccdCaseUser.getCaseTypeId()));
+        attributes.put("caseType", convertValueJsonNode(ccdCaseUser.getCaseType()));
         attributes.put("jurisdiction", convertValueJsonNode(ccdCaseUser.getJurisdiction()));
         String reference = ccdCaseUser.getReference().concat("-").concat(ccdCaseUser.getUserId());
 

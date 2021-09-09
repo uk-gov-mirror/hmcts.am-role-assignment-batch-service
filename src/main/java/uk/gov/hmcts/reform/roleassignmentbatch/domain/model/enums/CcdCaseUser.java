@@ -13,7 +13,7 @@ public class CcdCaseUser implements Serializable {
     private String userId;
     private String caseRole;
     private String jurisdiction;
-    private String caseTypeId;
+    private String caseType;
     private String roleCategory;
     private String startDate;
 }

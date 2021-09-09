@@ -114,7 +114,7 @@ public class TestDataBuilder {
         CcdCaseUser ccdCaseUser = new CcdCaseUser();
         ccdCaseUser.setUserId(requestUuid.toString());
         ccdCaseUser.setCaseRole("Role");
-        ccdCaseUser.setCaseTypeId("type");
+        ccdCaseUser.setCaseType("type");
         ccdCaseUser.setReference("DataId");
         return ccdCaseUser;
     }
