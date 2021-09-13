@@ -30,6 +30,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import uk.gov.hmcts.reform.roleassignmentbatch.ApplicationParams;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.FlagsEnum;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BeforeMigration;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.InsertDataPostMigrationTaskl
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReconcileDataTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.SetupDbFlags;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.CcdViewWriterTemp;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
@@ -181,6 +183,13 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    public Step setupDbForMigration(SetupDbFlags setupDbFlags) {
+        return steps.get("setupDbForMigration")
+                .tasklet(setupDbFlags)
+                .build();
+    }
+
+    @Bean
     public Step beforeMigrationReconStep() {
         return steps.get("beforeMigrationReconStep")
                 .tasklet(beforeMigration)
@@ -258,6 +267,19 @@ public class BatchConfig extends DefaultBatchConfigurer {
             .build();
     }
 
+    /**
+     * Setup the database flags, which would govern the CCD AM Migration.
+     *
+     * @return job
+     */
+    @Bean
+    public Job setupDatabaseFlags(@Autowired SetupDbFlags setupDbFlags) {
+        return jobs.get("setup-database-flags")
+                .incrementer(new RunIdIncrementer())
+                .start(setupDbForMigration(setupDbFlags))
+                .build();
+    }
+
 
 
     /**
@@ -269,7 +291,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     */
     @Bean
     public Job ccdToRasBatchJob() {
-        return jobs.get("ccd-am-migration")
+        return jobs.get(FlagsEnum.CCD_AM_MIGRATION_MAIN.getLabel())
                 .incrementer(new RunIdIncrementer())
                 .start(firstStep()) //Dummy step as Decider will work after Step
                 .next(checkLdStatus()).on(DISABLED).end(STOPPED)
@@ -291,7 +313,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
      */
     @Bean
     public Job renameTableRasBatchJob() {
-        return jobs.get("ccd-am-migration-rename-tables")
+        return jobs.get(FlagsEnum.CCD_AM_MIGRATION_RENAME.getLabel())
                 .incrementer(new RunIdIncrementer())
                 .start(firstStep()) //Dummy step as Decider will work after Step
                 .next(checkLdStatus()).on(DISABLED).end(STOPPED)
