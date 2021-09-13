@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.FlagsEnum;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.launchdarkly.FeatureConditionEvaluator;
@@ -62,8 +63,6 @@ public class CcdToRasBatchJobIntegrationTest extends BaseTest {
             + " read_skip_count, write_skip_count, process_skip_count, exit_code, exit_message "
             + "FROM public.batch_step_execution where job_execution_id=?";
 
-    private static final String CCD_AM_JOB = "ccd-am-migration";
-
     @Autowired
     private DataSource ds;
 
@@ -89,7 +88,7 @@ public class CcdToRasBatchJobIntegrationTest extends BaseTest {
     public void shouldStopProcess_LdFlagFalse() {
         logger.info("Process should stop as LD flag set as false");
         doReturn(false).when(featureConditionEvaluator).isFlagEnabled(anyString(), anyString());
-        Map<String, String> job = getRecordsFromBatchJobTable(CCD_AM_JOB);
+        Map<String, String> job = getRecordsFromBatchJobTable(FlagsEnum.CCD_AM_MIGRATION_MAIN.getLabel());
         Map<String, Map<String, String>> step = getRecordsFromBatchStepTable(job.get("job_execution_id"));
 
         assertEquals("COMPLETED", job.get("status"));
@@ -106,7 +105,7 @@ public class CcdToRasBatchJobIntegrationTest extends BaseTest {
         doReturn(DISABLED).when(applicationParams).getProcessCcdDataEnabled();
         doReturn(DISABLED).when(applicationParams).getRenamingPostMigrationTablesEnabled();
 
-        Map<String, String> job = getRecordsFromBatchJobTable(CCD_AM_JOB);
+        Map<String, String> job = getRecordsFromBatchJobTable(FlagsEnum.CCD_AM_MIGRATION_MAIN.getLabel());
         Map<String, Map<String, String>> step = getRecordsFromBatchStepTable(job.get("job_execution_id"));
         assertEquals("COMPLETED", job.get("status"));
         //assertEquals("COMPLETED", job.get("exit_code"));
@@ -122,7 +121,7 @@ public class CcdToRasBatchJobIntegrationTest extends BaseTest {
         doReturn(true).when(featureConditionEvaluator).isFlagEnabled(anyString(), anyString());
         doReturn(ENABLED).when(applicationParams).getProcessCcdDataEnabled();
         doReturn(DISABLED).when(applicationParams).getRenamingPostMigrationTablesEnabled();
-        Map<String, String> job = getRecordsFromBatchJobTable(CCD_AM_JOB);
+        Map<String, String> job = getRecordsFromBatchJobTable(FlagsEnum.CCD_AM_MIGRATION_MAIN.getLabel());
         Map<String, Map<String, String>> step = getRecordsFromBatchStepTable(job.get("job_execution_id"));
         assertEquals("COMPLETED", job.get("status"));
         //assertEquals("COMPLETED", job.get("exit_code"));

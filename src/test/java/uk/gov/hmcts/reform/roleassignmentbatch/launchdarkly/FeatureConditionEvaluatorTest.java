@@ -7,6 +7,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.FlagsEnum;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,7 +35,7 @@ public class FeatureConditionEvaluatorTest {
         when(ldClient.boolVariation(any(), any(), anyBoolean())).thenReturn(true);
         featureConditionEvaluator = new FeatureConditionEvaluator(ldClient, "", "");
         assertTrue(featureConditionEvaluator.isFlagEnabled("am_role_assignment_batch_service",
-                "ccd-am-migration"));
+                FlagsEnum.CCD_AM_MIGRATION_MAIN.getLabel()));
     }
 
     @Test
