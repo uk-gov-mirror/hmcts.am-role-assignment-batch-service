@@ -125,4 +125,14 @@ public class Constants {
     public static final String DELETE_EXPIRED_JOB = "DeleteExpiredJob";
     public static final String DELETE_EXPIRED_RECORD_JOB_STATUS = "Delete Expired Record Job Status";
     public static final String ZERO_COUNT_IN_CCD_VIEW = "ZERO";
+
+    public static final String SETUP_MIGRATION_CONTROL_TABLE_QUERY = "create table if not exists"
+            + " ccd_am_migration_control_table (flag_name varchar primary key, is_enabled boolean);";
+
+    public static final String SETUP_MIGRATION_MAIN_QUERY = "insert into ccd_am_migration_control_table"
+            + " (flag_name, is_enabled) values('ccd-am-migration', false)  on conflict(flag_name) do nothing;";
+
+    public static final String SETUP_MIGRATION_RENAME_QUERY = "insert into ccd_am_migration_control_table"
+            + " (flag_name, is_enabled) values('ccd-am-migration-rename-tables', false)"
+            + " on conflict(flag_name) do nothing;";
 }
