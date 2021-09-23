@@ -10,7 +10,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.12'
+    id 'uk.gov.hmcts.java' version '0.12.13'
     id 'pmd'
     id 'jacoco'
     id 'org.springframework.boot' version '2.5.4'
@@ -209,6 +209,9 @@ dependencies {
     //Remove netty in future versions of Azure blob store.
     implementation group: 'io.netty', name: 'netty-all', version: '4.1.65.Final'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.10'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.53'
 
     testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     testImplementation 'org.springframework.batch:spring-batch-test'
