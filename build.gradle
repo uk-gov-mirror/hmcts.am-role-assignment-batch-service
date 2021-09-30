@@ -92,6 +92,12 @@ task integration(type: Test, description: 'Runs the integration tests.', group: 
 }
 check.dependsOn integration
 
+task fortifyScan(type: JavaExec)  {
+  main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+  classpath += sourceSets.test.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
 jacocoTestReport {
     executionData(test)
     reports {
@@ -233,6 +239,7 @@ dependencies {
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: versions.rest_assured
     testCompile group: 'io.github.openfeign', name: 'feign-jackson', version: versions.feign_jackson
     testCompile('com.opentable.components:otj-pg-embedded:0.13.4')
+    testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
