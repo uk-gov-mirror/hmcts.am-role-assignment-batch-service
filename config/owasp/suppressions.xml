@@ -5,13 +5,4 @@
    ]]></notes>
     <cve>CVE-2018-1258</cve>
   </suppress>
-  <suppress until="2021-12-12">
-    <notes><![CDATA[
-     Suppressing the CVE's temporarily. To be fixed tomorrow)
-   ]]></notes>
-    <cve>CVE-2021-37136</cve>
-    <cve>CVE-2021-37137</cve>
-    <cve>CVE-2021-22096</cve>
-    <cve>CVE-2021-42340</cve>
-  </suppress>
 </suppressions>
