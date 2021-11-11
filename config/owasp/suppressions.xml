@@ -1,17 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?><suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-  <suppress until="2030-01-01">
-    <notes><![CDATA[
-     Suppressing as it's a false positive (see: https://pivotal.io/security/cve-2018-1258)
-   ]]></notes>
-    <cve>CVE-2018-1258</cve>
-  </suppress>
-  <suppress until="2021-12-12">
-    <notes><![CDATA[
-     Suppressing the CVE's temporarily. To be fixed tomorrow)
-   ]]></notes>
-    <cve>CVE-2021-37136</cve>
-    <cve>CVE-2021-37137</cve>
-    <cve>CVE-2021-22096</cve>
-    <cve>CVE-2021-42340</cve>
-  </suppress>
 </suppressions>

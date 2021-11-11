@@ -36,6 +36,7 @@ def versions = [
         reformLogging      : '5.1.1',
         serenity           : '2.1.0',
         springBoot         : '2.4.3',
+        spring             : '5.3.12',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
         feign_jackson      : '9.7.0'
@@ -194,6 +195,20 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
     implementation 'com.sendgrid:sendgrid-java:4.7.2'
 
+    //Fix CVE
+    implementation group: 'org.springframework', name: 'spring-aop', version: versions.spring
+    implementation group: 'org.springframework', name: 'spring-aspects', version: versions.spring
+    implementation group: 'org.springframework', name: 'spring-beans', version: versions.spring
+    implementation group: 'org.springframework', name: 'spring-context', version: versions.spring
+    implementation group: 'org.springframework', name: 'spring-context-support', version: versions.spring
+    implementation group: 'org.springframework', name: 'spring-expression', version: versions.spring
+    implementation group: 'org.springframework', name: 'spring-jcl', version: versions.spring
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: versions.spring
+    implementation group: 'org.springframework', name: 'spring-orm', version: versions.spring
+    implementation group: 'org.springframework', name: 'spring-tx', version: versions.spring
+    implementation group: 'org.springframework', name: 'spring-web', version: versions.spring
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: versions.spring
+
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
     implementation 'commons-io:commons-io:2.10.0'
     implementation group: 'javax.validation', name: 'validation-api'
@@ -213,7 +228,7 @@ dependencies {
         exclude group: 'io.netty'
     }
     //Remove netty in future versions of Azure blob store.
-    implementation group: 'io.netty', name: 'netty-all', version: '4.1.65.Final'
+    implementation group: 'io.netty', name: 'netty-all', version: '4.1.68.Final'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
 
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.12'
