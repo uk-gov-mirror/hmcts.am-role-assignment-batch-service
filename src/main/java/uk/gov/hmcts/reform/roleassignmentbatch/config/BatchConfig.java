@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.FAILED;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.SkipListener;
@@ -46,6 +41,11 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.CcdViewWriterTemp;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.FAILED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
+
 @Slf4j
 @Configuration
 @EnableBatchProcessing
@@ -54,6 +54,10 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Value("${delete-expired-records}")
     String taskParent;
+
+    @Value("${delete-expired-judicial-records}")
+    String taskParentJudicial;
+
     @Value("${batchjob-name}")
     String jobName;
 
@@ -103,12 +107,18 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
-                                  @Autowired DeleteExpiredRecords deleteExpiredRecords,
-                                  @Autowired DeleteJudicialExpiredRecords deleteJudicialExpiredRecords) {
+                                  @Autowired DeleteExpiredRecords deleteExpiredRecords) {
         return steps.get(taskParent)
                     .tasklet(deleteExpiredRecords)
-                    .tasklet(deleteJudicialExpiredRecords)
                     .build();
+    }
+
+    @Bean
+    public Step stepDeleteJudicalExpired(@Autowired StepBuilderFactory steps,
+                                  @Autowired DeleteJudicialExpiredRecords deleteJudicialExpiredRecords) {
+        return steps.get(taskParentJudicial)
+                .tasklet(deleteJudicialExpiredRecords)
+                .build();
     }
 
     @Bean
@@ -118,9 +128,10 @@ public class BatchConfig extends DefaultBatchConfigurer {
                             @Autowired DeleteJudicialExpiredRecords deleteJudicialExpiredRecords) {
 
         return jobs.get(jobName)
-                   .incrementer(new RunIdIncrementer())
-                   .start(stepOrchestration(steps, deleteExpiredRecords,deleteJudicialExpiredRecords))
-                   .build();
+                .incrementer(new RunIdIncrementer())
+                .start(stepOrchestration(steps, deleteExpiredRecords))
+                .next(stepDeleteJudicalExpired(steps, deleteJudicialExpiredRecords))
+                .build();
     }
 
     @Bean

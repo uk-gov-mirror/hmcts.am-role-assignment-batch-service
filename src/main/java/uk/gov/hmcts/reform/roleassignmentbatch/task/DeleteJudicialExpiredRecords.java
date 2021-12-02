@@ -12,28 +12,22 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
-import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
-import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 
 import javax.sql.DataSource;
-import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_RECORD_JOB_STATUS;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JUDICIAL_JOB;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JUDICIAL_JOB_STATUS;
 
 @Component
 @Slf4j
 public class DeleteJudicialExpiredRecords implements Tasklet {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     private EmailService emailService;
@@ -49,42 +43,33 @@ public class DeleteJudicialExpiredRecords implements Tasklet {
         log.info("Delete Judicial Expired records task starts::");
         Instant startTime = Instant.now();
         String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
-        int currentRecordsInHistoryTable = getCountFromHistoryTable();
         try {
-            List<RoleAssignmentHistory> rah = this.getLiveRecordsFromHistoryTable();
-            String historyLog = String.format("Retrieve History records whose End Time is less than current time."
-                    + " Number of records: %s", rah.size());
-            log.info(historyLog);
-            for (RoleAssignmentHistory ra : rah) {
-                ra.setStatus("EXPIRED");
-                int statusSequence = ra.getStatusSequence();
-                ra.setStatusSequence(statusSequence + 1);
-                ra.setLog("Record Expired");
-                ra.setCreated(new Timestamp(System.currentTimeMillis()));
-            }
-            log.info("Deleting Live records.");
-            int rowsDeleted = this.deleteRoleAssignmentRecords(rah);
-            String rowsDeletedLog = String.format("Number of live records deleted : %s", rowsDeleted);
+            Integer countEligibleJudicialRecords = getCountEligibleJudicialRecords();
+            String judicialLog = String.format("Retrieve Judicial records whose End Time is less than current time."
+                    + " Number of records: %s", countEligibleJudicialRecords);
+            log.info(judicialLog);
+            log.info("Deleting Live Judicial records.");
+            int countDeleted = deleteJudicialBookingRecords();
+            String rowsDeletedLog = String.format("Number of live records deleted : %s", countDeleted);
             log.info(rowsDeletedLog);
 
-
-            String numRecordsUpdatedLog = String.format("Updated number of records in History Table : %s",
-                    getCountFromHistoryTable() - currentRecordsInHistoryTable);
+            String numRecordsUpdatedLog = String.format(" Number of records in Judicial Table post delete: %s",
+                    getTotalJudicialRecords() - getCountEligibleJudicialRecords());
             log.info(numRecordsUpdatedLog);
+
             Instant endTime = Instant.now();
-            long timeElapsed = Duration.between(startTime, endTime).toMillis();
             Map<String, Object> templateMap = new HashMap<>();
             templateMap.put("jobId", jobId);
             templateMap.put("startTime", startTime);
             templateMap.put("endTime", endTime);
-            templateMap.put("elapsedTime", timeElapsed);
-            templateMap.put("liveCount", rowsDeleted);
-            templateMap.put("updatedRecordCount", getCountFromHistoryTable() - currentRecordsInHistoryTable);
+            templateMap.put("elapsedTime", Duration.between(startTime, endTime).toMillis());
+            templateMap.put("liveCount", countDeleted);
+            templateMap.put("updatedRecordCount", getTotalJudicialRecords() - getCountEligibleJudicialRecords());
             EmailData emailData = EmailData
                     .builder()
                     .runId(jobId)
-                    .emailSubject(DELETE_EXPIRED_RECORD_JOB_STATUS)
-                    .module(DELETE_EXPIRED_JOB)
+                    .emailSubject(DELETE_EXPIRED_JUDICIAL_JOB_STATUS)
+                    .module(DELETE_EXPIRED_JUDICIAL_JOB)
                     .templateMap(templateMap)
                     .build();
             emailService.sendEmail(emailData);
@@ -96,55 +81,19 @@ public class DeleteJudicialExpiredRecords implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    public int deleteRoleAssignmentRecords(List<RoleAssignmentHistory> rah) {
-        String deleteSql = "DELETE FROM role_assignment WHERE id=?";
-        int rows = 0;
-        for (RoleAssignmentHistory ra : rah) {
-            Object[] params = {ra.getId()};
-            // define SQL types of the arguments
-            int[] types = {Types.VARCHAR};
-            rows += jdbcTemplate.update(deleteSql, params, types);
-        }
-        return rows;
+    public int deleteJudicialBookingRecords() {
+        String deleteSql = "DELETE from booking b where b.status = 'LIVE' and b.end_time <= now()";
+        return jdbcTemplate.update(deleteSql);
     }
 
 
-    public List<RoleAssignmentHistory> getLiveRecordsFromHistoryTable() {
-        String getSQL = "SELECT * from role_assignment_history rah  "
-                + "WHERE id in (SELECT id FROM role_assignment WHERE end_time <= now()) and status='LIVE'";
-        List<RoleAssignmentHistory> list = new ArrayList<>();
-        return
-                jdbcTemplate.query(getSQL, rs -> {
-                    while (rs.next()) {
-                        RoleAssignmentHistory roleAssignmentHistory = new RoleAssignmentHistory();
-                        roleAssignmentHistory.setId(rs.getString("id"));
-                        roleAssignmentHistory.setRequestId(rs.getObject("request_id", java.util.UUID.class));
-                        roleAssignmentHistory.setActorIDType(rs.getString("actor_id_type"));
-                        roleAssignmentHistory.setActorId(rs.getString("actor_id"));
-                        roleAssignmentHistory.setRoleType(rs.getString("role_type"));
-                        roleAssignmentHistory.setRoleName(rs.getString("role_name"));
-                        roleAssignmentHistory.setClassification(rs.getString("classification"));
-                        roleAssignmentHistory.setGrantType(rs.getString("grant_type"));
-                        roleAssignmentHistory.setRoleCategory(rs.getString("role_category"));
-                        roleAssignmentHistory.setReadOnly(rs.getBoolean("read_only"));
-                        roleAssignmentHistory.setBeginTime(rs.getTimestamp("begin_time"));
-                        roleAssignmentHistory.setEndTime(rs.getTimestamp("end_time"));
-                        roleAssignmentHistory.setStatus(rs.getString("status"));
-                        roleAssignmentHistory.setReference(rs.getString("reference"));
-                        roleAssignmentHistory.setProcess(rs.getString("process"));
-                        roleAssignmentHistory.setAttributes(rs.getString("attributes"));
-                        roleAssignmentHistory.setNotes(rs.getString("notes"));
-                        roleAssignmentHistory.setLog(rs.getString("log"));
-                        roleAssignmentHistory.setStatusSequence(rs.getInt("status_sequence"));
-                        roleAssignmentHistory.setCreated(rs.getTimestamp("created"));
-                        list.add(roleAssignmentHistory);
-                    }
-                    return list;
-                });
+    public Integer getCountEligibleJudicialRecords() {
+        String getSQL = "SELECT count(*) from booking b where b.status = 'LIVE' and b.end_time <= now()";
+        return jdbcTemplate.queryForObject(getSQL, Integer.class);
     }
 
-    public Integer getCountFromHistoryTable() {
-        String getSQL = "SELECT count(*) from role_assignment_history rah";
+    public Integer getTotalJudicialRecords() {
+        String getSQL = "SELECT count(*) from booking b ";
         return jdbcTemplate.queryForObject(getSQL, Integer.class);
     }
 

@@ -84,6 +84,7 @@ spring:
 
 
 delete-expired-records: deleteExpiredRecords
+delete-expired-judicial-records: deleteExpiredJudicialRecords
 batchjob-name: deleteExpiredRecords
 batch-size: 4
 
