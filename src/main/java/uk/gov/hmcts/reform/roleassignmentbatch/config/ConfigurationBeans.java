@@ -29,8 +29,12 @@ import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
@@ -46,6 +50,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 public class ConfigurationBeans {
 
     @Autowired
+    @Qualifier("primaryDataSource")
     DataSource dataSource;
 
     @Autowired

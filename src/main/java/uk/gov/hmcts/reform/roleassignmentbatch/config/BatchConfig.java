@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BeforeMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BuildCcdViewMetrics;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteJudicialExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.InsertDataPostMigrationTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReconcileDataTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
@@ -102,20 +103,23 @@ public class BatchConfig extends DefaultBatchConfigurer {
 
     @Bean
     public Step stepOrchestration(@Autowired StepBuilderFactory steps,
-                                  @Autowired DeleteExpiredRecords deleteExpiredRecords) {
+                                  @Autowired DeleteExpiredRecords deleteExpiredRecords,
+                                  @Autowired DeleteJudicialExpiredRecords deleteJudicialExpiredRecords) {
         return steps.get(taskParent)
                     .tasklet(deleteExpiredRecords)
+                    .tasklet(deleteJudicialExpiredRecords)
                     .build();
     }
 
     @Bean
     public Job runRoutesJob(@Autowired JobBuilderFactory jobs,
                             @Autowired StepBuilderFactory steps,
-                            @Autowired DeleteExpiredRecords deleteExpiredRecords) {
+                            @Autowired DeleteExpiredRecords deleteExpiredRecords,
+                            @Autowired DeleteJudicialExpiredRecords deleteJudicialExpiredRecords) {
 
         return jobs.get(jobName)
                    .incrementer(new RunIdIncrementer())
-                   .start(stepOrchestration(steps, deleteExpiredRecords))
+                   .start(stepOrchestration(steps, deleteExpiredRecords,deleteJudicialExpiredRecords))
                    .build();
     }
 
