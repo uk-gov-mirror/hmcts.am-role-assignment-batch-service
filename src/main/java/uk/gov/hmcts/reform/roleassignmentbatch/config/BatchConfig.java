@@ -51,7 +51,6 @@ import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
 @EnableBatchProcessing
 public class BatchConfig extends DefaultBatchConfigurer {
 
-
     @Value("${delete-expired-records}")
     String taskParent;
 
