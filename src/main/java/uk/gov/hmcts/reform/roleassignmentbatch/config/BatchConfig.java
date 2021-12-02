@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.SetupDbFlags;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
-import uk.gov.hmcts.reform.roleassignmentbatch.writer.CcdViewWriterTemp;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
 
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
@@ -138,12 +137,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return new EntityWrapperProcessor();
     }
 
-    //TODO: Remove later
-    @Bean
-    public CcdViewWriterTemp ccdViewWriterTemp() {
-        return new CcdViewWriterTemp();
-    }
-
     @Bean
     SkipListener<CcdCaseUser, EntityWrapper> auditSkipListener() {
         return new AuditSkipListener();
@@ -229,18 +222,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public Step injectDataIntoView() {
-        return steps.get("injectDataIntoView")
-                    .<CcdCaseUser, CcdCaseUser>chunk(chunkSize)
-                    .reader(ccdCaseUsersReader)
-                    .writer(ccdViewWriterTemp())
-                    .taskExecutor(taskExecutor())
-                    .throttleLimit(10)
-                    .build();
-    }
-
-
-    @Bean
     public TaskExecutor taskExecutor() {
         return new SimpleAsyncTaskExecutor("ccd_migration");
     }
@@ -271,7 +252,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public Flow processCcdDataToTempTablesFlow() {
         return new FlowBuilder<Flow>("processCcdDataToTempTables")
             .start(replicateTables())
-            //.next(injectDataIntoView())
             .next(validationStep())
             .next(buildCCdViewMetricsStep())
             .next(beforeMigrationReconStep())

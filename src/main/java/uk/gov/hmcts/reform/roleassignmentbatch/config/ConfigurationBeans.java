@@ -90,18 +90,6 @@ public class ConfigurationBeans {
                 .build();
     }
 
-    //TODO: Remove once actual CCD View is available.
-    @Bean
-    public JdbcBatchItemWriter<CcdCaseUser> insertIntoCcdView() {
-        return
-            new JdbcBatchItemWriterBuilder<CcdCaseUser>()
-                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("insert into ccd_user_view(reference,user_id,case_role,jurisdiction,case_type_id,role_category,"
-                     + "start_date) values (:reference,:userId,:caseRole,:jurisdiction,:caseType,:roleCategory,"
-                     + ":startDate)")
-                .dataSource(dataSource)
-                .build();
-    }
 
     @Bean
     public LDClient ldClient(@Value("${launchdarkly.sdk.key}") String sdkKey) {
@@ -118,17 +106,6 @@ public class ConfigurationBeans {
                 .build();
     }
 
-    //TODO: Remove later as we are inserting into actor cache in a separate step.
-    @Bean
-    public JdbcBatchItemWriter<ActorCacheEntity> insertIntoActorCacheTable() {
-        return
-            new JdbcBatchItemWriterBuilder<ActorCacheEntity>()
-                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql(Constants.ACTOR_CACHE_QUERY)
-                .dataSource(dataSource)
-                .assertUpdates(false)
-                .build();
-    }
 
     @Bean
     public JdbcPagingItemReader<CcdCaseUser> databaseItemReader(@Autowired CcdViewRowMapper ccdViewRowMapper) {
@@ -139,7 +116,6 @@ public class ConfigurationBeans {
             .name("ccdCaseUserReader")
             .dataSource(dataSource)
             .queryProvider(queryProvider)
-            //.parameterValues(parameterValues)
             .rowMapper(ccdViewRowMapper)
             .saveState(false)
             .pageSize(chunkSize)
