@@ -1,17 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.START_DATE;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.REFERENCE;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_ROLE;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_TYPE_ID;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.JURISDICTION;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ROLE_CATEGORY;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.USER_ID;
-
-import java.util.HashMap;
-import java.util.Map;
-import javax.sql.DataSource;
-
 import com.launchdarkly.sdk.server.LDClient;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
@@ -31,20 +19,28 @@ import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
-import uk.gov.hmcts.reform.roleassignmentbatch.entities.ActorCacheEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.AuditFaults;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.CcdViewRowMapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
+
+import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_ROLE;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.CASE_TYPE_ID;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.JURISDICTION;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.REFERENCE;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ROLE_CATEGORY;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.START_DATE;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.USER_ID;
 
 @Component
 public class ConfigurationBeans {

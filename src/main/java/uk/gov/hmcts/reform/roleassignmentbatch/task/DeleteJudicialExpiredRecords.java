@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 
 import javax.sql.DataSource;
+import java.sql.Types;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -53,8 +54,9 @@ public class DeleteJudicialExpiredRecords implements Tasklet {
             String rowsDeletedLog = String.format("Number of live records deleted : %s", countDeleted);
             log.info(rowsDeletedLog);
 
+            int judicialRecordsPostDelete = getTotalJudicialRecords();
             String numRecordsUpdatedLog = String.format(" Number of records in Judicial Table post delete: %s",
-                    getTotalJudicialRecords() - getCountEligibleJudicialRecords());
+                    judicialRecordsPostDelete);
             log.info(numRecordsUpdatedLog);
 
             Instant endTime = Instant.now();
@@ -64,7 +66,7 @@ public class DeleteJudicialExpiredRecords implements Tasklet {
             templateMap.put("endTime", endTime);
             templateMap.put("elapsedTime", Duration.between(startTime, endTime).toMillis());
             templateMap.put("liveCount", countDeleted);
-            templateMap.put("updatedRecordCount", getTotalJudicialRecords() - getCountEligibleJudicialRecords());
+            templateMap.put("updatedRecordCount", judicialRecordsPostDelete);
             EmailData emailData = EmailData
                     .builder()
                     .runId(jobId)
@@ -81,14 +83,20 @@ public class DeleteJudicialExpiredRecords implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    public int deleteJudicialBookingRecords() {
-        String deleteSql = "DELETE from booking b where b.status = 'LIVE' and b.end_time <= now()";
-        return jdbcTemplate.update(deleteSql);
+    public int deleteJudicialBookingRecords(int days) {
+        Object[] params = {days};
+        // define SQL types of the arguments
+        int[] types = {Types.INTEGER};
+        String deleteSql = "DELETE from booking b where b.end_time < CURRENT_DATE - ?";
+        return jdbcTemplate.update(deleteSql, params, types);
     }
 
 
-    public Integer getCountEligibleJudicialRecords() {
-        String getSQL = "SELECT count(*) from booking b where b.status = 'LIVE' and b.end_time <= now()";
+    public Integer getCountEligibleJudicialRecords(int days) {
+        Object[] params = {days};
+        // define SQL types of the arguments
+        int[] types = {Types.INTEGER};
+        String getSQL = "SELECT count(*) from booking b where b.end_time < CURRENT_DATE - ?";
         return jdbcTemplate.queryForObject(getSQL, Integer.class);
     }
 
