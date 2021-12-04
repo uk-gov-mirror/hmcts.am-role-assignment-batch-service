@@ -7,6 +7,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -29,33 +30,40 @@ import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPI
 public class DeleteJudicialExpiredRecords implements Tasklet {
 
     private final JdbcTemplate jdbcTemplate;
+    private final int days;
 
     @Autowired
     private EmailService emailService;
 
-    public DeleteJudicialExpiredRecords(@Autowired @Qualifier("secondaryDataSource") DataSource dataSource) {
+    public DeleteJudicialExpiredRecords(@Autowired @Qualifier("secondaryDataSource") DataSource dataSource,
+                                        @Value("${spring.judicial.days}") int days) {
         jdbcTemplate = new JdbcTemplate(dataSource);
+        this.days = days;
     }
 
 
     @Override
     @Transactional
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+        if (days < 0) {
+            log.error("Please enter a positive number for Judicial record deletion: {}", days);
+        }
+
         log.info("Delete Judicial Expired records task starts::");
         Instant startTime = Instant.now();
         String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
         try {
-            Integer countEligibleJudicialRecords = getCountEligibleJudicialRecords();
+            Integer countEligibleJudicialRecords = getCountEligibleJudicialRecords(days);
             String judicialLog = String.format("Retrieve Judicial records whose End Time is less than current time."
                     + " Number of records: %s", countEligibleJudicialRecords);
             log.info(judicialLog);
             log.info("Deleting Live Judicial records.");
-            int countDeleted = deleteJudicialBookingRecords();
-            String rowsDeletedLog = String.format("Number of live records deleted : %s", countDeleted);
+            int countDeleted = deleteJudicialBookingRecords(days);
+            String rowsDeletedLog = String.format("Number of live judicial records deleted : %s", countDeleted);
             log.info(rowsDeletedLog);
 
             int judicialRecordsPostDelete = getTotalJudicialRecords();
-            String numRecordsUpdatedLog = String.format(" Number of records in Judicial Table post delete: %s",
+            String numRecordsUpdatedLog = String.format("Number of records in Judicial Table post delete: %s",
                     judicialRecordsPostDelete);
             log.info(numRecordsUpdatedLog);
 
@@ -87,17 +95,14 @@ public class DeleteJudicialExpiredRecords implements Tasklet {
         Object[] params = {days};
         // define SQL types of the arguments
         int[] types = {Types.INTEGER};
-        String deleteSql = "DELETE from booking b where b.end_time < CURRENT_DATE - ?";
+        String deleteSql = "DELETE from booking b where b.end_time < (current_date - ? ) + '00:00:00'::time";
         return jdbcTemplate.update(deleteSql, params, types);
     }
 
 
     public Integer getCountEligibleJudicialRecords(int days) {
-        Object[] params = {days};
-        // define SQL types of the arguments
-        int[] types = {Types.INTEGER};
-        String getSQL = "SELECT count(*) from booking b where b.end_time < CURRENT_DATE - ?";
-        return jdbcTemplate.queryForObject(getSQL, Integer.class);
+        String getSQL = "SELECT count(*) from booking b where b.end_time < (current_date - ? ) + '00:00:00'::time";
+        return jdbcTemplate.queryForObject(getSQL, Integer.class, days);
     }
 
     public Integer getTotalJudicialRecords() {

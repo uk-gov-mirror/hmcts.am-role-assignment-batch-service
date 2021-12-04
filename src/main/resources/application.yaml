@@ -68,6 +68,7 @@ spring:
       password: ${JUDICIAL_BOOKING_SERVICE_POSTGRES_PASS:am}
       properties:
         charSet: UTF-8
+    days: ${DAYS:0}
 
 ## Sendgrid configuration ##
   mail:
