@@ -55,11 +55,20 @@ spring:
   flyway.locations: classpath:db/migration
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://${ROLE_ASSIGNMENT_DB_HOST:localhost}:${ROLE_ASSIGNMENT_DB_PORT:5451}/${ROLE_ASSIGNMENT_DB_NAME:role_assignment}${ROLE_ASSIGNMENT_DB_OPTIONS:?stringtype=unspecified}
+    jdbcUrl: jdbc:postgresql://${ROLE_ASSIGNMENT_DB_HOST:localhost}:${ROLE_ASSIGNMENT_DB_PORT:5451}/${ROLE_ASSIGNMENT_DB_NAME:role_assignment}${ROLE_ASSIGNMENT_DB_OPTIONS:?stringtype=unspecified}
     username: ${ROLE_ASSIGNMENT_DB_USERNAME:am}
     password: ${ROLE_ASSIGNMENT_DB_PASSWORD:am}
     properties:
       charSet: UTF-8
+  judicial:
+    datasource:
+      driverClassName: org.postgresql.Driver
+      jdbcUrl: jdbc:postgresql://${JUDICIAL_BOOKING_SERVICE_POSTGRES_HOST:localhost}:${JUDICIAL_BOOKING_SERVICE_POSTGRES_PORT:5451}/${JUDICIAL_BOOKING_SERVICE_POSTGRES_DATABASE:judicial_booking}${JUDICIAL_BOOKING_SERVICE_DB_OPTIONS:}
+      username: ${JUDICIAL_BOOKING_SERVICE_POSTGRES_USER:am}
+      password: ${JUDICIAL_BOOKING_SERVICE_POSTGRES_PASS:am}
+      properties:
+        charSet: UTF-8
+    days: ${DAYS:0}
 
   ## Sendgrid configuration ##
   mail:
@@ -76,6 +85,7 @@ spring:
 
 
 delete-expired-records: deleteExpiredRecords
+delete-expired-judicial-records: deleteExpiredJudicialRecords
 batchjob-name: deleteExpiredRecords
 batch-size: 4
 
