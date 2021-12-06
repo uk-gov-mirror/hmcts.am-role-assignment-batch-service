@@ -58,7 +58,7 @@ public class DeleteJudicialExpiredRecords implements Tasklet {
         Instant startTime = Instant.now();
         String jobId = contribution.getStepExecution().getJobExecution().getId().toString();
         try {
-            Integer countEligibleJudicialRecords = getCountEligibleJudicialRecords(days);
+            Integer countEligibleJudicialRecords = getCountEligibleJudicialRecords();
             String judicialLog = String.format("Retrieve Judicial records whose End Time is less than current time."
                     + " Number of records: %s", countEligibleJudicialRecords);
             log.info(judicialLog);
@@ -105,7 +105,7 @@ public class DeleteJudicialExpiredRecords implements Tasklet {
     }
 
 
-    public Integer getCountEligibleJudicialRecords(int days) {
+    public Integer getCountEligibleJudicialRecords() {
         String getSQL = "SELECT count(*) from booking b where b.end_time < (current_date - ? ) + '00:00:00'::time";
         return jdbcTemplate.queryForObject(getSQL, Integer.class, days);
     }

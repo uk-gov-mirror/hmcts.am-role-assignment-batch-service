@@ -74,7 +74,7 @@ public class JudicalBookingBatchJobIntegrationTest extends BaseTest {
     public void shouldDeleteLiveJudicialRecords() {
         Integer totalRecords = sut.getTotalJudicialRecords();
         logger.info("Total number of Judicial records in Database::{}", totalRecords);
-        Integer countEligibleRecordsForDeletion = sut.getCountEligibleJudicialRecords(0);
+        Integer countEligibleRecordsForDeletion = sut.getCountEligibleJudicialRecords();
         logger.info("Records Eligible for Deletion in Judicial records in Database::{}",
                 countEligibleRecordsForDeletion);
         Assert.assertEquals("Total records", Integer.valueOf(5), totalRecords);
@@ -90,10 +90,37 @@ public class JudicalBookingBatchJobIntegrationTest extends BaseTest {
                 Integer.valueOf(totalRecordsInDbPostDelete));
     }
 
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, config = @SqlConfig(dataSource = "judicialDataSource"),
+            scripts = {"classpath:sql/judicial/insert_judicial_database.sql"})
+    public void shouldNotDeleteLiveJudicialRecordsForDaysParam() {
+        sut = new DeleteJudicialExpiredRecords(judicialDataSource, 50);
+
+        Integer totalRecords = sut.getTotalJudicialRecords();
+        logger.info("Total number of Judicial records in Database::{}", totalRecords);
+
+        Integer countEligibleRecordsForDeletion = sut.getCountEligibleJudicialRecords();
+        logger.info("Records Eligible for Deletion in Judicial records in Database::{}",
+                countEligibleRecordsForDeletion);
+
+        Assert.assertEquals("Total records", Integer.valueOf(5), totalRecords);
+        Assert.assertEquals("Records eligible for deletion", Integer.valueOf(0),
+                countEligibleRecordsForDeletion);
+        logger.info("Deleting the Judicial records");
+        sut.execute(stepContribution, chunkContext);
+
+        int totalRecordsInDbPostDelete = sut.getTotalJudicialRecords();
+        logger.info("Total number of Judicial records in Database::{} ", totalRecordsInDbPostDelete);
+
+        Assert.assertEquals("Total records post delete", Integer.valueOf(5),
+                Integer.valueOf(totalRecordsInDbPostDelete));
+    }
+
     @Test(expected = BadDayConfigForJudicialRecords.class)
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, config = @SqlConfig(dataSource = "judicialDataSource"),
             scripts = {"classpath:sql/judicial/insert_judicial_database.sql"})
     public void shouldThrowExceptionForBadDayInput() {
+
         sut = new DeleteJudicialExpiredRecords(judicialDataSource, -5);
         sut.execute(stepContribution, chunkContext);
 
