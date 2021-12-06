@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -13,7 +14,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
+import uk.gov.hmcts.reform.roleassignmentbatch.exception.BadDayConfigForJudicialRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
+import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -35,7 +38,7 @@ public class DeleteJudicialExpiredRecords implements Tasklet {
     @Autowired
     private EmailService emailService;
 
-    public DeleteJudicialExpiredRecords(@Autowired @Qualifier("secondaryDataSource") DataSource dataSource,
+    public DeleteJudicialExpiredRecords(@Autowired @Qualifier("judicialDataSource") DataSource dataSource,
                                         @Value("${spring.judicial.days}") int days) {
         jdbcTemplate = new JdbcTemplate(dataSource);
         this.days = days;
@@ -47,6 +50,8 @@ public class DeleteJudicialExpiredRecords implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         if (days < 0) {
             log.error("Please enter a positive number for Judicial record deletion: {}", days);
+            contribution.setExitStatus(ExitStatus.FAILED);
+            throw new BadDayConfigForJudicialRecords(Constants.INVALID_DAYS_CONFIG);
         }
 
         log.info("Delete Judicial Expired records task starts::");

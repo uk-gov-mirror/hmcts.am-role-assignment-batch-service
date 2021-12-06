@@ -74,11 +74,23 @@ public abstract class BaseTest {
             connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
             DataSource datasource = new SingleConnectionDataSource(connection, true);
             Flyway.configure().dataSource(datasource)
-                    .locations("db/migration/ras/").load().migrate();
+                    .locations("db/migration/").load().migrate();
             return datasource;
 
         }
 
+        @Bean(name = "judicialDataSource")
+        public DataSource judicialDataSource(@Autowired EmbeddedPostgres pg) throws Exception {
+            final Properties props = new Properties();
+            // Instruct JDBC to accept JSON string for JSONB
+            props.setProperty("stringtype", "unspecified");
+            connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
+            DataSource datasource = new SingleConnectionDataSource(connection, true);
+            Flyway.configure().dataSource(datasource)
+                    .locations("db/migration/").load().migrate();
+            return datasource;
+
+        }
 
         @PreDestroy
         public void contextDestroyed() throws SQLException {

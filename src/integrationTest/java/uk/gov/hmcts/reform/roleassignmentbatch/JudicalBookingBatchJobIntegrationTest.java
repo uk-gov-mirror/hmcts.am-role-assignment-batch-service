@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import javax.sql.DataSource;
-
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,11 +15,16 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
+import org.springframework.test.context.jdbc.SqlConfig;
+import uk.gov.hmcts.reform.roleassignmentbatch.exception.BadDayConfigForJudicialRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteJudicialExpiredRecords;
+
+import javax.sql.DataSource;
 
 @SpringBootTest
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -32,14 +32,15 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 public class JudicalBookingBatchJobIntegrationTest extends BaseTest {
 
     private static final Logger logger = LoggerFactory.getLogger(JudicalBookingBatchJobIntegrationTest.class);
-
-    private DeleteExpiredRecords sut;
-    private static final String COUNT_RECORDS_FROM_LIVE_TABLE = "SELECT count(*) as n FROM role_assignment";
-    private static final String COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE =
-        "SELECT count(*) as n FROM role_assignment_history where STATUS='EXPIRED'";
+    private DeleteJudicialExpiredRecords sut;
 
     @Autowired
-    private DataSource ds;
+    @Qualifier("rasDataSource")
+    private DataSource rasDataSource;
+
+    @Autowired
+    @Qualifier("judicialDataSource")
+    private DataSource judicialDataSource;
 
     private JdbcTemplate template;
 
@@ -60,75 +61,42 @@ public class JudicalBookingBatchJobIntegrationTest extends BaseTest {
 
     @Before
     public void setUp() {
-        template = new JdbcTemplate(ds);
-        sut = new DeleteExpiredRecords(template, 2);
+        template = new JdbcTemplate(judicialDataSource);
+        sut = new DeleteJudicialExpiredRecords(judicialDataSource, 0);
         Mockito.when(stepContribution.getStepExecution()).thenReturn(stepExecution);
         Mockito.when(stepContribution.getStepExecution().getJobExecution()).thenReturn(jobExecution);
         Mockito.when(stepContribution.getStepExecution().getJobExecution().getId()).thenReturn(Long.valueOf(1));
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-         scripts = {"classpath:sql/role_assignment_clean_up.sql",
-                    "classpath:sql/insert_role_assignment_request.sql",
-                    "classpath:sql/insert_role_assignment_history.sql",
-                    "classpath:sql/insert_role_assignment.sql"})
-    public void shouldGetRecordCountFromLiveTable() {
-        final Integer count = template.queryForObject(COUNT_RECORDS_FROM_LIVE_TABLE, Integer.class);
-        logger.info(" Total number of records fetched from role assignment Live table...{}", count);
-        assertNotNull(count);
-        assertEquals(
-            "role_assignment record count ", 5, count.intValue());
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, config = @SqlConfig(dataSource = "judicialDataSource"),
+            scripts = {"classpath:sql/judicial/insert_judicial_database.sql"})
+    public void shouldDeleteLiveJudicialRecords() {
+        Integer totalRecords = sut.getTotalJudicialRecords();
+        logger.info("Total number of Judicial records in Database::{}", totalRecords);
+        Integer countEligibleRecordsForDeletion = sut.getCountEligibleJudicialRecords(0);
+        logger.info("Records Eligible for Deletion in Judicial records in Database::{}",
+                countEligibleRecordsForDeletion);
+        Assert.assertEquals("Total records", Integer.valueOf(5), totalRecords);
+        Assert.assertEquals("Records eligible for deletion", Integer.valueOf(3),
+                countEligibleRecordsForDeletion);
+        logger.info("Deleting the Judicial records");
+        sut.execute(stepContribution, chunkContext);
+
+        int totalRecordsInDbPostDelete = sut.getTotalJudicialRecords();
+        logger.info("Total number of Judicial records in Database::{} ", totalRecordsInDbPostDelete);
+
+        Assert.assertEquals("Total records post delete", Integer.valueOf(2),
+                Integer.valueOf(totalRecordsInDbPostDelete));
     }
 
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-         scripts = {"classpath:sql/role_assignment_clean_up.sql",
-                    "classpath:sql/insert_role_assignment_request.sql",
-                    "classpath:sql/insert_role_assignment_history.sql",
-                    "classpath:sql/insert_role_assignment.sql"})
-    public void shouldDeleteRecordsFromLiveTable() {
-        Integer count = template.queryForObject(COUNT_RECORDS_FROM_LIVE_TABLE, Integer.class);
-        logger.info(" Total number of records fetched from role assignment Live table...{}", count);
-        logger.info(" Deleting the records from Live table.");
+    @Test(expected = BadDayConfigForJudicialRecords.class)
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, config = @SqlConfig(dataSource = "judicialDataSource"),
+            scripts = {"classpath:sql/judicial/insert_judicial_database.sql"})
+    public void shouldThrowExceptionForBadDayInput() {
+        sut = new DeleteJudicialExpiredRecords(judicialDataSource, -5);
         sut.execute(stepContribution, chunkContext);
-        count = template.queryForObject(COUNT_RECORDS_FROM_LIVE_TABLE, Integer.class);
-        logger.info(" Total number of records fetched from role assignment Live table...{}", count);
-        Assert.assertEquals("The live records were not deleted", Integer.valueOf(0), count);
-    }
 
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-         scripts = {"classpath:sql/role_assignment_clean_up.sql",
-                    "classpath:sql/insert_role_assignment_request.sql",
-                    "classpath:sql/insert_role_assignment_history.sql",
-                    "classpath:sql/insert_role_assignment.sql"})
-    public void shouldInsertRecordsInHistoryTable() {
-        Integer count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
-        logger.info(" Total number of expired records fetched from History table...{}", count);
-        Assert.assertEquals("The live records were not deleted", Integer.valueOf(0), count);
-        logger.info(" Deleting the records from Live table. Insert the records in History table.");
-        sut.execute(stepContribution, chunkContext);
-        count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
-        logger.info(" Total number of Expired records fetched from History table...{}", count);
-        Assert.assertEquals("The EXPIRED records were not inserted", Integer.valueOf(5), count);
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-         scripts = {"classpath:sql/role_assignment_clean_up.sql",
-                    "classpath:sqlcomplexscenarios/insert_role_assignment_request.sql",
-                    "classpath:sqlcomplexscenarios/insert_role_assignment_history.sql",
-                    "classpath:sqlcomplexscenarios/insert_role_assignment.sql"})
-    public void shouldDeleteLiveRecordsComplexScenario() {
-        Integer count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
-        logger.info(" Total number of expired records fetched from History table...{}", count);
-        Assert.assertEquals("The live records were not deleted", Integer.valueOf(0), count);
-        logger.info(" Deleting the records from Live table. Insert the records in History table.");
-        sut.execute(stepContribution, chunkContext);
-        count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
-        logger.info(" Total number of Expired records fetched from History table...{}", count);
-        Assert.assertEquals("The EXPIRED records were not inserted", Integer.valueOf(3), count);
     }
 
 }

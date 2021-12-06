@@ -19,12 +19,9 @@ public class DataSourceConfiguration {
 
     }
 
-    @Bean(name = "secondaryDataSource")
+    @Bean(name = "judicialDataSource")
     @ConfigurationProperties(prefix = "spring.judicial.datasource")
-    public DataSource secondaryDataSource() {
+    public DataSource judicialDataSource() {
         return DataSourceBuilder.create().build();
-
     }
-
-
 }
