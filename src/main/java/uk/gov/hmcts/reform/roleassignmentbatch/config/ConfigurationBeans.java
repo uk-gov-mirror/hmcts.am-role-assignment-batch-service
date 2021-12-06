@@ -46,7 +46,7 @@ import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.USER_ID;
 public class ConfigurationBeans {
 
     @Autowired
-    @Qualifier("primaryDataSource")
+    @Qualifier("rasDataSource")
     DataSource dataSource;
 
     @Autowired

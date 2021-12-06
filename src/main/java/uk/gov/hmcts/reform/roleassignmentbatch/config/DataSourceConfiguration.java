@@ -11,10 +11,10 @@ import javax.sql.DataSource;
 @Configuration
 public class DataSourceConfiguration {
 
-    @Bean(name = "primaryDataSource")
+    @Bean(name = "rasDataSource")
     @Primary
     @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource primaryDataSource() {
+    public DataSource rasDataSource() {
         return DataSourceBuilder.create().build();
 
     }
