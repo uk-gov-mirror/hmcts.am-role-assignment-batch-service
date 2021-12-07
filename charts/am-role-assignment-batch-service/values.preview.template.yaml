@@ -44,9 +44,9 @@ services:
       enabled: true
       image:
         tag: '11.3.0'
-      postgresqlUsername: role_assignment
-      postgresqlPassword: role_assignment
-      postgresqlDatabase: role_assignment
+      postgresqlUsername: judicial
+      postgresqlPassword: judicial
+      postgresqlDatabase: judicial
       postgresqlPort: 5432
       persistence:
         enabled: false
