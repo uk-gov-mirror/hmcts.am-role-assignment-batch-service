@@ -27,26 +27,13 @@ job:
   global:
     jobKind: CronJob
 
-services:
-  ras:
-    postgresql:
-      enabled: true
-      image:
-        tag: '11.3.0'
-      postgresqlUsername: role_assignment
-      postgresqlPassword: role_assignment
-      postgresqlDatabase: role_assignment
-      postgresqlPort: 5432
-      persistence:
-        enabled: false
-  judicial:
-    postgresql:
-      enabled: true
-      image:
-        tag: '11.3.0'
-      postgresqlUsername: judicial
-      postgresqlPassword: judicial
-      postgresqlDatabase: judicial
-      postgresqlPort: 5432
-      persistence:
-        enabled: false
+postgresql:
+  enabled: true
+  image:
+    tag: '11.3.0'
+  postgresqlUsername: role_assignment
+  postgresqlPassword: role_assignment
+  postgresqlDatabase: role_assignment
+  postgresqlPort: 5432
+  persistence:
+    enabled: false
