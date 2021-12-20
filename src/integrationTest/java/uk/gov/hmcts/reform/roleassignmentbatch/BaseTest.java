@@ -1,14 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Properties;
-import javax.annotation.PreDestroy;
-import javax.sql.DataSource;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -21,6 +12,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+
+import javax.annotation.PreDestroy;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
 
 @Configuration
 public abstract class BaseTest {
@@ -51,8 +51,22 @@ public abstract class BaseTest {
                     .start();
         }
 
-        @Bean
+        @Bean(name = "rasDataSource")
         public DataSource dataSource(@Autowired EmbeddedPostgres pg) throws Exception {
+
+            final Properties props = new Properties();
+            // Instruct JDBC to accept JSON string for JSONB
+            props.setProperty("stringtype", "unspecified");
+            connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
+            DataSource datasource = new SingleConnectionDataSource(connection, true);
+            Flyway.configure().dataSource(datasource)
+                    .locations("db/migration/ras/").load().migrate();
+            return datasource;
+
+        }
+
+        @Bean(name = "rasDataSource")
+        public DataSource rasDataSource(@Autowired EmbeddedPostgres pg) throws Exception {
 
             final Properties props = new Properties();
             // Instruct JDBC to accept JSON string for JSONB
@@ -65,7 +79,18 @@ public abstract class BaseTest {
 
         }
 
+        @Bean(name = "judicialDataSource")
+        public DataSource judicialDataSource(@Autowired EmbeddedPostgres pg) throws Exception {
+            final Properties props = new Properties();
+            // Instruct JDBC to accept JSON string for JSONB
+            props.setProperty("stringtype", "unspecified");
+            connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
+            DataSource datasource = new SingleConnectionDataSource(connection, true);
+            Flyway.configure().dataSource(datasource)
+                    .locations("db/migration/").load().migrate();
+            return datasource;
 
+        }
 
         @PreDestroy
         public void contextDestroyed() throws SQLException {

@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.FAILED;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.SkipListener;
@@ -36,23 +31,31 @@ import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BeforeMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BuildCcdViewMetrics;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteJudicialExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.InsertDataPostMigrationTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReconcileDataTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.SetupDbFlags;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
-import uk.gov.hmcts.reform.roleassignmentbatch.writer.CcdViewWriterTemp;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
+
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.FAILED;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
 
 @Slf4j
 @Configuration
 @EnableBatchProcessing
 public class BatchConfig extends DefaultBatchConfigurer {
 
-
     @Value("${delete-expired-records}")
     String taskParent;
+
+    @Value("${delete-expired-judicial-records}")
+    String taskParentJudicial;
+
     @Value("${batchjob-name}")
     String jobName;
 
@@ -109,25 +112,29 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
+    public Step stepDeleteJudicalExpired(@Autowired StepBuilderFactory steps,
+                                  @Autowired DeleteJudicialExpiredRecords deleteJudicialExpiredRecords) {
+        return steps.get(taskParentJudicial)
+                .tasklet(deleteJudicialExpiredRecords)
+                .build();
+    }
+
+    @Bean
     public Job runRoutesJob(@Autowired JobBuilderFactory jobs,
                             @Autowired StepBuilderFactory steps,
-                            @Autowired DeleteExpiredRecords deleteExpiredRecords) {
+                            @Autowired DeleteExpiredRecords deleteExpiredRecords,
+                            @Autowired DeleteJudicialExpiredRecords deleteJudicialExpiredRecords) {
 
         return jobs.get(jobName)
-                   .incrementer(new RunIdIncrementer())
-                   .start(stepOrchestration(steps, deleteExpiredRecords))
-                   .build();
+                .incrementer(new RunIdIncrementer())
+                .start(stepOrchestration(steps, deleteExpiredRecords))
+                .next(stepDeleteJudicalExpired(steps, deleteJudicialExpiredRecords))
+                .build();
     }
 
     @Bean
     public EntityWrapperProcessor entityWrapperProcessor() {
         return new EntityWrapperProcessor();
-    }
-
-    //TODO: Remove later
-    @Bean
-    public CcdViewWriterTemp ccdViewWriterTemp() {
-        return new CcdViewWriterTemp();
     }
 
     @Bean
@@ -215,18 +222,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public Step injectDataIntoView() {
-        return steps.get("injectDataIntoView")
-                    .<CcdCaseUser, CcdCaseUser>chunk(chunkSize)
-                    .reader(ccdCaseUsersReader)
-                    .writer(ccdViewWriterTemp())
-                    .taskExecutor(taskExecutor())
-                    .throttleLimit(10)
-                    .build();
-    }
-
-
-    @Bean
     public TaskExecutor taskExecutor() {
         return new SimpleAsyncTaskExecutor("ccd_migration");
     }
@@ -257,7 +252,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public Flow processCcdDataToTempTablesFlow() {
         return new FlowBuilder<Flow>("processCcdDataToTempTables")
             .start(replicateTables())
-            //.next(injectDataIntoView())
             .next(validationStep())
             .next(buildCCdViewMetricsStep())
             .next(beforeMigrationReconStep())

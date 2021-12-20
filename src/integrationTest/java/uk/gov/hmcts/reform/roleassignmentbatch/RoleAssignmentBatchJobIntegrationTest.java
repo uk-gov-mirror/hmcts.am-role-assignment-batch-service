@@ -20,10 +20,12 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 
 @SpringBootTest
@@ -39,6 +41,7 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
         "SELECT count(*) as n FROM role_assignment_history where STATUS='EXPIRED'";
 
     @Autowired
+    @Qualifier("rasDataSource")
     private DataSource ds;
 
     private JdbcTemplate template;
@@ -68,11 +71,11 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-         scripts = {"classpath:sql/role_assignment_clean_up.sql",
-                    "classpath:sql/insert_role_assignment_request.sql",
-                    "classpath:sql/insert_role_assignment_history.sql",
-                    "classpath:sql/insert_role_assignment.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, config = @SqlConfig(dataSource = "rasDataSource"),
+         scripts = {"classpath:sql/ras/role_assignment_clean_up.sql",
+                    "classpath:sql/ras/insert_role_assignment_request.sql",
+                    "classpath:sql/ras/insert_role_assignment_history.sql",
+                    "classpath:sql/ras/insert_role_assignment.sql"})
     public void shouldGetRecordCountFromLiveTable() {
         final Integer count = template.queryForObject(COUNT_RECORDS_FROM_LIVE_TABLE, Integer.class);
         logger.info(" Total number of records fetched from role assignment Live table...{}", count);
@@ -82,11 +85,11 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-         scripts = {"classpath:sql/role_assignment_clean_up.sql",
-                    "classpath:sql/insert_role_assignment_request.sql",
-                    "classpath:sql/insert_role_assignment_history.sql",
-                    "classpath:sql/insert_role_assignment.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,config = @SqlConfig(dataSource = "rasDataSource"),
+         scripts = {"classpath:sql/ras/role_assignment_clean_up.sql",
+                    "classpath:sql/ras/insert_role_assignment_request.sql",
+                    "classpath:sql/ras/insert_role_assignment_history.sql",
+                    "classpath:sql/ras/insert_role_assignment.sql"})
     public void shouldDeleteRecordsFromLiveTable() {
         Integer count = template.queryForObject(COUNT_RECORDS_FROM_LIVE_TABLE, Integer.class);
         logger.info(" Total number of records fetched from role assignment Live table...{}", count);
@@ -98,11 +101,11 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-         scripts = {"classpath:sql/role_assignment_clean_up.sql",
-                    "classpath:sql/insert_role_assignment_request.sql",
-                    "classpath:sql/insert_role_assignment_history.sql",
-                    "classpath:sql/insert_role_assignment.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, config = @SqlConfig(dataSource = "rasDataSource"),
+         scripts = {"classpath:sql/ras/role_assignment_clean_up.sql",
+                    "classpath:sql/ras/insert_role_assignment_request.sql",
+                    "classpath:sql/ras/insert_role_assignment_history.sql",
+                    "classpath:sql/ras/insert_role_assignment.sql"})
     public void shouldInsertRecordsInHistoryTable() {
         Integer count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
         logger.info(" Total number of expired records fetched from History table...{}", count);
@@ -115,8 +118,8 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-         scripts = {"classpath:sql/role_assignment_clean_up.sql",
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, config = @SqlConfig(dataSource = "rasDataSource"),
+         scripts = {"classpath:sql/ras/role_assignment_clean_up.sql",
                     "classpath:sqlcomplexscenarios/insert_role_assignment_request.sql",
                     "classpath:sqlcomplexscenarios/insert_role_assignment_history.sql",
                     "classpath:sqlcomplexscenarios/insert_role_assignment.sql"})

@@ -123,6 +123,9 @@ public class Constants {
     public static final String RECONCILIATION = "Reconciliation";
     public static final String PROCESS_FLAGS = "ProcessFlags";
     public static final String DELETE_EXPIRED_JOB = "DeleteExpiredJob";
+    public static final String DELETE_EXPIRED_JUDICIAL_JOB = "DeleteExpiredJudicialJob";
     public static final String DELETE_EXPIRED_RECORD_JOB_STATUS = "Delete Expired Record Job Status";
+    public static final String DELETE_EXPIRED_JUDICIAL_JOB_STATUS = "Delete Expired Judidial Records Job Status";
     public static final String ZERO_COUNT_IN_CCD_VIEW = "ZERO";
+    public static final String INVALID_DAYS_CONFIG = "The number of days configured for Judicial cleanup is invalid";
 }

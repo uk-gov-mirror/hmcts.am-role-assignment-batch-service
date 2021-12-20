@@ -225,11 +225,6 @@ dependencies {
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '7.11.0'
 
-    implementation (group: 'com.azure', name: 'azure-storage-blob', version: '12.12.0') {
-        exclude group: 'io.netty'
-    }
-    //Remove netty in future versions of Azure blob store.
-    implementation group: 'io.netty', name: 'netty-all', version: '4.1.68.Final'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
 
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.12'
@@ -255,7 +250,7 @@ dependencies {
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: versions.rest_assured
     testCompile group: 'io.github.openfeign', name: 'feign-jackson', version: versions.feign_jackson
     testCompile('com.opentable.components:otj-pg-embedded:0.13.4')
-    testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
+    //testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
