@@ -19,5 +19,11 @@ def vaultOverrides = [
 withNightlyPipeline(type, product, component) {
   overrideVaultEnvironments(vaultOverrides)
 
-  enableMutationTest()
+  // enableMutationTest()
+
+  enableFortifyScan()
+
+  after('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+  }
 }
