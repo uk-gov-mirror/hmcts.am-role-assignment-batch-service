@@ -49,12 +49,6 @@ withPipeline(type, product, component) {
   disableLegacyDeployment()
   nonServiceApp()
 
-  enableFortifyScan()
-
-  after('fortify-scan') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-  }
-
   // Sync environment specific branches with master branch
   syncBranchesWithMaster(branchesToSync)
 
