@@ -15,11 +15,7 @@ management:
       cache:
         time-to-live: 5s
       show-details: "always"
-  security:
-    enabled: false
   endpoints:
-    health:
-      sensitive: false
     web:
       base-path: /
       exposure:
