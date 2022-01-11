@@ -115,7 +115,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public Step stepDeleteJudicalExpired(@Autowired StepBuilderFactory steps,
                                   @Autowired DeleteJudicialExpiredRecords deleteJudicialExpiredRecords) {
         return steps.get(taskParentJudicial)
-                .tasklet(deleteJudicialExpiredRecords)
+                .tasklet((contribution, chunkContext) -> null)
                 .build();
     }
 
