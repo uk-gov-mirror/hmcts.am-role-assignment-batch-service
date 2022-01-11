@@ -250,7 +250,7 @@ dependencies {
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: versions.rest_assured
     testCompile group: 'io.github.openfeign', name: 'feign-jackson', version: versions.feign_jackson
     testCompile('com.opentable.components:otj-pg-embedded:0.13.4')
-    //testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
+    testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
