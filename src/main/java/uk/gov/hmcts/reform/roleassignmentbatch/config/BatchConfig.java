@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BeforeMigration;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BuildCcdViewMetrics;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteJudicialExpiredRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.EmptyTask;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.InsertDataPostMigrationTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReconcileDataTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.RenameTablesPostMigration;
@@ -112,10 +112,10 @@ public class BatchConfig extends DefaultBatchConfigurer {
     }
 
     @Bean
-    public Step stepDeleteJudicalExpired(@Autowired StepBuilderFactory steps,
-                                  @Autowired DeleteJudicialExpiredRecords deleteJudicialExpiredRecords) {
+    public Step stepDeleteJudicialExpired(@Autowired StepBuilderFactory steps,
+                                          @Autowired EmptyTask emptyTask) {
         return steps.get(taskParentJudicial)
-                .tasklet((contribution, chunkContext) -> null)
+                .tasklet(emptyTask)
                 .build();
     }
 
@@ -123,12 +123,12 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public Job runRoutesJob(@Autowired JobBuilderFactory jobs,
                             @Autowired StepBuilderFactory steps,
                             @Autowired DeleteExpiredRecords deleteExpiredRecords,
-                            @Autowired DeleteJudicialExpiredRecords deleteJudicialExpiredRecords) {
+                            @Autowired EmptyTask emptyTask) {
 
         return jobs.get(jobName)
                 .incrementer(new RunIdIncrementer())
                 .start(stepOrchestration(steps, deleteExpiredRecords))
-                .next(stepDeleteJudicalExpired(steps, deleteJudicialExpiredRecords))
+                .next(stepDeleteJudicialExpired(steps, emptyTask))
                 .build();
     }
 
