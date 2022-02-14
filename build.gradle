@@ -41,7 +41,8 @@ def versions = [
         spring             : '5.3.15',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
-        feign_jackson      : '9.7.0'
+        feign_jackson      : '9.7.0',
+        logbackVersion     : '1.2.10'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.roleassignmentbatch.RoleAssignmentBatchApplication'
@@ -270,6 +271,8 @@ dependencies {
 configurations {
     runtime.exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     runtime.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+    runtime.exclude group: 'ch.qos.logback', module: 'logback-classic'
+    runtime.exclude group: 'ch.qos.logback', module: 'logback-core'
 }
 
 test {
