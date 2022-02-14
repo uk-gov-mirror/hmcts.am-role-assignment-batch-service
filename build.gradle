@@ -38,10 +38,11 @@ def versions = [
         reformLogging      : '5.1.7',
         serenity           : '2.2.12',
         springBoot         : '2.4.9',
-        spring             : '5.3.12',
+        spring             : '5.3.15',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
-        feign_jackson      : '9.7.0'
+        feign_jackson      : '9.7.0',
+        logbackVersion     : '1.2.10'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.roleassignmentbatch.RoleAssignmentBatchApplication'
@@ -191,7 +192,7 @@ dependencies {
     compile (group: 'org.springframework.boot', name: 'spring-boot-starter-batch')
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot)
     compile(group: 'org.springframework', name: 'spring-jdbc')
-    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.15'
+    implementation group: 'org.springframework', name: 'spring-core', version: versions.spring
 
     //Sendgrid
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: versions.springBoot
@@ -231,8 +232,8 @@ dependencies {
 
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
 
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.12'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.54'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.16'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.58'
 
     testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     testImplementation 'org.springframework.batch:spring-batch-test'
@@ -267,6 +268,12 @@ dependencies {
 
 }
 
+configurations {
+    runtime.exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    runtime.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+    runtime.exclude group: 'ch.qos.logback', module: 'logback-classic'
+    runtime.exclude group: 'ch.qos.logback', module: 'logback-core'
+}
 
 test {
     useJUnitPlatform()
