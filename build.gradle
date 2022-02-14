@@ -38,7 +38,7 @@ def versions = [
         reformLogging      : '5.1.7',
         serenity           : '2.2.12',
         springBoot         : '2.4.9',
-        spring             : '5.3.12',
+        spring             : '5.3.15',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
         feign_jackson      : '9.7.0'
@@ -191,7 +191,7 @@ dependencies {
     compile (group: 'org.springframework.boot', name: 'spring-boot-starter-batch')
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot)
     compile(group: 'org.springframework', name: 'spring-jdbc')
-    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.15'
+    implementation group: 'org.springframework', name: 'spring-core', version: versions.spring
 
     //Sendgrid
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: versions.springBoot
@@ -267,6 +267,10 @@ dependencies {
 
 }
 
+configurations {
+    runtime.exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    runtime.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+}
 
 test {
     useJUnitPlatform()
