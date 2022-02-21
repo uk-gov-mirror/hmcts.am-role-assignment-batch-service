@@ -193,7 +193,7 @@ dependencies {
     compile (group: 'org.springframework.boot', name: 'spring-boot-starter-batch')
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot)
     compile(group: 'org.springframework', name: 'spring-jdbc')
-    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.15'
+    implementation group: 'org.springframework', name: 'spring-core', versions.spring
     implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
 
     //Sendgrid
@@ -270,6 +270,12 @@ dependencies {
 
 }
 
+configurations {
+    runtime.exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    runtime.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+    runtime.exclude group: 'ch.qos.logback', module: 'logback-classic'
+    runtime.exclude group: 'ch.qos.logback', module: 'logback-core'
+}
 
 test {
     useJUnitPlatform()
