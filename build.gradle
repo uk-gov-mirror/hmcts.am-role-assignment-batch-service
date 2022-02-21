@@ -193,6 +193,7 @@ dependencies {
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot)
     compile(group: 'org.springframework', name: 'spring-jdbc')
     implementation group: 'org.springframework', name: 'spring-core', version: versions.spring
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
 
     //Sendgrid
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: versions.springBoot
