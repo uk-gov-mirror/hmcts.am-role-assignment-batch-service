@@ -42,6 +42,7 @@ def versions = [
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
         feign_jackson      : '9.7.0',
+        log4JVersion       : '2.17.1',
         logbackVersion     : '1.2.10'
 ]
 
@@ -271,11 +272,17 @@ dependencies {
 
 }
 
-configurations {
-    runtime.exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
-    runtime.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
-    runtime.exclude group: 'ch.qos.logback', module: 'logback-classic'
-    runtime.exclude group: 'ch.qos.logback', module: 'logback-core'
+dependencyManagement {
+    dependencies {
+        dependencySet(group: 'org.apache.logging.log4j', version: versions.log4JVersion) {
+            entry 'log4j-api'
+            entry 'log4j-to-slf4j'
+        }
+        dependencySet(group: 'ch.qos.logback', version: versions.logbackVersion) {
+            entry 'logback-classic'
+            entry 'logback-core'
+        }
+    }
 }
 
 test {
