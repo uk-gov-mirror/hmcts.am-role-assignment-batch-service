@@ -10,13 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -33,12 +31,6 @@ public abstract class BaseTest {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
-    protected static final MediaType JSON_CONTENT_TYPE = new MediaType(
-            MediaType.APPLICATION_JSON.getType(),
-            MediaType.APPLICATION_JSON.getSubtype(),
-            StandardCharsets.UTF_8
-    );
-
     @TestConfiguration
     static class Configuration {
         Connection connection;
@@ -47,7 +39,6 @@ public abstract class BaseTest {
         public EmbeddedPostgres embeddedPostgres() throws IOException {
             return EmbeddedPostgres
                     .builder()
-                    .setPort(0)
                     .start();
         }
 
@@ -57,7 +48,8 @@ public abstract class BaseTest {
             final Properties props = new Properties();
             // Instruct JDBC to accept JSON string for JSONB
             props.setProperty("stringtype", "unspecified");
-            connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
+            props.setProperty("user", "postgres");
+            connection = DriverManager.getConnection(pg.getJdbcUrl("postgres"), props);
             DataSource datasource = new SingleConnectionDataSource(connection, true);
             Flyway.configure().dataSource(datasource)
                     .locations("db/migration/ras/").load().migrate();
@@ -71,7 +63,8 @@ public abstract class BaseTest {
             final Properties props = new Properties();
             // Instruct JDBC to accept JSON string for JSONB
             props.setProperty("stringtype", "unspecified");
-            connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
+            props.setProperty("user", "postgres");
+            connection = DriverManager.getConnection(pg.getJdbcUrl("postgres"), props);
             DataSource datasource = new SingleConnectionDataSource(connection, true);
             Flyway.configure().dataSource(datasource)
                     .locations("db/migration/").load().migrate();
@@ -84,7 +77,8 @@ public abstract class BaseTest {
             final Properties props = new Properties();
             // Instruct JDBC to accept JSON string for JSONB
             props.setProperty("stringtype", "unspecified");
-            connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
+            props.setProperty("user", "postgres");
+            connection = DriverManager.getConnection(pg.getJdbcUrl("postgres"), props);
             DataSource datasource = new SingleConnectionDataSource(connection, true);
             Flyway.configure().dataSource(datasource)
                     .locations("db/migration/").load().migrate();
