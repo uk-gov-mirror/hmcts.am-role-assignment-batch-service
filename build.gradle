@@ -15,7 +15,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.13'
     id 'pmd'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.5.4'
+    id 'org.springframework.boot' version '2.6.6'
     id 'info.solidsoft.pitest' version '1.7.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
@@ -37,8 +37,8 @@ def versions = [
         pitest             : '1.7.4',
         reformLogging      : '5.1.7',
         serenity           : '2.2.12',
-        springBoot         : '2.6.2',
-        spring             : '5.3.15',
+        springBoot         : '2.6.6',
+        spring             : '5.3.18',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
         feign_jackson      : '9.7.0',
