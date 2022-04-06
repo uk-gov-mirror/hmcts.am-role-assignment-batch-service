@@ -1,8 +1,8 @@
 name: "Combine Dependabot Pull Requests"
 
 on:
-  # schedule:
-  #   - cron: '00 05 * * 1' # Runs at 5 AM every Monday
+  schedule:
+    - cron: '00 05 * * 1' # Runs at 5 AM every Monday
 
   workflow_dispatch:
 
