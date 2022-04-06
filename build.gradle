@@ -237,7 +237,7 @@ dependencies {
 
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
 
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.16'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.20'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.58'
 
     testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
