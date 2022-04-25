@@ -5,14 +5,14 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath("net.serenity-bdd:serenity-gradle-plugin:3.2.3")
+        classpath("net.serenity-bdd:serenity-gradle-plugin:3.2.4")
         classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.7.4'
     }
 }
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.21'
+    id 'uk.gov.hmcts.java' version '0.12.22'
     id 'pmd'
     id 'jacoco'
     id 'org.springframework.boot' version '2.5.9'
@@ -39,6 +39,7 @@ def versions = [
         serenity           : '2.2.12',
         springBoot         : '2.6.6',
         spring             : '5.3.19',
+        springSecurity     : '5.6.3',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
         feign_jackson      : '9.7.0',
@@ -195,7 +196,7 @@ dependencies {
     implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot)
     implementation(group: 'org.springframework', name: 'spring-jdbc')
     implementation group: 'org.springframework', name: 'spring-core', version: versions.spring
-    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: versions.springSecurity
 
     //Sendgrid
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: versions.springBoot
@@ -228,18 +229,14 @@ dependencies {
 
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.4'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk' , version: '5.6.6'
-
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk' , version: '5.8.0'
     implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
-
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.5'
-
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.7'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '10.0.20'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.20'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.58'
 
     testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     testImplementation group: 'org.springframework.batch', name: 'spring-batch-test'
@@ -260,7 +257,7 @@ dependencies {
     testImplementation 'com.github.hmcts:fortify-client:1.2.0:all'
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: versions.rest_assured
     testImplementation group: 'io.github.openfeign', name: 'feign-jackson', version: versions.feign_jackson
-    testImplementation('com.opentable.components:otj-pg-embedded:1.0.0')
+    testImplementation('com.opentable.components:otj-pg-embedded:1.0.1')
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
