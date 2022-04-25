@@ -39,6 +39,7 @@ def versions = [
         serenity           : '2.2.12',
         springBoot         : '2.6.6',
         spring             : '5.3.19',
+        springSecurity     : '5.6.3',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
         feign_jackson      : '9.7.0',
@@ -195,7 +196,7 @@ dependencies {
     implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot)
     implementation(group: 'org.springframework', name: 'spring-jdbc')
     implementation group: 'org.springframework', name: 'spring-core', version: versions.spring
-    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.3'
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: versions.springSecurity
 
     //Sendgrid
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: versions.springBoot
@@ -230,9 +231,9 @@ dependencies {
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.4'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk' , version: '5.6.6'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk' , version: '5.8.0'
     implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.5'
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.7'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '10.0.20'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.20'
