@@ -229,7 +229,7 @@ dependencies {
     implementation 'commons-io:commons-io:20030203.000550'
     implementation group: 'javax.validation', name: 'validation-api'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.1'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.2'
     implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.13.2.20220328', ext: 'pom'
 
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
