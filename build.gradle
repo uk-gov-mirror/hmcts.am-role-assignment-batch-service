@@ -206,7 +206,7 @@ dependencies {
     //Sendgrid
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: versions.springBoot
     implementation group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.15.RELEASE'
-    implementation group: 'org.thymeleaf', name: 'thymeleaf-spring5', version: '3.0.13.RELEASE'
+    implementation group: 'org.thymeleaf', name: 'thymeleaf-spring5', version: '3.0.15.RELEASE'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
     implementation 'com.sendgrid:sendgrid-java:4.9.1'
 
