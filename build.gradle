@@ -12,7 +12,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.23'
+    id 'uk.gov.hmcts.java' version '0.12.24'
     id 'pmd'
     id 'jacoco'
     id 'org.springframework.boot' version '2.5.9'
@@ -208,7 +208,7 @@ dependencies {
     implementation group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.15.RELEASE'
     implementation group: 'org.thymeleaf', name: 'thymeleaf-spring5', version: '3.0.15.RELEASE'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
-    implementation 'com.sendgrid:sendgrid-java:4.9.1'
+    implementation 'com.sendgrid:sendgrid-java:4.9.2'
 
     //Fix CVE
     implementation group: 'org.springframework', name: 'spring-aop', version: versions.spring
