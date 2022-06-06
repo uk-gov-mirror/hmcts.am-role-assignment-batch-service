@@ -9,7 +9,6 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Setter;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ActorIdType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Classification;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 
-@Setter
 public class TestDataBuilder {
 
     private TestDataBuilder() {
