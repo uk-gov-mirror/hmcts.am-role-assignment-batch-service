@@ -210,7 +210,7 @@ dependencies {
     implementation group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.15.RELEASE'
     implementation group: 'org.thymeleaf', name: 'thymeleaf-spring5', version: '3.0.15.RELEASE'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
-    implementation 'com.sendgrid:sendgrid-java:4.9.2'
+    implementation 'com.sendgrid:sendgrid-java:4.9.3'
 
     //Fix CVE
     implementation group: 'org.springframework', name: 'spring-aop', version: versions.spring
