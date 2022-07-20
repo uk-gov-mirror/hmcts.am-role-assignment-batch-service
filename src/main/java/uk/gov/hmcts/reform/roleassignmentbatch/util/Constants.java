@@ -96,13 +96,6 @@ public class Constants {
     public static final String SETUP_MIGRATION_CONTROL_TABLE = "create table if not exists"
             + " ccd_am_migration_control_table (flag_name varchar primary key, is_enabled boolean);";
 
-    public static final String SETUP_MIGRATION_MAIN = "insert into ccd_am_migration_control_table"
-            + " (flag_name, is_enabled) values('ccd-am-migration', false)  on conflict(flag_name) do nothing;";
-
-    public static final String SETUP_MIGRATION_RENAME = "insert into ccd_am_migration_control_table"
-            + " (flag_name, is_enabled) values('ccd-am-migration-rename-tables', false)"
-            + " on conflict(flag_name) do nothing;";
-
     public static final String GET_DB_FLAG_VALUE = "select is_enabled from ccd_am_migration_control_table camct"
             + " where camct .flag_name  = ?";
     public static final String INVALID_DB_FLAG_VALUE = "ERROR: Please enable either"

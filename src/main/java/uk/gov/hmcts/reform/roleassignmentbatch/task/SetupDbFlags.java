@@ -20,8 +20,6 @@ public class SetupDbFlags implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         template.execute(Constants.SETUP_MIGRATION_CONTROL_TABLE);
-        template.execute(Constants.SETUP_MIGRATION_MAIN);
-        template.execute(Constants.SETUP_MIGRATION_RENAME);
         return RepeatStatus.FINISHED;
     }
 }

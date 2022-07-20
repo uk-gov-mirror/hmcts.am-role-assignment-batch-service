@@ -25,7 +25,6 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import uk.gov.hmcts.reform.roleassignmentbatch.ApplicationParams;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
-import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.FlagsEnum;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.EntityWrapper;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.BeforeMigration;
@@ -39,11 +38,6 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.SetupDbFlags;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.writer.EntityWrapperWriter;
-
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ANY;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DISABLED;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.FAILED;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.STOPPED;
 
 @Slf4j
 @Configuration
@@ -271,52 +265,6 @@ public class BatchConfig extends DefaultBatchConfigurer {
         return jobs.get("setup-database-flags")
                 .incrementer(new RunIdIncrementer())
                 .start(setupDbForMigration(setupDbFlags))
-                .build();
-    }
-
-
-
-    /**
-     * Job will start and check for LD flag, In case LD flag is disabled it will end the JOB
-     * otherwise will check or CCD migration flag, In case flag is enabled will process the CCD data to temp tables
-     * otherwise it will end the job.
-     *
-     * @return job
-    */
-    @Bean
-    public Job ccdToRasBatchJob() {
-        return jobs.get(FlagsEnum.CCD_AM_MIGRATION_MAIN.getLabel())
-                .incrementer(new RunIdIncrementer())
-                .start(firstStep()) //Dummy step as Decider will work after Step
-                .next(checkLdStatus()).on(DISABLED).end(STOPPED)
-                .from(checkLdStatus()).on(ANY).to(checkCcdProcessStatus())
-                .from(checkCcdProcessStatus()).on(DISABLED).end(STOPPED)
-                .from(checkCcdProcessStatus()).on(ANY).to(processCcdDataToTempTablesFlow())
-                                                        .on(FAILED).end(FAILED)
-                                                        .on(ANY).end()
-                .end()
-                .build();
-    }
-
-    /**
-     * Job will start and check for LD flag, In case LD flag is disabled it will end the JOB
-     * otherwise will check migration rename to live tables flag, In case flag is enabled will rename the temp tables to
-     * live tables otherwise it will end the job.
-     *
-     * @return job
-     */
-    @Bean
-    public Job renameTableRasBatchJob() {
-        return jobs.get(FlagsEnum.CCD_AM_MIGRATION_RENAME.getLabel())
-                .incrementer(new RunIdIncrementer())
-                .start(firstStep()) //Dummy step as Decider will work after Step
-                .next(checkLdStatus()).on(DISABLED).end(STOPPED)
-                .from(checkLdStatus()).on(ANY).to(checkRenamingTablesStatus())
-                .from(checkRenamingTablesStatus()).on(DISABLED).end(STOPPED)
-                .from(checkRenamingTablesStatus()).on(ANY).to(renameTablesPostMigrationStep())
-                                                            .on(FAILED).end(FAILED)
-                                                            .on(ANY).end()
-                .end()
                 .build();
     }
 
