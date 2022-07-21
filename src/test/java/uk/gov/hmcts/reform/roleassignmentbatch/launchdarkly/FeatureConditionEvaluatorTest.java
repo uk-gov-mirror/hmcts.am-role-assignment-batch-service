@@ -35,7 +35,7 @@ public class FeatureConditionEvaluatorTest {
         when(ldClient.boolVariation(any(), any(), anyBoolean())).thenReturn(true);
         featureConditionEvaluator = new FeatureConditionEvaluator(ldClient, "", "");
         assertTrue(featureConditionEvaluator.isFlagEnabled("am_role_assignment_batch_service",
-                FlagsEnum.CCD_AM_MIGRATION_MAIN.getLabel()));
+                FlagsEnum.GET_LD_FLAG.getLabel()));
     }
 
     @Test

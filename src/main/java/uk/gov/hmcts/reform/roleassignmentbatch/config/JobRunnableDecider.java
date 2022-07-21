@@ -54,24 +54,20 @@ public class JobRunnableDecider implements JobExecutionDecider {
         log.info("***** The Application params for Job {} run are {} *****", job.getJobInstance().getJobName(),
                 applicationParams.toString());
 
-        if (isServiceEnabled) {
-            isFlowEnabled = processExecutionDecider(job);
-        }
-
         return new FlowExecutionStatus(isFlowEnabled ? ENABLED : DISABLED);
     }
 
     public boolean processExecutionDecider(JobExecution job) {
         var isEnabled = true;
 
-        var ldMigrationFlag = getFluxFlagStatus(FlagsEnum.CCD_AM_MIGRATION_MAIN.getLabel());
-        var ldRenameTablesFlag = getFluxFlagStatus(FlagsEnum.CCD_AM_MIGRATION_RENAME.getLabel());
+        var ldMigrationFlag = getFluxFlagStatus(FlagsEnum.GET_LD_FLAG.getLabel());
+        var ldRenameTablesFlag = getFluxFlagStatus(FlagsEnum.GET_LD_FLAG.getLabel());
 
         Boolean isDbMigrationFlagEnabled = template.queryForObject(GET_DB_FLAG_VALUE, Boolean.class,
-                FlagsEnum.CCD_AM_MIGRATION_MAIN.getLabel());
+                FlagsEnum.GET_LD_FLAG.getLabel());
 
         Boolean isDbRenameFlagEnabled = template.queryForObject(GET_DB_FLAG_VALUE, Boolean.class,
-                FlagsEnum.CCD_AM_MIGRATION_RENAME.getLabel());
+                FlagsEnum.GET_LD_FLAG.getLabel());
 
         var flagStatus = buildFlagStatusString(ldMigrationFlag, ldRenameTablesFlag, isDbMigrationFlagEnabled,
                 isDbRenameFlagEnabled);
