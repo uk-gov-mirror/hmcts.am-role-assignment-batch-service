@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums;
 
 public enum FlagsEnum {
-    CCD_AM_MIGRATION_MAIN("ccd-am-migration"),
-    CCD_AM_MIGRATION_RENAME("ccd-am-migration-rename-tables");
+
+    GET_LD_FLAG("get-ld-flag");
 
     private final String label;
 
