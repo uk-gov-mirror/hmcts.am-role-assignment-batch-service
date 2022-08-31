@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath("net.serenity-bdd:serenity-gradle-plugin:3.2.5")
-        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.9.0'
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.7.4'
     }
 }
 
@@ -16,7 +16,7 @@ plugins {
     id 'pmd'
     id 'jacoco'
     id 'org.springframework.boot' version '2.5.9'
-    id 'info.solidsoft.pitest' version '1.9.0'
+    id 'info.solidsoft.pitest' version '1.7.4'
     id 'io.spring.dependency-management' version '1.0.13.RELEASE'
     id 'java'
     id 'com.github.ben-manes.versions' version '0.41.0'
@@ -235,11 +235,11 @@ dependencies {
 
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.4.2'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.5.0'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk' , version: '5.10.0'
     implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.1.6'
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.2.0'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '10.0.23'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.23'
@@ -258,7 +258,7 @@ dependencies {
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
 
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
-    testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.9.0'
+    testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.7.4'
     testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
     testImplementation 'com.github.hmcts:fortify-client:1.2.0:all'
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: versions.rest_assured
