@@ -295,6 +295,10 @@ dependencyManagement {
     }
 }
 
+configurations.all {
+    exclude group: 'org.codehaus.jettison', module: 'jettison'
+}
+
 test {
     useJUnitPlatform()
     failFast = true
