@@ -244,7 +244,7 @@ dependencies {
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '10.0.23'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.23'
 
-    testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0'
+    testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.3'
     testImplementation group: 'org.springframework.batch', name: 'spring-batch-test'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
