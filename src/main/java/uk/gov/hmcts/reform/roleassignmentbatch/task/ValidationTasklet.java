@@ -53,10 +53,10 @@ public class ValidationTasklet implements Tasklet {
     @Autowired
     CcdViewRowMapper ccdViewRowMapper;
 
-    @Value("${ccd.roleNames}")
+    @Value("${ccd.roleNames:}")
     List<String> configRoleMappings;
 
-    @Value("${ccd.roleCategories}")
+    @Value("${ccd.roleCategories:}")
     List<String> configRoleCategories;
 
     @Override
@@ -76,7 +76,7 @@ public class ValidationTasklet implements Tasklet {
         if (!CollectionUtils.isEmpty(validationErrors)) {
             String errors = validationErrors.stream()
                             .map(Map::values)
-                            .collect(Collectors.toList())
+                            .toList()
                         .stream()
                         .map(Object::toString)
                         .collect(Collectors.joining(","));
@@ -120,7 +120,7 @@ public class ValidationTasklet implements Tasklet {
         }
         List<CcdCaseUser> ccdCaseUsers = jdbcTemplate.query(Constants.CCD_RECORDS_HAVING_NULL_FIELDS, ccdViewRowMapper);
         if (!ccdCaseUsers.isEmpty()) {
-            List<String> invalidIds = ccdCaseUsers.stream().map(CcdCaseUser::getRowNo).collect(Collectors.toList());
+            List<String> invalidIds = ccdCaseUsers.stream().map(CcdCaseUser::getRowNo).toList();
             log.error("CCD View has null fields. The ID's are as follows: {}", invalidIds);
             AuditFaults auditFaults =
                 AuditFaults.builder()
@@ -175,7 +175,7 @@ public class ValidationTasklet implements Tasklet {
     private List<String> findDifferences(List<String> list, List<String> sublist) {
         return sublist.stream()
                       .filter(element -> !list.contains(element))
-                      .collect(Collectors.toList());
+                      .toList();
     }
 
     private void persistFaults(List<String> invalidDataList, String reason) throws Exception {
