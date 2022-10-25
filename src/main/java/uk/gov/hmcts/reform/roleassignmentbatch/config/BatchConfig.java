@@ -37,7 +37,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Value("${migration.chunkSize}")
     private int chunkSize;
 
-    @Value("${migration.masterFlag}")
+    @Value("${migration.masterFlag:false}")
     boolean masterFlag;
     @Value("${migration.renameTables}")
     boolean renameTables;
