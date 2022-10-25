@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +39,7 @@ public class BatchConfig extends DefaultBatchConfigurer {
     @Value("${migration.chunkSize}")
     private int chunkSize;
 
-    @Value("${migration.masterFlag:false}")
+    @Value("${migration.masterFlag}")
     boolean masterFlag;
     @Value("${migration.renameTables}")
     boolean renameTables;
@@ -64,6 +66,20 @@ public class BatchConfig extends DefaultBatchConfigurer {
                     .tasklet(deleteExpiredRecords)
                     .build();
     }
+
+    @Bean
+    public Job runRoutesJob(@Autowired JobBuilderFactory jobs,
+                            @Autowired StepBuilderFactory steps,
+                            @Autowired DeleteExpiredRecords deleteExpiredRecords,
+                            @Autowired EmptyTask emptyTask) {
+
+        return jobs.get(jobName)
+                .incrementer(new RunIdIncrementer())
+                .start(stepOrchestration(steps, deleteExpiredRecords))
+                .next(stepDeleteJudicialExpired(steps, emptyTask))
+                .build();
+    }
+
 
     @Bean
     public Step stepDeleteJudicialExpired(@Autowired StepBuilderFactory steps,
