@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.roleassignmentbatch.processors.EntityWrapperProcessor;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
-import uk.gov.hmcts.reform.roleassignmentbatch.task.EmptyTask;
+import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteJudicialExpiredRecords;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReconcileDataTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ReplicateTablesTasklet;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.ValidationTasklet;
@@ -71,21 +71,21 @@ public class BatchConfig extends DefaultBatchConfigurer {
     public Job runRoutesJob(@Autowired JobBuilderFactory jobs,
                             @Autowired StepBuilderFactory steps,
                             @Autowired DeleteExpiredRecords deleteExpiredRecords,
-                            @Autowired EmptyTask emptyTask) {
+                            @Autowired DeleteJudicialExpiredRecords deleteJudicialExpiredRecords) {
 
         return jobs.get(jobName)
                 .incrementer(new RunIdIncrementer())
                 .start(stepOrchestration(steps, deleteExpiredRecords))
-                .next(stepDeleteJudicialExpired(steps, emptyTask))
+                .next(stepDeleteJudicialExpired(steps, deleteJudicialExpiredRecords))
                 .build();
     }
 
 
     @Bean
     public Step stepDeleteJudicialExpired(@Autowired StepBuilderFactory steps,
-                                          @Autowired EmptyTask emptyTask) {
+                                          @Autowired DeleteJudicialExpiredRecords stepDeleteJudicialExpired) {
         return steps.get(taskParentJudicial)
-                .tasklet(emptyTask)
+                .tasklet(stepDeleteJudicialExpired)
                 .build();
     }
 
