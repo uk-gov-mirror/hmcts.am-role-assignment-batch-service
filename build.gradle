@@ -2,7 +2,6 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
     }
     dependencies {
         classpath("net.serenity-bdd:serenity-gradle-plugin:3.2.5")

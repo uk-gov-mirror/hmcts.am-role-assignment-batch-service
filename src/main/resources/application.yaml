@@ -91,8 +91,9 @@ batch-size: 4
 
 csv-file-name: book2.csv
 migration:
+  masterFlag: ${CCD_AM_MIGRATION_MASTER_FLAG:true}
+  renameTables: ${CCD_AM_MIGRATION_RENAME_TABLES_FLAG:false}
   chunkSize: ${CHUNK_SIZE:1000}
-
 
 launchdarkly:
   sdk:
