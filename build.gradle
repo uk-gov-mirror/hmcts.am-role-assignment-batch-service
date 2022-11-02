@@ -238,7 +238,7 @@ dependencies {
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk' , version: '5.10.3'
     implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.6.0'
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.7.0'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.68'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.68'
