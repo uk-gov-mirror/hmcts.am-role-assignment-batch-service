@@ -31,7 +31,8 @@ spring:
   application:
     name: Role Assignment Batch Service
   batch:
-    initialize-schema: always
+    jdbc:
+      initialize-schema: always
     job:
       enabled: true
   main:
