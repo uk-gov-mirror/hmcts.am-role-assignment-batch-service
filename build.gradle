@@ -39,10 +39,10 @@ def versions = [
         serenity           : '2.2.12',
         springBoot         : '2.7.7',
         spring             : '5.3.25',
-        springSecurity     : '6.0.1',
+        springSecurity     : '5.8.0',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
-        feign_jackson      : '9.7.0',
+        feign_jackson      : '12.1',
         log4JVersion       : '2.19.0',
         logbackVersion     : '1.2.10'
 ]
