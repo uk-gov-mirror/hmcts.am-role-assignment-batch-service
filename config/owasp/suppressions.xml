@@ -41,13 +41,13 @@
     <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
     <cvssBelow>9</cvssBelow>
   </suppress>
-  <suppress until="2023-05-05">
-    <notes>cucumber:datatable pom contains com.googlecode.java-diff-utils:diffutils which has the CVE vulnerability, no fix has been released yet for this</notes>
-    <cve>CVE-2021-4277</cve>
-  </suppress>
     <suppress>
         <notes>SpringBoot only uses snakeYaml to parse application.yaml file so this security vulnerability should not be a risk, info in AM-2517 comments</notes>
         <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
         <cve>CVE-2022-1471</cve>
     </suppress>
+  <suppress until="2023-05-05">
+    <notes>cucumber:datatable pom contains com.googlecode.java-diff-utils:diffutils which has the CVE vulnerability, no fix has been released yet for this</notes>
+    <cve>CVE-2021-4277</cve>
+  </suppress>
 </suppressions>
