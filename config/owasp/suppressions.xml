@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <suppress>
         <notes>spring-*-5.3.20</notes>
         <cve>CVE-2016-1000027</cve>
@@ -40,6 +41,11 @@
     <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
     <cvssBelow>9</cvssBelow>
   </suppress>
+    <suppress>
+        <notes>SpringBoot only uses snakeYaml to parse application.yaml file so this security vulnerability should not be a risk, info in AM-2517 comments</notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2022-1471</cve>
+    </suppress>
   <suppress until="2023-05-05">
     <notes>cucumber:datatable pom contains com.googlecode.java-diff-utils:diffutils which has the CVE vulnerability, no fix has been released yet for this</notes>
     <cve>CVE-2021-4277</cve>
