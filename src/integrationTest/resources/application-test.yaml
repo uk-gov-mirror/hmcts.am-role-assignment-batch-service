@@ -27,12 +27,14 @@ spring:
   application:
     name: Role Assignment Batch Service
   batch:
-    initialize-schema: always
+    jdbc:
+      initialize-schema: always
     job:
       enabled: true
   main:
     web-application-type: none
     allow-bean-definition-overriding: true
+    allow-circular-references: true
   jackson:
     default-property-inclusion: NON_NULL
   config:
