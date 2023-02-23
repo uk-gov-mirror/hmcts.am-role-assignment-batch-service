@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.service;
 
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JUDICIAL_JOB;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.PROCESS_FLAGS;
 import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
@@ -102,7 +103,7 @@ public class EmailServiceImpl implements EmailService {
                 String process = templateEngine.process("recon-email.html", context);
                 content = new Content("text/html", process);
             }
-            if (DELETE_EXPIRED_JOB.equals(emailData.getModule())) {
+            if (List.of(DELETE_EXPIRED_JOB, DELETE_EXPIRED_JUDICIAL_JOB).contains(emailData.getModule())) {
                 emailData.setTemplateMap(emailData.getTemplateMap());
                 context.setVariables(emailData.getTemplateMap());
                 String process = templateEngine.process("delete-count.html", context);
