@@ -46,6 +46,10 @@
         <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
         <cve>CVE-2022-1471</cve>
     </suppress>
+    <suppress until="2023-07-05">
+        <notes>suppressing due to no working updated version for jackson</notes>
+        <cve>CVE-2022-45688</cve>
+    </suppress>
   <suppress until="2023-05-05">
     <notes>cucumber:datatable pom contains com.googlecode.java-diff-utils:diffutils which has the CVE vulnerability, no fix has been released yet for this</notes>
     <cve>CVE-2021-4277</cve>
