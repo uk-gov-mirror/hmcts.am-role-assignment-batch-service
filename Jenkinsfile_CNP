@@ -36,10 +36,10 @@ def branchesToSync = ['demo', 'perftest', 'ithc']
 
 withPipeline(type, product, component) {
   onMaster {
-    enableSlackNotifications('#am-role-assignment-batch-service-builds')
+    enableSlackNotifications('#am-master-builds')
   }
   onPR {
-    enableSlackNotifications('#am-role-assignment-batch-service-builds')
+    enableSlackNotifications('#am-master-builds')
   }
 
   overrideVaultEnvironments(vaultOverrides)
