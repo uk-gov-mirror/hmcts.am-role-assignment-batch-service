@@ -32,11 +32,11 @@ public class RoleAssignmentBatchApplication {
         } catch (InterruptedException e) {
             log.error(e.getMessage());
         } finally {
-            client.flush();
             int exitCode = SpringApplication.exit(context);
             String exitCodeLog = String.format("RoleAssignmentBatchApplication Application exiting with exit code %s",
                     exitCode);
             log.info(exitCodeLog);
+            client.flush();
             System.exit(exitCode);
         }
     }
