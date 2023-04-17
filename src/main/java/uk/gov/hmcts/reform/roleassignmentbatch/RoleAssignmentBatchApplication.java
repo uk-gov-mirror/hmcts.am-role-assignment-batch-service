@@ -22,22 +22,17 @@ public class RoleAssignmentBatchApplication {
         RoleAssignmentBatchApplication.client = client;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         final ApplicationContext context = SpringApplication.run(RoleAssignmentBatchApplication.class, args);
 
-        try {
-            log.info("Putting application to sleep");
-            Thread.sleep(1000 * 5L);
-            log.info("The sleep is complete.");
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-        } finally {
-            int exitCode = SpringApplication.exit(context);
-            String exitCodeLog = String.format("RoleAssignmentBatchApplication Application exiting with exit code %s",
-                    exitCode);
-            log.info(exitCodeLog);
-            client.flush();
-            System.exit(exitCode);
-        }
+        int exitCode = SpringApplication.exit(context);
+        String exitCodeLog = String.format("RoleAssignmentBatchApplication Application exiting with exit code %s",
+                exitCode);
+        log.info(exitCodeLog);
+        client.flush();
+        log.info("Putting application to sleep");
+        Thread.sleep(1000 * 5L);
+        log.info("The sleep is complete.");
+        System.exit(exitCode);
     }
 }
