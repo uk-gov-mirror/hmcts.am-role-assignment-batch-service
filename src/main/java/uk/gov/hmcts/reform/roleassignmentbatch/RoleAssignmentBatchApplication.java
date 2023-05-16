@@ -30,9 +30,8 @@ public class RoleAssignmentBatchApplication {
                 exitCode);
         log.info(exitCodeLog);
         client.flush();
-        log.info("Putting application to sleep");
+        //Sleep added to allow app-insights to flush the logs
         Thread.sleep(1000 * 5L);
-        log.info("The sleep is complete.");
         System.exit(exitCode);
     }
 }
