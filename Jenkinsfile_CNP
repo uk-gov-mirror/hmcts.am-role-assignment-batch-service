@@ -9,6 +9,8 @@ properties(
   ]
 )
 
+import uk.gov.hmcts.contino.GithubAPI
+
 @Library("Infrastructure")
 
 def type = "java"
@@ -40,6 +42,11 @@ withPipeline(type, product, component) {
   }
   onPR {
     enableSlackNotifications('#am-master-builds')
+
+    def githubApi = new GithubAPI(this)
+    if (!githubApi.getLabelsbyPattern(env.BRANCH_NAME, "keep-helm")) {
+      enableCleanupOfHelmReleaseAlways()
+    }
   }
 
   overrideVaultEnvironments(vaultOverrides)

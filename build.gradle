@@ -14,7 +14,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.24'
     id 'pmd'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.7.10'
+    id 'org.springframework.boot' version '2.7.12'
     id 'info.solidsoft.pitest' version '1.7.4'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'java'
@@ -39,8 +39,8 @@ def versions = [
         pitest             : '1.12.0',
         reformLogging      : '5.1.9',
         serenity           : '2.2.12',
-        springBoot         : '2.7.10',
-        spring             : '5.3.26',
+        springBoot         : '2.7.12',
+        spring             : '5.3.27',
         springSecurity     : '5.8.3',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
@@ -244,8 +244,10 @@ dependencies {
     implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.16.3'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.74'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.72'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.76'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.76'
+
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.4'
 
     testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.7'
     testImplementation group: 'org.springframework.batch', name: 'spring-batch-test'
