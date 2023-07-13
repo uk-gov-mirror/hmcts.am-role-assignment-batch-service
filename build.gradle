@@ -245,7 +245,7 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.16.3'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.76'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.76'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.78'
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.4'
 
