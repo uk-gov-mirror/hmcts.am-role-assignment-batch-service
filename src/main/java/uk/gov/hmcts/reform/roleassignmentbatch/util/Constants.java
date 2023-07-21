@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Constants {
 
-    private Constants(){
+    private Constants() {
     }
 
     public static final String DISABLED = "DISABLED";
