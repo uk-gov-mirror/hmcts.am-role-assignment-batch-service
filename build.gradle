@@ -14,9 +14,9 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.43'
     id 'pmd'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.7.12'
+    id 'org.springframework.boot' version '2.7.14'
     id 'info.solidsoft.pitest' version '1.7.4'
-    id 'io.spring.dependency-management' version '1.1.0'
+    id 'io.spring.dependency-management' version '1.1.2'
     id 'java'
     id 'com.github.ben-manes.versions' version '0.46.0'
     id 'org.sonarqube' version '4.0.0.2929'
@@ -39,9 +39,9 @@ def versions = [
         pitest             : '1.12.0',
         reformLogging      : '5.1.9',
         serenity           : '2.2.12',
-        springBoot         : '2.7.12',
+        springBoot         : '2.7.14',
         spring             : '5.3.28',
-        springSecurity     : '5.8.3',
+        springSecurity     : '5.8.5',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
         feign_jackson      : '12.3',
@@ -203,7 +203,7 @@ dependencies {
     implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot)
     implementation(group: 'org.springframework', name: 'spring-jdbc')
     implementation group: 'org.springframework', name: 'spring-core', version: versions.spring
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.6'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.7'
     implementation (group: 'org.springframework.security', name: 'spring-security-core', version: versions.springSecurity) {
         exclude group: 'org.springframework.security', module: 'spring-security-crypto'
     }
@@ -244,7 +244,7 @@ dependencies {
     implementation group: 'com.google.guava', name: 'guava', version: '32.0.1-jre'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.16.3'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.76'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.78'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.78'
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.4'
@@ -293,7 +293,7 @@ dependencyManagement {
             entry 'logback-classic'
             entry 'logback-core'
         }
-        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.15.0') {
+        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.15.2') {
             entry 'jackson-databind'
             entry 'jackson-core'
             entry 'jackson-annotations'
