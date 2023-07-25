@@ -143,7 +143,7 @@ public class EmailServiceImpl implements EmailService {
      * Thymeleaf builder template for reconciliation mail notification.
      *
      * @param runId JobId is the parameter
-     * @return
+     * @return Map String, Object
      */
     private Map<String, Object> reconThymeleafTemplate(String runId) {
         ReconciliationData reconData = jdbcTemplate.queryForObject(Constants.GET_LATEST_RECONCILIATION_DATA,
@@ -172,7 +172,7 @@ public class EmailServiceImpl implements EmailService {
      * Thymeleaf builder template for ccd_view  validation mail notification.
      *
      * @param runId JobId is the parameter
-     * @return
+     * @return Map String, Object
      */
     private Map<String, Object> ccdValidationThymeleafTemplate(String runId) {
 
@@ -196,7 +196,7 @@ public class EmailServiceImpl implements EmailService {
      * Thymeleaf builder template for process flag status mail notification.
      *
      * @param runId JobId is the parameter
-     * @return
+     * @return Map String, Object
      */
     private Map<String, Object> processFlagStatusThymeleafTemplate(String runId,
                                                                    String flagStatus) {
