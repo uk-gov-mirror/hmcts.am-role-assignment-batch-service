@@ -41,7 +41,7 @@ def versions = [
         serenity           : '2.2.12',
         springBoot         : '2.7.15',
         spring             : '5.3.29',
-        springSecurity     : '5.8.6',
+        springSecurity     : '5.8.7',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
         feign_jackson      : '12.5',
