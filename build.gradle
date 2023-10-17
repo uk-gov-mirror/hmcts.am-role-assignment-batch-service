@@ -43,6 +43,7 @@ def versions = [
         spring             : '5.3.29',
         springSecurity     : '5.8.7',
         sonarPitest        : '0.5',
+        tomcat             : '9.0.82',
         rest_assured       : '3.3.0',
         feign_jackson      : '12.5',
         log4JVersion       : '2.20.0',
@@ -244,8 +245,8 @@ dependencies {
     implementation group: 'com.google.guava', name: 'guava', version: '32.1.2-jre'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.2'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.80'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.80'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: versions.tomcat
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: versions.tomcat
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.4'
 
