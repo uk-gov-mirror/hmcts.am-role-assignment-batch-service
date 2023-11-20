@@ -36,7 +36,7 @@ def versions = [
         junit              : '5.9.3',
         lombok             : '1.18.30',
         gradlePitest       : '1.3.0',
-        pitest             : '1.15.3',
+        pitest             : '1.15.1',
         reformLogging      : '6.0.1',
         serenity           : '2.2.12',
         springBoot         : '2.7.17',
@@ -46,6 +46,7 @@ def versions = [
         tomcat             : '9.0.82',
         rest_assured       : '3.3.0',
         feign_jackson      : '13.1',
+        jacksondata        : '2.16.0',
         log4JVersion       : '2.21.1',
         logbackVersion     : '1.2.10'
 ]
@@ -234,8 +235,8 @@ dependencies {
     implementation 'commons-io:commons-io:20030203.000550'
     implementation group: 'javax.validation', name: 'validation-api'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.3'
-    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.16.0', ext: 'pom'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jacksondata
+    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: versions.jacksondata, ext: 'pom'
 
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
@@ -294,7 +295,7 @@ dependencyManagement {
             entry 'logback-classic'
             entry 'logback-core'
         }
-        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.15.3') {
+        dependencySet(group: 'com.fasterxml.jackson.core', version: versions.jacksondata) {
             entry 'jackson-databind'
             entry 'jackson-core'
             entry 'jackson-annotations'
