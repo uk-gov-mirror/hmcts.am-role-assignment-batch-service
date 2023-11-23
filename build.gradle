@@ -40,7 +40,7 @@ def versions = [
         reformLogging      : '6.0.1',
         serenity           : '2.2.12',
         springBoot         : '2.7.17',
-        spring             : '5.3.30',
+        spring             : '5.3.31',
         springSecurity     : '5.8.8',
         sonarPitest        : '0.5',
         tomcat             : '9.0.82',
