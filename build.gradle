@@ -48,7 +48,7 @@ def versions = [
         feign_jackson      : '13.1',
         jacksondata        : '2.16.0',
         log4JVersion       : '2.21.1',
-        logbackVersion     : '1.2.10'
+        logbackVersion     : '1.2.13'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.roleassignmentbatch.RoleAssignmentBatchApplication'
