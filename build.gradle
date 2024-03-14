@@ -11,7 +11,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.56'
+    id 'uk.gov.hmcts.java' version '0.12.57'
     id 'pmd'
     id 'jacoco'
     id 'org.springframework.boot' version '2.7.18'
@@ -41,7 +41,7 @@ def versions = [
         serenity           : '2.2.12',
         springBoot         : '2.7.18',
         spring             : '5.3.31',
-        springSecurity     : '5.8.9',
+        springSecurity     : '5.8.10',
         sonarPitest        : '0.5',
         tomcat             : '9.0.85',
         rest_assured       : '3.3.0',
@@ -251,7 +251,7 @@ dependencies {
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.4'
 
-    testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.11'
+    testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.12'
     testImplementation group: 'org.springframework.batch', name: 'spring-batch-test'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
