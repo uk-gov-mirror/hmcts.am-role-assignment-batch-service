@@ -11,7 +11,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.60'
+    id 'uk.gov.hmcts.java' version '0.12.61'
     id 'pmd'
     id 'jacoco'
     id 'org.springframework.boot' version '2.7.18'
@@ -40,10 +40,10 @@ def versions = [
         reformLogging      : '6.1.4',
         serenity           : '2.2.12',
         springBoot         : '2.7.18',
-        spring             : '5.3.33',
+        spring             : '5.3.34',
         springSecurity     : '5.8.12',
         sonarPitest        : '0.5',
-        tomcat             : '9.0.87',
+        tomcat             : '9.0.88',
         rest_assured       : '3.3.0',
         feign_jackson      : '13.2.1',
         jacksondata        : '2.17.0',
