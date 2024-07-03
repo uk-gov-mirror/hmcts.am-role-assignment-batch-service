@@ -34,6 +34,10 @@ def secrets = []
 // Configure branches to sync with master branch
 def branchesToSync = ['demo', 'ithc', 'perftest']
 
+// Vars for Azure Container Registries DTSAM-370
+env.TESTCONTAINERS_HOST_OVERRIDE="localhost"
+env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX="hmctspublic.azurecr.io/imported/"
+
 withPipeline(type, product, component) {
   onMaster {
     enableSlackNotifications('#am-master-builds')
