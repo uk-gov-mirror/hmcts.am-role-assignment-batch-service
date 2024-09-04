@@ -40,7 +40,7 @@ def versions = [
         reformLogging      : '6.1.6',
         serenity           : '2.2.12',
         springBoot         : '2.7.18',
-        spring             : '5.3.37',
+        spring             : '5.3.39',
         springSecurity     : '5.8.14',
         sonarPitest        : '0.5',
         tomcat             : '9.0.93',
@@ -240,7 +240,7 @@ dependencies {
 
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk' , version: '5.10.9'
     implementation group: 'com.google.guava', name: 'guava', version: '33.2.1-jre'
