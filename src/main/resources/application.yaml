@@ -1,31 +1,3 @@
-server:
-  port: ${PORT:4099}
-
-management:
-  health:
-    db:
-      enabled: true
-    defaults:
-      enabled: true
-    diskspace:
-      enabled: true
-  endpoint:
-    health:
-      enabled: true
-      cache:
-        time-to-live: 5s
-      show-details: "always"
-  security:
-    enabled: true
-  endpoints:
-    health:
-      sensitive: true
-    web:
-      base-path: /
-      exposure:
-        include: 'health'
-
-#If you use a database then uncomment below lines and update db properties accordingly
 
 spring:
   application:
@@ -53,7 +25,7 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-  flyway.enabled: ${ENABLE_DB_MIGRATE:false}
+  flyway.enabled: false
   flyway.locations: classpath:db/migration
   datasource:
     driverClassName: org.postgresql.Driver
@@ -72,7 +44,7 @@ spring:
         charSet: UTF-8
     days: ${DAYS:730}
 
-## Sendgrid configuration ##
+  ## Sendgrid configuration ##
   mail:
     to: ${EMAIL_LIST:}
     host: ${EMAIL_HOST:mta.reform.hmcts.net}
@@ -91,17 +63,7 @@ delete-expired-judicial-records: deleteExpiredJudicialRecords
 batchjob-name: deleteExpiredRecords
 batch-size: 4
 
-csv-file-name: book2.csv
-migration:
-  masterFlag: ${CCD_AM_MIGRATION_MASTER_FLAG:true}
-  renameTables: ${CCD_AM_MIGRATION_RENAME_TABLES_FLAG:false}
-  chunkSize: ${CHUNK_SIZE:1000}
-
-launchdarkly:
-  sdk:
-    key: ${LD_SDK_KEY:}
-    environment: ${LAUNCH_DARKLY_ENV:pr}
-    user: am-${LAUNCH_DARKLY_ENV:local}
+batch-environment: ${BATCH_ENV:local}
 
 logging.level.org.springframework.batch.core.step.item.ChunkMonitor: ${APPLICATION_LOGGING_LEVEL:ERROR}
 

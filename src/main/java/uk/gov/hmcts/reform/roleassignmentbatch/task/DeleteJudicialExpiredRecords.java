@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
@@ -32,21 +34,23 @@ import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPI
 @Slf4j
 public class DeleteJudicialExpiredRecords implements Tasklet {
 
+    private final EmailService emailService;
     private final JdbcTemplate jdbcTemplate;
+
     private final int days;
 
     @Autowired
-    private EmailService emailService;
-
-    public DeleteJudicialExpiredRecords(@Autowired @Qualifier("judicialDataSource") DataSource dataSource,
+    public DeleteJudicialExpiredRecords(EmailService emailService,
+                                        @Qualifier("judicialDataSource") DataSource dataSource,
                                         @Value("${spring.judicial.days}") int days) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+        this.emailService = emailService;
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.days = days;
     }
 
-
     @Override
     @Transactional
+    @WithSpan(value = "Delete Judicial Expired Records", kind = SpanKind.SERVER)
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         if (days < 0) {
             log.error("Please enter a positive number for Judicial record deletion: {}", days);

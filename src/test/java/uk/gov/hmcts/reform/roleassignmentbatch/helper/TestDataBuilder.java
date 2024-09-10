@@ -1,26 +1,25 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.helper;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.CcdCaseUser;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ActorIdType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Classification;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.GrantType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleCategory;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.RoleType;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.Status;
-import uk.gov.hmcts.reform.roleassignmentbatch.entities.HistoryEntity;
-import uk.gov.hmcts.reform.roleassignmentbatch.entities.RequestEntity;
 import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 public class TestDataBuilder {
+
+    public static final String TEST_ACTOR_ID = "21334a2b-79ce-44eb-9168-2d49a744be9c";
 
     private TestDataBuilder() {
         //not meant to be instantiated.
@@ -31,7 +30,7 @@ public class TestDataBuilder {
         return RoleAssignmentHistory
                 .builder()
                 .id(("9785c98c-78f2-418b-ab74-a892c3ccca9f"))
-                .actorId(("21334a2b-79ce-44eb-9168-2d49a744be9c"))
+                .actorId((TEST_ACTOR_ID))
                 .actorIDType(ActorIdType.IDAM.name())
                 .attributes(buildAttributesFromFile().toString())
                 .created(Timestamp.valueOf(timeStamp))
@@ -53,7 +52,7 @@ public class TestDataBuilder {
                 .build();
     }
 
-    private static JsonNode buildAttributesFromFile() throws IOException {
+    public static JsonNode buildAttributesFromFile() throws IOException {
         InputStream inputStream =
                 TestDataBuilder.class.getClassLoader().getResourceAsStream("attributes.json");
         assert inputStream != null;
@@ -69,51 +68,4 @@ public class TestDataBuilder {
         });
     }
 
-    public static RequestEntity buildRequestEntity(UUID requestId, String userId, String caseData) {
-
-        return RequestEntity.builder()
-                            .id(requestId)
-                            .correlationId(UUID.randomUUID().toString())
-                            .clientId("ccd_migration")
-                            .authenticatedUserId("A fixed Authenticated User Id")
-                            .assignerId(userId)
-                            .requestType("CREATE")
-                            .status("APPROVED")
-                            .process("CCD")
-                            .replaceExisting(false)
-                            .roleAssignmentId(UUID.randomUUID())
-                            .reference(caseData.concat(userId))
-                            .log(null)
-                            .created(LocalDateTime.now())
-                            .build();
-    }
-
-    public static HistoryEntity buildHistoryEntity(UUID requestId, String userId, String caseData) {
-        UUID requestUuid = UUID.randomUUID();
-        return HistoryEntity.builder()
-                .id(requestUuid)
-                .actorId(userId)
-                .actorIdType("judge")
-                .roleType("judge")
-                .roleName("name")
-                .status("APPROVED")
-                .process("CCD")
-                .classification("org")
-                .grantType("admin")
-                .attributes(null)
-                .reference(caseData.concat(userId))
-                .log(null)
-                .created(LocalDateTime.now())
-                .build();
-    }
-
-    public static CcdCaseUser buildCcdCaseUsers() {
-        UUID requestUuid = UUID.randomUUID();
-        CcdCaseUser ccdCaseUser = new CcdCaseUser();
-        ccdCaseUser.setUserId(requestUuid.toString());
-        ccdCaseUser.setCaseRole("Role");
-        ccdCaseUser.setCaseType("type");
-        ccdCaseUser.setReference("DataId");
-        return ccdCaseUser;
-    }
 }

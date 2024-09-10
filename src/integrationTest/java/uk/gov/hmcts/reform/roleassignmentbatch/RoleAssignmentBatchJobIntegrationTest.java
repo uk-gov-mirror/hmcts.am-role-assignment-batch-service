@@ -26,6 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
+import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 
 @SpringBootTest
@@ -47,6 +48,9 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     private JdbcTemplate template;
 
     @Mock
+    private EmailService emailService;
+
+    @Mock
     StepExecution stepExecution = Mockito.mock(StepExecution.class);
 
     @Mock
@@ -64,7 +68,7 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     @Before
     public void setUp() {
         template = new JdbcTemplate(ds);
-        sut = new DeleteExpiredRecords(template, 2);
+        sut = new DeleteExpiredRecords(emailService, template, 2);
         Mockito.when(stepContribution.getStepExecution()).thenReturn(stepExecution);
         Mockito.when(stepContribution.getStepExecution().getJobExecution()).thenReturn(jobExecution);
         Mockito.when(stepContribution.getStepExecution().getJobExecution().getId()).thenReturn(Long.valueOf(1));

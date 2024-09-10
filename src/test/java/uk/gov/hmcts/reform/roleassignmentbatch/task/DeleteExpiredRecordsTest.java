@@ -1,20 +1,6 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.task;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
@@ -38,6 +24,19 @@ import uk.gov.hmcts.reform.roleassignmentbatch.entities.RoleAssignmentHistory;
 import uk.gov.hmcts.reform.roleassignmentbatch.helper.TestDataBuilder;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+
 @RunWith(MockitoJUnitRunner.class)
 class DeleteExpiredRecordsTest {
 
@@ -53,8 +52,6 @@ class DeleteExpiredRecordsTest {
     @Mock
     ResultSet rs = Mockito.mock(ResultSet.class);
 
-    private DeleteExpiredRecords sut = new DeleteExpiredRecords(jdbcTemplate, 5);
-
     @Mock
     StepExecution stepExecution = Mockito.mock(StepExecution.class);
 
@@ -64,10 +61,7 @@ class DeleteExpiredRecordsTest {
     @Mock
     EmailService emailService = Mockito.mock(EmailService.class);
 
-    @BeforeAll
-    public static void setUp() {
-        //MockitoAnnotations.initMocks(this);
-    }
+    private DeleteExpiredRecords sut = new DeleteExpiredRecords(emailService, jdbcTemplate, 5);
 
     @Test
     void execute() throws IOException {
@@ -141,38 +135,33 @@ class DeleteExpiredRecordsTest {
         Timestamp created = Timestamp.valueOf(timeStamp);
         Mockito.when(jdbcTemplate.query(
             ArgumentMatchers.anyString(), ArgumentMatchers.<ResultSetExtractor<Object>>any()))
-               .thenAnswer((invocation) -> {
+               .thenAnswer(invocation -> {
 
                    final ResultSetExtractor<List<RoleAssignmentHistory>> resultSetExtractor =
                        invocation.getArgument(1);
                    Mockito.when(rs.next()).thenReturn(true, false);
 
-                   Mockito.when(rs.getObject(ArgumentMatchers.eq("id")))
-                          .thenReturn(UUID.fromString("9785c98c-78f2-418b-ab74-a892c3ccca9f"));
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("request_id")))
-                          .thenReturn("123e4567-e89b-42d3-a456-556642445678");
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("actor_id_type"))).thenReturn(ActorIdType.IDAM.name());
-                   Mockito.when(rs.getObject(ArgumentMatchers.eq("actor_id")))
-                          .thenReturn("3168da13-00b3-41e3-81fa-cbc71ac28a0f");
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("role_type")))
-                          .thenReturn(RoleType.CASE.name());
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("role_name"))).thenReturn("Judge");
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("classification")))
-                          .thenReturn(Classification.PUBLIC.name());
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("grant_type"))).thenReturn(GrantType.STANDARD.name());
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("role_category")))
-                          .thenReturn(RoleCategory.JUDICIAL.name());
-                   Mockito.when(rs.getBoolean(ArgumentMatchers.eq("read_only"))).thenReturn(true);
-                   Mockito.when(rs.getTimestamp(ArgumentMatchers.eq("begin_time"))).thenReturn(beginDate);
-                   Mockito.when(rs.getTimestamp(ArgumentMatchers.eq("end_time"))).thenReturn(endDate);
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("status"))).thenReturn(Status.LIVE.toString());
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("reference"))).thenReturn("reference");
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("process"))).thenReturn("process");
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("attributes"))).thenReturn("attributes");
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("notes"))).thenReturn("notes");
-                   Mockito.when(rs.getString(ArgumentMatchers.eq("log"))).thenReturn("logs");
-                   Mockito.when(rs.getInt(ArgumentMatchers.eq("status_sequence"))).thenReturn(1);
-                   Mockito.when(rs.getTimestamp(ArgumentMatchers.eq("created"))).thenReturn(created);
+                   Mockito.when(rs.getObject("id"))
+                           .thenReturn(UUID.fromString("9785c98c-78f2-418b-ab74-a892c3ccca9f"));
+                   Mockito.when(rs.getString("request_id")).thenReturn("123e4567-e89b-42d3-a456-556642445678");
+                   Mockito.when(rs.getString("actor_id_type")).thenReturn(ActorIdType.IDAM.name());
+                   Mockito.when(rs.getObject("actor_id")).thenReturn("3168da13-00b3-41e3-81fa-cbc71ac28a0f");
+                   Mockito.when(rs.getString("role_type")).thenReturn(RoleType.CASE.name());
+                   Mockito.when(rs.getString("role_name")).thenReturn("Judge");
+                   Mockito.when(rs.getString("classification")).thenReturn(Classification.PUBLIC.name());
+                   Mockito.when(rs.getString("grant_type")).thenReturn(GrantType.STANDARD.name());
+                   Mockito.when(rs.getString("role_category")).thenReturn(RoleCategory.JUDICIAL.name());
+                   Mockito.when(rs.getBoolean("read_only")).thenReturn(true);
+                   Mockito.when(rs.getTimestamp("begin_time")).thenReturn(beginDate);
+                   Mockito.when(rs.getTimestamp("end_time")).thenReturn(endDate);
+                   Mockito.when(rs.getString("status")).thenReturn(Status.LIVE.toString());
+                   Mockito.when(rs.getString("reference")).thenReturn("reference");
+                   Mockito.when(rs.getString("process")).thenReturn("process");
+                   Mockito.when(rs.getString("attributes")).thenReturn("attributes");
+                   Mockito.when(rs.getString("notes")).thenReturn("notes");
+                   Mockito.when(rs.getString("log")).thenReturn("logs");
+                   Mockito.when(rs.getInt("status_sequence")).thenReturn(1);
+                   Mockito.when(rs.getTimestamp("created")).thenReturn(created);
                    return resultSetExtractor.extractData(rs);
                });
 
@@ -183,7 +172,7 @@ class DeleteExpiredRecordsTest {
         Assertions.assertEquals("PUBLIC", result.get(0).getClassification());
         Assertions.assertEquals("STANDARD", result.get(0).getGrantType());
         Assertions.assertEquals("JUDICIAL", result.get(0).getRoleCategory());
-        Assertions.assertEquals(true, result.get(0).isReadOnly());
+        Assertions.assertTrue(result.get(0).isReadOnly());
         Assertions.assertEquals("LIVE", result.get(0).getStatus());
         Assertions.assertEquals(beginDate, result.get(0).getBeginTime());
         Assertions.assertEquals(endDate, result.get(0).getEndTime());
@@ -202,4 +191,5 @@ class DeleteExpiredRecordsTest {
                .thenReturn(400);
         Assertions.assertEquals(400, sut.getCountFromHistoryTable());
     }
+
 }

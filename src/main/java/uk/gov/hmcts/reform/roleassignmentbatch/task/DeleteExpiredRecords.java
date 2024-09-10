@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -32,12 +34,16 @@ import uk.gov.hmcts.reform.roleassignmentbatch.util.BatchUtil;
 @Slf4j
 public class DeleteExpiredRecords implements Tasklet {
 
+    private final EmailService emailService;
     private final JdbcTemplate jdbcTemplate;
-    private final int batchSize;
-    @Autowired
-    private EmailService emailService;
 
-    public DeleteExpiredRecords(@Autowired JdbcTemplate jdbcTemplate, @Value("${batch-size}") int batchSize) {
+    private final int batchSize;
+
+    @Autowired
+    public DeleteExpiredRecords(EmailService emailService,
+                                JdbcTemplate jdbcTemplate,
+                                @Value("${batch-size}") int batchSize) {
+        this.emailService = emailService;
         this.jdbcTemplate = jdbcTemplate;
         this.batchSize = batchSize;
     }
@@ -45,6 +51,7 @@ public class DeleteExpiredRecords implements Tasklet {
 
     @Override
     @Transactional
+    @WithSpan(value = "Delete Expired Records", kind = SpanKind.SERVER)
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         log.info("Delete Expired records task starts::");
         Instant startTime = Instant.now();

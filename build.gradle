@@ -43,7 +43,6 @@ def versions = [
         spring             : '5.3.39',
         springSecurity     : '5.8.14',
         sonarPitest        : '0.5',
-        tomcat             : '9.0.93',
         rest_assured       : '3.3.0',
         feign_jackson      : '13.3',
         jacksondata        : '2.17.2',
@@ -95,6 +94,14 @@ sourceSets {
     }
 }
 
+idea {
+    module {
+        // config to allow IntelliJ to mark test source and resource files correctly to help linting tools
+        testSources.from(java.sourceSets.integrationTest.java.srcDirs)
+        testResources.from(java.sourceSets.integrationTest.resources.srcDirs)
+    }
+}
+
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:unchecked" << "-Werror"
 }
@@ -116,7 +123,7 @@ task fortifyScan(type: JavaExec)  {
 }
 
 jacocoTestReport {
-    executionData(test)
+    executionData(test, integration)
     reports {
         xml.required = true
         csv.required = false
@@ -148,7 +155,9 @@ sonarqube {
         property "sonar.projectName", "am-role-assignment-batch-service"
         property "sonar.projectKey", "am-role-assignment-batch-service"
         property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-        property "sonar.exclusions", "**/RoleAssignmentBatchApplication.java,"+ "**/roleassignmentbatch/**.java,"+ "**/util/**.java,"+"**/RenameTablesPostMigration.java,"+"**/ReplicateTablesTasklet.java"
+        property "sonar.exclusions",
+                "src/main/java/uk/gov/hmcts/reform/roleassignmentbatch/*Application.java," +
+                "src/main/java/uk/gov/hmcts/reform/roleassignmentbatch/config/**"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     }
@@ -242,14 +251,11 @@ dependencies {
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk' , version: '5.10.9'
     implementation group: 'com.google.guava', name: 'guava', version: '33.2.1-jre'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: versions.tomcat
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: versions.tomcat
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.4'
+    implementation group: 'io.opentelemetry.instrumentation', name: 'opentelemetry-instrumentation-annotations', version: '1.33.4'
 
     testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.16'
     testImplementation group: 'org.springframework.batch', name: 'spring-batch-test'
@@ -279,6 +285,8 @@ dependencies {
     integrationTestImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
     integrationTestImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     integrationTestImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
+
+    integrationTestImplementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
     integrationTestImplementation sourceSets.test.runtimeClasspath

@@ -1,27 +1,3 @@
-server:
-  port: ${PORT:4099}
-
-management:
-  health:
-    db:
-      enabled: true
-    defaults:
-      enabled: true
-    diskspace:
-      enabled: true
-  endpoint:
-    health:
-      enabled: true
-      cache:
-        time-to-live: 5s
-      show-details: "always"
-  endpoints:
-    web:
-      base-path: /
-      exposure:
-        include: 'health'
-
-#If you use a database then uncomment below lines and update db properties accordingly
 
 spring:
   application:
@@ -87,28 +63,7 @@ delete-expired-judicial-records: deleteExpiredJudicialRecords
 batchjob-name: deleteExpiredRecords
 batch-size: 4
 
-csv-file-name: book2.csv
-migration:
-  masterFlag: ${CCD_AM_MIGRATION_MASTER_FLAG:true}
-  renameTables: ${CCD_AM_MIGRATION_RENAME_TABLES_FLAG:false}
-  chunkSize: ${CHUNK_SIZE:1000}
-
-azure:
-  container-name: amccdras
-  account-name: ${AZURE_BLOB_STORAGE_ACCOUNT:amdatamigrationstorage}
-  account-key: ${AZURE_BLOB_STORAGE_ACCOUNT_KEY:}
-
-ccd:
-  roleNames: ${ROLE_NAMES:[PETSOLICITOR],[RESPSOLICITOR],[BARRISTER],[CAFCASSSOLICITOR],[EPSMANAGING],[LABARRISTER],[LAMANAGING],
-    [LASOLICITOR],[SOLICITOR],[SOLICITORA],[SOLICITORB],[SOLICITORC],[SOLICITORD],[SOLICITORE],
-    [SOLICITORF],[SOLICITORG],[SOLICITORH],[SOLICITORI],[SOLICITORJ],[LEGALREPRESENTATIVE],[CREATOR]}
-  roleCategories: ${ROLE_CATEGORIES:PROFESSIONAL,CITIZEN,JUDICIAL,LEGAL_OPERATIONS}
-
-launchdarkly:
-  sdk:
-    key: ${LD_SDK_KEY:}
-    environment: ${LAUNCH_DARKLY_ENV:pr}
-    user: am-${LAUNCH_DARKLY_ENV:local}
+batch-environment: ${BATCH_ENV:local}
 
 logging.level.org.springframework.batch.core.step.item.ChunkMonitor: ${APPLICATION_LOGGING_LEVEL:ERROR}
 

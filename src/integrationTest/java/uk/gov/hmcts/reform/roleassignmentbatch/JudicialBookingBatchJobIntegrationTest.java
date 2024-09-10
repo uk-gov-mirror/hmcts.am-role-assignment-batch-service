@@ -17,11 +17,11 @@ import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import uk.gov.hmcts.reform.roleassignmentbatch.exception.BadDayConfigForJudicialRecords;
+import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteJudicialExpiredRecords;
 
 import javax.sql.DataSource;
@@ -29,20 +29,17 @@ import javax.sql.DataSource;
 @SpringBootTest
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ContextConfiguration(classes = BaseTest.class)
-public class JudicalBookingBatchJobIntegrationTest extends BaseTest {
+public class JudicialBookingBatchJobIntegrationTest extends BaseTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(JudicalBookingBatchJobIntegrationTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(JudicialBookingBatchJobIntegrationTest.class);
     private DeleteJudicialExpiredRecords sut;
-
-    @Autowired
-    @Qualifier("rasDataSource")
-    private DataSource rasDataSource;
 
     @Autowired
     @Qualifier("judicialDataSource")
     private DataSource judicialDataSource;
 
-    private JdbcTemplate template;
+    @Mock
+    EmailService emailService = Mockito.mock(EmailService.class);
 
     @Mock
     StepExecution stepExecution = Mockito.mock(StepExecution.class);
@@ -61,8 +58,7 @@ public class JudicalBookingBatchJobIntegrationTest extends BaseTest {
 
     @Before
     public void setUp() {
-        template = new JdbcTemplate(judicialDataSource);
-        sut = new DeleteJudicialExpiredRecords(judicialDataSource, 0);
+        sut = new DeleteJudicialExpiredRecords(emailService, judicialDataSource, 0);
         Mockito.when(stepContribution.getStepExecution()).thenReturn(stepExecution);
         Mockito.when(stepContribution.getStepExecution().getJobExecution()).thenReturn(jobExecution);
         Mockito.when(stepContribution.getStepExecution().getJobExecution().getId()).thenReturn(Long.valueOf(1));
@@ -94,7 +90,7 @@ public class JudicalBookingBatchJobIntegrationTest extends BaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, config = @SqlConfig(dataSource = "judicialDataSource"),
             scripts = {"classpath:sql/judicial/insert_judicial_database.sql"})
     public void shouldNotDeleteLiveJudicialRecordsForDaysParam() {
-        sut = new DeleteJudicialExpiredRecords(judicialDataSource, 50);
+        sut = new DeleteJudicialExpiredRecords(emailService, judicialDataSource, 50);
 
         Integer totalRecords = sut.getTotalJudicialRecords();
         logger.info("Total number of Judicial records in Database::{}", totalRecords);
@@ -121,7 +117,7 @@ public class JudicalBookingBatchJobIntegrationTest extends BaseTest {
             scripts = {"classpath:sql/judicial/insert_judicial_database.sql"})
     public void shouldThrowExceptionForBadDayInput() {
 
-        sut = new DeleteJudicialExpiredRecords(judicialDataSource, -5);
+        sut = new DeleteJudicialExpiredRecords(emailService, judicialDataSource, -5);
         sut.execute(stepContribution, chunkContext);
 
     }

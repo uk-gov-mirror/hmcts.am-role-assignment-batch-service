@@ -1,17 +1,5 @@
 package uk.gov.hmcts.reform.roleassignmentbatch.service;
 
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JUDICIAL_JOB;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.EMPTY_STRING;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.PROCESS_FLAGS;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.RECONCILIATION;
-import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.ZERO_COUNT_IN_CCD_VIEW;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -20,61 +8,60 @@ import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.spring5.SpringTemplateEngine;
 import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.EmailData;
-import uk.gov.hmcts.reform.roleassignmentbatch.domain.model.enums.ReconQuery;
-import uk.gov.hmcts.reform.roleassignmentbatch.entities.ReconciliationData;
 import uk.gov.hmcts.reform.roleassignmentbatch.exception.EmailSendFailedException;
-import uk.gov.hmcts.reform.roleassignmentbatch.exception.NoReconciliationDataFound;
-import uk.gov.hmcts.reform.roleassignmentbatch.rowmappers.ReconciliationMapper;
-import uk.gov.hmcts.reform.roleassignmentbatch.util.Constants;
 
+import java.util.List;
+
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JOB;
+import static uk.gov.hmcts.reform.roleassignmentbatch.util.Constants.DELETE_EXPIRED_JUDICIAL_JOB;
 
 /**
- * This class sends emails to intended recipients for ccd migration process
- * with detailed reason of reconciliation data.
+ * This class sends emails to intended recipients for batch process with summary of outcome.
  */
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class EmailServiceImpl implements EmailService {
 
-    @Value("${sendgrid.mail.from}")
-    private String mailFrom;
+    static final String TEMPLATE_DELETE_COUNT = "delete-count.html";
 
-    @Value("${spring.mail.to}")
-    private List<String> mailTo;
+    private final String mailFrom;
+    private final List<String> mailTo;
+    private final boolean mailEnabled;
+    private final String environmentName;
 
-    @Value("${spring.mail.enabled:false}")
-    private boolean mailEnabled;
-
-    @Value("${launchdarkly.sdk.environment}")
-    private String environmentName;
+    private final SendGrid sendGrid;
+    private final ITemplateEngine templateEngine;
 
     @Autowired
-    private SendGrid sendGrid;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private SpringTemplateEngine templateEngine;
+    public EmailServiceImpl(SendGrid sendGrid,
+                            ITemplateEngine templateEngine,
+                            @Value("${sendgrid.mail.from}") String mailFrom,
+                            @Value("${spring.mail.to}") List<String> mailTo,
+                            @Value("${spring.mail.enabled:false}") boolean mailEnabled,
+                            @Value("${batch-environment}") String environmentName) {
+        this.sendGrid = sendGrid;
+        this.templateEngine = templateEngine;
+        this.mailFrom = mailFrom;
+        this.mailTo = mailTo;
+        this.mailEnabled = mailEnabled;
+        this.environmentName = environmentName;
+    }
 
     /**
      * Generic Method is used to send mail notification to the caller.
      *
      * @param emailData EmailData as parameter
-     * @return Sedngrid response
+     * @return SendGrid response
      */
     @Override
     @SneakyThrows
@@ -85,34 +72,14 @@ public class EmailServiceImpl implements EmailService {
             var personalization = new Personalization();
             mailTo.forEach(email -> personalization.addTo(new Email(email)));
             Context context = new Context();
-            Content content = null;
+            Content content = new Content();
             emailData.setEmailTo(mailTo);
             emailData.setEmailSubject(concatEmailSubject);
             emailData.setRunId(emailData.getRunId());
-            if (PROCESS_FLAGS.equals(emailData.getModule())) {
-                emailData.setTemplateMap(processFlagStatusThymeleafTemplate(
-                        emailData.getRunId(),
-                        emailData.getFlags()));
-                context.setVariables(emailData.getTemplateMap());
-                String process = templateEngine.process("broken-flags.html", context);
-                content = new Content("text/html", process);
-            }
-            if (RECONCILIATION.equals(emailData.getModule())) {
-                emailData.setTemplateMap(reconThymeleafTemplate(emailData.getRunId()));
-                context.setVariables(emailData.getTemplateMap());
-                String process = templateEngine.process("recon-email.html", context);
-                content = new Content("text/html", process);
-            }
             if (List.of(DELETE_EXPIRED_JOB, DELETE_EXPIRED_JUDICIAL_JOB).contains(emailData.getModule())) {
                 emailData.setTemplateMap(emailData.getTemplateMap());
                 context.setVariables(emailData.getTemplateMap());
-                String process = templateEngine.process("delete-count.html", context);
-                content = new Content("text/html", process);
-            }
-            if (ZERO_COUNT_IN_CCD_VIEW.equals(emailData.getModule())) {
-                emailData.setTemplateMap(ccdValidationThymeleafTemplate(emailData.getRunId()));
-                context.setVariables(emailData.getTemplateMap());
-                String process = templateEngine.process("recon-email.html", context);
+                String process = templateEngine.process(TEMPLATE_DELETE_COUNT, context);
                 content = new Content("text/html", process);
             }
             Mail mail = new Mail();
@@ -132,80 +99,10 @@ public class EmailServiceImpl implements EmailService {
                         response.getStatusCode(),
                         response.getBody()
                 )));
-                log.error("{}", emailSendFailedException);
+                log.error("", emailSendFailedException);
             }
         }
         return response;
     }
 
-
-    /**
-     * Thymeleaf builder template for reconciliation mail notification.
-     *
-     * @param runId JobId is the parameter
-     * @return Map String, Object
-     */
-    private Map<String, Object> reconThymeleafTemplate(String runId) {
-        ReconciliationData reconData = jdbcTemplate.queryForObject(Constants.GET_LATEST_RECONCILIATION_DATA,
-                new ReconciliationMapper());
-        if (reconData == null) {
-            throw new NoReconciliationDataFound(String.format(Constants.NO_RECONCILIATION_DATA_FOUND, runId));
-        }
-
-        Map<String, Object> templateMap = new HashMap<>();
-        templateMap.put("runId", reconData.getRunId());
-        templateMap.put("createdDate", reconData.getCreatedDate());
-        templateMap.put("ccdJurisdictionData", reconData.getCcdJurisdictionData());
-        templateMap.put("ccdRoleNameData", reconData.getCcdRoleNameData());
-        templateMap.put("amJurisdictionData", reconData.getReplicaAmJurisdictionData());
-        templateMap.put("amRoleNameData", reconData.getReplicaAmRoleNameData());
-        templateMap.put("totalCountFromCcd", reconData.getTotalCountFromCcd());
-        templateMap.put("totalCountFromAm", reconData.getTotalCountFromAm());
-        templateMap.put("status", reconData.getStatus());
-        templateMap.put("notes", reconData.getNotes());
-        templateMap.put("amRecordsBeforeMigration", reconData.getAmRecordsBeforeMigration());
-        templateMap.put("amRecordsAfterMigration", reconData.getAmRecordsAfterMigration());
-        return templateMap;
-    }
-
-    /**
-     * Thymeleaf builder template for ccd_view  validation mail notification.
-     *
-     * @param runId JobId is the parameter
-     * @return Map String, Object
-     */
-    private Map<String, Object> ccdValidationThymeleafTemplate(String runId) {
-
-        Map<String, Object> templateMap = new HashMap<>();
-        templateMap.put("runId", runId);
-        templateMap.put("createdDate", LocalDateTime.now());
-        templateMap.put("ccdJurisdictionData", EMPTY_STRING);
-        templateMap.put("ccdRoleNameData", EMPTY_STRING);
-        templateMap.put("amJurisdictionData", EMPTY_STRING);
-        templateMap.put("amRoleNameData", EMPTY_STRING);
-        templateMap.put("totalCountFromCcd", 0);
-        templateMap.put("totalCountFromAm", EMPTY_STRING);
-        templateMap.put("status", ReconQuery.FAILED.getKey());
-        templateMap.put("notes", "No record found in ccd_user_view");
-        templateMap.put("amRecordsBeforeMigration", EMPTY_STRING);
-        templateMap.put("amRecordsAfterMigration", EMPTY_STRING);
-        return templateMap;
-    }
-
-    /**
-     * Thymeleaf builder template for process flag status mail notification.
-     *
-     * @param runId JobId is the parameter
-     * @return Map String, Object
-     */
-    private Map<String, Object> processFlagStatusThymeleafTemplate(String runId,
-                                                                   String flagStatus) {
-
-        Map<String, Object> templateMap = new HashMap<>();
-        templateMap.put("runId", runId);
-        templateMap.put("createdDate", LocalDateTime.now());
-        templateMap.put("status", ReconQuery.FAILED.getKey());
-        templateMap.put("flagStatus", flagStatus);
-        return templateMap;
-    }
 }
