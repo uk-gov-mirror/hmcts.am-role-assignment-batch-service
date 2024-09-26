@@ -138,8 +138,7 @@ jacoco {
 }
 
 pitest {
-    pitestVersion = "1.5.2"
-    testPlugin = "junit5"
+    junit5PluginVersion = '1.2.1'
     targetClasses = ['uk.gov.hmcts.reform.*']
     excludedClasses = ['uk.gov.hmcts.reform.roleassignmentbatch.RoleAssignmentBatchApplication',
                        'uk.gov.hmcts.reform.roleassignmentbatch.config.*',
