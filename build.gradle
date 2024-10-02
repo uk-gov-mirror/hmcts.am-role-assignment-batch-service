@@ -224,7 +224,7 @@ dependencies {
     implementation group: 'org.thymeleaf', name: 'thymeleaf', version: '3.1.2.RELEASE'
     implementation group: 'org.thymeleaf', name: 'thymeleaf-spring5', version: '3.1.2.RELEASE'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
-    implementation 'com.sendgrid:sendgrid-java:4.10.2'
+    implementation 'com.sendgrid:sendgrid-java:4.10.3'
 
     //Fix CVE
     implementation group: 'org.springframework', name: 'spring-aop', version: versions.spring
@@ -251,7 +251,7 @@ dependencies {
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
-    implementation group: 'com.google.guava', name: 'guava', version: '33.3.0-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.3.1-jre'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.4'
