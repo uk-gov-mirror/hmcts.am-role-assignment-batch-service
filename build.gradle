@@ -46,7 +46,7 @@ def versions = [
         rest_assured       : '3.3.0',
         feign_jackson      : '13.3',
         jacksondata        : '2.17.2',
-        log4JVersion       : '2.24.0',
+        log4JVersion       : '2.24.1',
         logbackVersion     : '1.2.13'
 ]
 
@@ -214,7 +214,7 @@ dependencies {
     implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot)
     implementation(group: 'org.springframework', name: 'spring-jdbc')
     implementation group: 'org.springframework', name: 'spring-core', version: versions.spring
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.8'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.9'
     implementation (group: 'org.springframework.security', name: 'spring-security-core', version: versions.springSecurity) {
         exclude group: 'org.springframework.security', module: 'spring-security-crypto'
     }
