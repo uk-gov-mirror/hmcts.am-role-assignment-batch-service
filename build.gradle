@@ -44,7 +44,7 @@ def versions = [
         springSecurity     : '5.8.14',
         sonarPitest        : '0.5',
         rest_assured       : '3.3.0',
-        feign_jackson      : '13.3',
+        feign_jackson      : '13.5',
         jacksondata        : '2.18.0',
         log4JVersion       : '2.24.1',
         logbackVersion     : '1.2.13'
@@ -54,7 +54,7 @@ mainClassName = 'uk.gov.hmcts.reform.roleassignmentbatch.RoleAssignmentBatchAppl
 def jarName = 'am-role-assignment-batch-service.jar'
 
 pmd {
-    toolVersion = '7.5.0'
+    toolVersion = '7.6.0'
     sourceSets = []
 }
 
