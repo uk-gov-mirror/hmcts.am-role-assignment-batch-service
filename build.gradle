@@ -54,7 +54,7 @@ mainClassName = 'uk.gov.hmcts.reform.roleassignmentbatch.RoleAssignmentBatchAppl
 def jarName = 'am-role-assignment-batch-service.jar'
 
 pmd {
-    toolVersion = '7.9.0'
+    toolVersion = '7.10.0'
     sourceSets = []
 }
 
@@ -255,7 +255,7 @@ dependencies {
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.4'
-    implementation group: 'io.opentelemetry.instrumentation', name: 'opentelemetry-instrumentation-annotations', version: '2.12.0'
+    implementation group: 'io.opentelemetry.instrumentation', name: 'opentelemetry-instrumentation-annotations', version: '2.13.1'
 
     testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.16'
     testImplementation group: 'org.springframework.batch', name: 'spring-batch-test'
