@@ -17,7 +17,7 @@ This is spring batch application scheduled with Kubernetes and runs once in a da
 
 To run the project you will need to have the following installed:
 
-* Java 17
+* Java 21
 * Docker
 
 please ensure the following application components are already running:
