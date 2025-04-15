@@ -4,4 +4,13 @@
         <notes>https://tools.hmcts.net/jira/browse/DTSAM-602 spring</notes>
         <cve>CVE-2024-38820</cve>
     </suppress>
+    <suppress>
+        <notes>https://tools.hmcts.net/jira/browse/DTSAM-843 tomcat</notes>
+        <cve>CVE-2025-24813</cve>
+    </suppress>
+    <suppress>
+        <notes>https://tools.hmcts.net/jira/browse/DTSAM-844 tomcat</notes>
+        <cve>CVE-2024-38286</cve>
+    </suppress>
+
 </suppressions>
