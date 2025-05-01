@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.roleassignmentbatch;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -26,8 +26,10 @@ import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteJudicialExpiredRecords
 
 import javax.sql.DataSource;
 
+import static org.junit.Assert.assertThrows;
+
 @SpringBootTest
-@RunWith(SpringIntegrationSerenityRunner.class)
+@ExtendWith(SerenityJUnit5Extension.class)
 @ContextConfiguration(classes = BaseTest.class)
 public class JudicialBookingBatchJobIntegrationTest extends BaseTest {
 
@@ -56,7 +58,7 @@ public class JudicialBookingBatchJobIntegrationTest extends BaseTest {
     @Mock
     ChunkContext chunkContext = new ChunkContext(stepContext);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         sut = new DeleteJudicialExpiredRecords(emailService, judicialDataSource, 0);
         Mockito.when(stepContribution.getStepExecution()).thenReturn(stepExecution);
@@ -73,17 +75,17 @@ public class JudicialBookingBatchJobIntegrationTest extends BaseTest {
         Integer countEligibleRecordsForDeletion = sut.getCountEligibleJudicialRecords();
         logger.info("Records Eligible for Deletion in Judicial records in Database::{}",
                 countEligibleRecordsForDeletion);
-        Assert.assertEquals("Total records", Integer.valueOf(5), totalRecords);
-        Assert.assertEquals("Records eligible for deletion", Integer.valueOf(3),
-                countEligibleRecordsForDeletion);
+        Assertions.assertEquals(Integer.valueOf(5), totalRecords, "Total records");
+        Assertions.assertEquals(Integer.valueOf(3), countEligibleRecordsForDeletion, "Records eligible for deletion");
         logger.info("Deleting the Judicial records");
         sut.execute(stepContribution, chunkContext);
 
         int totalRecordsInDbPostDelete = sut.getTotalJudicialRecords();
         logger.info("Total number of Judicial records in Database::{} ", totalRecordsInDbPostDelete);
 
-        Assert.assertEquals("Total records post delete", Integer.valueOf(2),
-                Integer.valueOf(totalRecordsInDbPostDelete));
+        Assertions.assertEquals(Integer.valueOf(2),
+                Integer.valueOf(totalRecordsInDbPostDelete),
+                "Total records post delete");
     }
 
     @Test
@@ -99,27 +101,26 @@ public class JudicialBookingBatchJobIntegrationTest extends BaseTest {
         logger.info("Records Eligible for Deletion in Judicial records in Database::{}",
                 countEligibleRecordsForDeletion);
 
-        Assert.assertEquals("Total records", Integer.valueOf(5), totalRecords);
-        Assert.assertEquals("Records eligible for deletion", Integer.valueOf(0),
-                countEligibleRecordsForDeletion);
+        Assertions.assertEquals(Integer.valueOf(5), totalRecords, "Total records");
+        Assertions.assertEquals(Integer.valueOf(0), countEligibleRecordsForDeletion, "Records eligible for deletion");
         logger.info("Deleting the Judicial records");
         sut.execute(stepContribution, chunkContext);
 
         int totalRecordsInDbPostDelete = sut.getTotalJudicialRecords();
         logger.info("Total number of Judicial records in Database::{} ", totalRecordsInDbPostDelete);
 
-        Assert.assertEquals("Total records post delete", Integer.valueOf(5),
-                Integer.valueOf(totalRecordsInDbPostDelete));
+        Assertions.assertEquals(Integer.valueOf(5),
+                Integer.valueOf(totalRecordsInDbPostDelete),
+                "Total records post delete");
     }
 
-    @Test(expected = BadDayConfigForJudicialRecords.class)
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, config = @SqlConfig(dataSource = "judicialDataSource"),
             scripts = {"classpath:sql/judicial/insert_judicial_database.sql"})
     public void shouldThrowExceptionForBadDayInput() {
 
         sut = new DeleteJudicialExpiredRecords(emailService, judicialDataSource, -5);
-        sut.execute(stepContribution, chunkContext);
-
+        assertThrows(BadDayConfigForJudicialRecords.class, () -> sut.execute(stepContribution, chunkContext));
     }
 
 }

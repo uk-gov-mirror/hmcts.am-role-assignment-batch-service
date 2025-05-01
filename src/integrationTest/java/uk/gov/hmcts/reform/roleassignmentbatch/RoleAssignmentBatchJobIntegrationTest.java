@@ -1,15 +1,10 @@
 package uk.gov.hmcts.reform.roleassignmentbatch;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import javax.sql.DataSource;
-
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -29,8 +24,10 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import uk.gov.hmcts.reform.roleassignmentbatch.service.EmailService;
 import uk.gov.hmcts.reform.roleassignmentbatch.task.DeleteExpiredRecords;
 
+import javax.sql.DataSource;
+
 @SpringBootTest
-@RunWith(SpringIntegrationSerenityRunner.class)
+@ExtendWith(SerenityJUnit5Extension.class)
 @ContextConfiguration(classes = BaseTest.class)
 public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
 
@@ -65,7 +62,7 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     @Mock
     ChunkContext chunkContext = new ChunkContext(stepContext);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         template = new JdbcTemplate(ds);
         sut = new DeleteExpiredRecords(emailService, template, 2);
@@ -83,9 +80,8 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     public void shouldGetRecordCountFromLiveTable() {
         final Integer count = template.queryForObject(COUNT_RECORDS_FROM_LIVE_TABLE, Integer.class);
         logger.info(" Total number of records fetched from role assignment Live table...{}", count);
-        assertNotNull(count);
-        assertEquals(
-            "role_assignment record count ", 5, count.intValue());
+        Assertions.assertNotNull(count);
+        Assertions.assertEquals(5, count.intValue(), "role_assignment record count ");
     }
 
     @Test
@@ -101,7 +97,7 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
         sut.execute(stepContribution, chunkContext);
         count = template.queryForObject(COUNT_RECORDS_FROM_LIVE_TABLE, Integer.class);
         logger.info(" Total number of records fetched from role assignment Live table...{}", count);
-        Assert.assertEquals("The live records were not deleted", Integer.valueOf(0), count);
+        Assertions.assertEquals(Integer.valueOf(0), count, "The live records were not deleted");
     }
 
     @Test
@@ -113,12 +109,12 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     public void shouldInsertRecordsInHistoryTable() {
         Integer count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
         logger.info(" Total number of expired records fetched from History table...{}", count);
-        Assert.assertEquals("The live records were not deleted", Integer.valueOf(0), count);
+        Assertions.assertEquals(Integer.valueOf(0), count, "The live records were not deleted");
         logger.info(" Deleting the records from Live table. Insert the records in History table.");
         sut.execute(stepContribution, chunkContext);
         count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
         logger.info(" Total number of Expired records fetched from History table...{}", count);
-        Assert.assertEquals("The EXPIRED records were not inserted", Integer.valueOf(5), count);
+        Assertions.assertEquals(Integer.valueOf(5), count, "The EXPIRED records were not inserted");
     }
 
     @Test
@@ -130,12 +126,12 @@ public class RoleAssignmentBatchJobIntegrationTest extends BaseTest {
     public void shouldDeleteLiveRecordsComplexScenario() {
         Integer count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
         logger.info(" Total number of expired records fetched from History table...{}", count);
-        Assert.assertEquals("The live records were not deleted", Integer.valueOf(0), count);
+        Assertions.assertEquals(Integer.valueOf(0), count, "The live records were not deleted");
         logger.info(" Deleting the records from Live table. Insert the records in History table.");
         sut.execute(stepContribution, chunkContext);
         count = template.queryForObject(COUNT_EXPIRED_RECORDS_FROM_HISTORY_TABLE, Integer.class);
         logger.info(" Total number of Expired records fetched from History table...{}", count);
-        Assert.assertEquals("The EXPIRED records were not inserted", Integer.valueOf(3), count);
+        Assertions.assertEquals(Integer.valueOf(3), count, "The EXPIRED records were not inserted");
     }
 
 }
