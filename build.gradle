@@ -253,7 +253,7 @@ dependencies {
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-    implementation group: 'io.opentelemetry.instrumentation', name: 'opentelemetry-instrumentation-annotations', version: '2.15.0'
+    implementation group: 'io.opentelemetry.instrumentation', name: 'opentelemetry-instrumentation-annotations', version: '2.18.1'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.7.3'
     testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.17'
     testImplementation group: 'org.springframework.batch', name: 'spring-batch-test'
