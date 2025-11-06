@@ -14,10 +14,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
@@ -65,10 +65,10 @@ class EmailServiceImplTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    @MockBean
+    @MockitoBean
     private SendGrid sendGrid;
 
-    @MockBean
+    @MockitoBean
     private ITemplateEngine templateEngine;
 
     @Autowired
