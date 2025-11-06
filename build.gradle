@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("net.serenity-bdd:serenity-gradle-plugin:3.2.5")
+        classpath("net.serenity-bdd:serenity-gradle-plugin:4.3.2")
         classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.15.0'
     }
 }
