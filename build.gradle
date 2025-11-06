@@ -14,7 +14,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.67'
     id 'pmd'
     id 'jacoco'
-    id 'org.springframework.boot' version '3.3.7'
+    id 'org.springframework.boot' version '3.5.7'
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
@@ -307,7 +307,7 @@ dependencyManagement {
     }
 
     imports {
-        mavenBom "org.springframework.boot:spring-boot-dependencies:3.3.7"
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.7"
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }
