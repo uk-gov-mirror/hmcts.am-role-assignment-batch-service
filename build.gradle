@@ -37,8 +37,8 @@ ext {
 }
 
 def versions = [
-        junit              : '6.1.2',
-        junitPlatform      : '6.1.2',
+        junit              : '6.1.3',
+        junitPlatform      : '6.1.3',
         lombok             : '1.18.46',
         gradlePitest       : '1.3.0',
         pitest             : '1.25.8',
