@@ -46,7 +46,7 @@ def versions = [
         serenity           : '4.3.4',
         spring             : '6.2.19',
         sonarPitest        : '0.5',
-        feign_jackson      : '13.14',
+        feign_jackson      : '13.15',
         rest_assured       : '6.0.1',
         jacksondata        : '2.19.2',
         testcontainers     : '1.21.4',
