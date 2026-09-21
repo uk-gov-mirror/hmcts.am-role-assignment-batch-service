@@ -315,7 +315,7 @@ dependencyManagement {
             entry 'jackson-core'
             entry 'jackson-annotations'
         }
-        dependencySet(group: 'org.apache.tomcat.embed', version: '11.0.25') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '11.0.26') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
