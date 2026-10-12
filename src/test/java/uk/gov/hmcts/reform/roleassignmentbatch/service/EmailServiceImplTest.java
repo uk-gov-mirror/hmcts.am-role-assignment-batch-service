@@ -73,7 +73,7 @@ class EmailServiceImplTest {
     private ITemplateEngine templateEngine;
 
     @Autowired
-    private EmailServiceImpl sut;
+    private EmailServiceImpl sutWithMailEnabled;
 
     @Nested
     @TestPropertySource(properties = {
@@ -82,7 +82,7 @@ class EmailServiceImplTest {
     class WhenMailDisabled {
 
         @Autowired
-        private EmailServiceImpl sut;
+        private EmailServiceImpl sutWithMailDisabled;
 
         @Test
         void sendEmail_notEnabled() throws IOException {
@@ -93,7 +93,7 @@ class EmailServiceImplTest {
                 .build();
 
             // WHEN
-            sut.sendEmail(emailData);
+            sutWithMailDisabled.sendEmail(emailData);
 
             // THEN
             verify(sendGrid, never()).api(any());
@@ -101,10 +101,10 @@ class EmailServiceImplTest {
         }
 
         @Test
-        void isMailEnabled_notEnabled() throws IOException {
+        void isMailEnabled_notEnabled() {
 
             // WHEN
-            boolean result = sut.isMailEnabled();
+            boolean result = sutWithMailDisabled.isMailEnabled();
 
             // THEN
             assertFalse(result);
@@ -132,7 +132,7 @@ class EmailServiceImplTest {
         when(sendGrid.api(any())).thenReturn(new Response(HttpStatus.OK.value(), null, null));
 
         // WHEN
-        Response response = sut.sendEmail(emailData);
+        Response response = sutWithMailEnabled.sendEmail(emailData);
 
         // THEN
         assertEquals(HttpStatus.OK.value(), response.getStatusCode());
@@ -182,17 +182,17 @@ class EmailServiceImplTest {
         when(sendGrid.api(any())).thenReturn(new Response(HttpStatus.BAD_REQUEST.value(), null, null));
 
         // WHEN
-        Response response = sut.sendEmail(emailData);
+        Response response = sutWithMailEnabled.sendEmail(emailData);
 
         // THEN
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
     }
 
     @Test
-    void isMailEnabled_enabled() throws IOException {
+    void isMailEnabled_enabled() {
 
         // WHEN
-        boolean result = sut.isMailEnabled();
+        boolean result = sutWithMailEnabled.isMailEnabled();
 
         // THEN
         assertTrue(result);
