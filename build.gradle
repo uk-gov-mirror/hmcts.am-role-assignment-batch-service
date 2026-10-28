@@ -47,7 +47,7 @@ def versions = [
         spring             : '6.2.19',
         sonarPitest        : '0.5',
         feign_jackson      : '13.17',
-        rest_assured       : '6.0.1',
+        rest_assured       : '6.3.0',
         jacksondata        : '2.19.2',
         testcontainers     : '1.21.4',
         log4JVersion       : '2.26.1'
@@ -57,7 +57,7 @@ mainClassName = 'uk.gov.hmcts.reform.roleassignmentbatch.RoleAssignmentBatchAppl
 def jarName = 'am-role-assignment-batch-service.jar'
 
 pmd {
-    toolVersion = '7.26.0'
+    toolVersion = '7.28.0'
     sourceSets = []
 }
 
@@ -297,7 +297,7 @@ dependencies {
     integrationTestImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     integrationTestImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
 
-    integrationTestImplementation group: 'org.flywaydb', name: 'flyway-core', version: '13.5.0'
+    integrationTestImplementation group: 'org.flywaydb', name: 'flyway-core', version: '13.11.1'
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
     integrationTestImplementation sourceSets.test.runtimeClasspath
